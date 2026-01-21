@@ -6,6 +6,26 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		937B9F3F2F2023AC00C08885 /* CalicCollectionV2App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937B9F3E2F2023AC00C08885 /* CalicCollectionV2App.swift */; };
+		937B9F412F2023AC00C08885 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937B9F402F2023AC00C08885 /* ContentView.swift */; };
+		937B9F742F20247B00C08885 /* FamilyResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937B9F732F20247800C08885 /* FamilyResponse.swift */; };
+		937B9F762F20248C00C08885 /* VariantResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937B9F752F20248700C08885 /* VariantResponse.swift */; };
+		937B9F782F20249B00C08885 /* CritterResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937B9F772F20249800C08885 /* CritterResponse.swift */; };
+		937B9F7A2F2024F100C08885 /* Critter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937B9F792F2024EF00C08885 /* Critter.swift */; };
+		937B9F7C2F2024FB00C08885 /* CritterVariant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937B9F7B2F2024F800C08885 /* CritterVariant.swift */; };
+		937B9F7E2F20250300C08885 /* Family.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937B9F7D2F20250200C08885 /* Family.swift */; };
+		937B9F802F20250A00C08885 /* OwnedVariant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937B9F7F2F20250800C08885 /* OwnedVariant.swift */; };
+		937B9F822F20254B00C08885 /* CritterStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937B9F812F20254800C08885 /* CritterStatus.swift */; };
+		937B9F842F20259400C08885 /* APIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937B9F832F20259100C08885 /* APIService.swift */; };
+		937B9F862F20259D00C08885 /* SyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937B9F852F20259900C08885 /* SyncService.swift */; };
+		937B9F882F20282600C08885 /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937B9F872F20282400C08885 /* SearchView.swift */; };
+		937B9F8A2F2028D300C08885 /* VariantPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937B9F892F2028CF00C08885 /* VariantPicker.swift */; };
+		937B9F8C2F2028E600C08885 /* CritterDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937B9F8B2F2028E300C08885 /* CritterDetailView.swift */; };
+		937B9F8E2F202A1000C08885 /* FirstSyncView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937B9F8D2F202A0E00C08885 /* FirstSyncView.swift */; };
+		937B9F902F202B7400C08885 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937B9F8F2F202B6800C08885 /* Config.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		937B9F4B2F2023AD00C08885 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -25,8 +45,26 @@
 
 /* Begin PBXFileReference section */
 		937B9F3B2F2023AC00C08885 /* CalicCollectionV2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CalicCollectionV2.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		937B9F3E2F2023AC00C08885 /* CalicCollectionV2App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalicCollectionV2App.swift; sourceTree = "<group>"; };
+		937B9F402F2023AC00C08885 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		937B9F4A2F2023AD00C08885 /* CalicCollectionV2Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CalicCollectionV2Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		937B9F542F2023AD00C08885 /* CalicCollectionV2UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CalicCollectionV2UITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		937B9F732F20247800C08885 /* FamilyResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FamilyResponse.swift; sourceTree = "<group>"; };
+		937B9F752F20248700C08885 /* VariantResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VariantResponse.swift; sourceTree = "<group>"; };
+		937B9F772F20249800C08885 /* CritterResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CritterResponse.swift; sourceTree = "<group>"; };
+		937B9F792F2024EF00C08885 /* Critter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Critter.swift; sourceTree = "<group>"; };
+		937B9F7B2F2024F800C08885 /* CritterVariant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CritterVariant.swift; sourceTree = "<group>"; };
+		937B9F7D2F20250200C08885 /* Family.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Family.swift; sourceTree = "<group>"; };
+		937B9F7F2F20250800C08885 /* OwnedVariant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OwnedVariant.swift; sourceTree = "<group>"; };
+		937B9F812F20254800C08885 /* CritterStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CritterStatus.swift; sourceTree = "<group>"; };
+		937B9F832F20259100C08885 /* APIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIService.swift; sourceTree = "<group>"; };
+		937B9F852F20259900C08885 /* SyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncService.swift; sourceTree = "<group>"; };
+		937B9F872F20282400C08885 /* SearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchView.swift; sourceTree = "<group>"; };
+		937B9F892F2028CF00C08885 /* VariantPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VariantPicker.swift; sourceTree = "<group>"; };
+		937B9F8B2F2028E300C08885 /* CritterDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CritterDetailView.swift; sourceTree = "<group>"; };
+		937B9F8D2F202A0E00C08885 /* FirstSyncView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstSyncView.swift; sourceTree = "<group>"; };
+		937B9F8F2F202B6800C08885 /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
+		937B9F912F202C8400C08885 /* info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -75,6 +113,8 @@
 		937B9F322F2023AC00C08885 = {
 			isa = PBXGroup;
 			children = (
+				937B9F912F202C8400C08885 /* info.plist */,
+				937B9F672F2023D800C08885 /* App */,
 				937B9F3D2F2023AC00C08885 /* CalicCollectionV2 */,
 				937B9F4D2F2023AD00C08885 /* CalicCollectionV2Tests */,
 				937B9F572F2023AD00C08885 /* CalicCollectionV2UITests */,
@@ -90,6 +130,118 @@
 				937B9F542F2023AD00C08885 /* CalicCollectionV2UITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		937B9F672F2023D800C08885 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				937B9F3E2F2023AC00C08885 /* CalicCollectionV2App.swift */,
+				937B9F6B2F2023F200C08885 /* Helpers */,
+				937B9F682F2023DC00C08885 /* Models */,
+				937B9F692F2023E400C08885 /* Services */,
+				937B9F6A2F2023EB00C08885 /* Views */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		937B9F682F2023DC00C08885 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				937B9F6D2F20240500C08885 /* Domain */,
+				937B9F6C2F2023FC00C08885 /* API */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		937B9F692F2023E400C08885 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				937B9F852F20259900C08885 /* SyncService.swift */,
+				937B9F832F20259100C08885 /* APIService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		937B9F6A2F2023EB00C08885 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				937B9F402F2023AC00C08885 /* ContentView.swift */,
+				937B9F8D2F202A0E00C08885 /* FirstSyncView.swift */,
+				937B9F6F2F20241700C08885 /* Collection */,
+				937B9F722F20242E00C08885 /* Components */,
+				937B9F6E2F20241200C08885 /* Search */,
+				937B9F712F20242500C08885 /* Settings */,
+				937B9F702F20241D00C08885 /* Wishlist */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		937B9F6B2F2023F200C08885 /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Helpers;
+			sourceTree = "<group>";
+		};
+		937B9F6C2F2023FC00C08885 /* API */ = {
+			isa = PBXGroup;
+			children = (
+				937B9F772F20249800C08885 /* CritterResponse.swift */,
+				937B9F752F20248700C08885 /* VariantResponse.swift */,
+				937B9F732F20247800C08885 /* FamilyResponse.swift */,
+			);
+			path = API;
+			sourceTree = "<group>";
+		};
+		937B9F6D2F20240500C08885 /* Domain */ = {
+			isa = PBXGroup;
+			children = (
+				937B9F812F20254800C08885 /* CritterStatus.swift */,
+				937B9F7F2F20250800C08885 /* OwnedVariant.swift */,
+				937B9F7D2F20250200C08885 /* Family.swift */,
+				937B9F7B2F2024F800C08885 /* CritterVariant.swift */,
+				937B9F792F2024EF00C08885 /* Critter.swift */,
+			);
+			path = Domain;
+			sourceTree = "<group>";
+		};
+		937B9F6E2F20241200C08885 /* Search */ = {
+			isa = PBXGroup;
+			children = (
+				937B9F8B2F2028E300C08885 /* CritterDetailView.swift */,
+				937B9F892F2028CF00C08885 /* VariantPicker.swift */,
+				937B9F872F20282400C08885 /* SearchView.swift */,
+			);
+			path = Search;
+			sourceTree = "<group>";
+		};
+		937B9F6F2F20241700C08885 /* Collection */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Collection;
+			sourceTree = "<group>";
+		};
+		937B9F702F20241D00C08885 /* Wishlist */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Wishlist;
+			sourceTree = "<group>";
+		};
+		937B9F712F20242500C08885 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				937B9F8F2F202B6800C08885 /* Config.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		937B9F722F20242E00C08885 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Components;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -236,6 +388,23 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				937B9F742F20247B00C08885 /* FamilyResponse.swift in Sources */,
+				937B9F7C2F2024FB00C08885 /* CritterVariant.swift in Sources */,
+				937B9F7E2F20250300C08885 /* Family.swift in Sources */,
+				937B9F762F20248C00C08885 /* VariantResponse.swift in Sources */,
+				937B9F902F202B7400C08885 /* Config.swift in Sources */,
+				937B9F862F20259D00C08885 /* SyncService.swift in Sources */,
+				937B9F8A2F2028D300C08885 /* VariantPicker.swift in Sources */,
+				937B9F782F20249B00C08885 /* CritterResponse.swift in Sources */,
+				937B9F802F20250A00C08885 /* OwnedVariant.swift in Sources */,
+				937B9F412F2023AC00C08885 /* ContentView.swift in Sources */,
+				937B9F8C2F2028E600C08885 /* CritterDetailView.swift in Sources */,
+				937B9F882F20282600C08885 /* SearchView.swift in Sources */,
+				937B9F822F20254B00C08885 /* CritterStatus.swift in Sources */,
+				937B9F7A2F2024F100C08885 /* Critter.swift in Sources */,
+				937B9F842F20259400C08885 /* APIService.swift in Sources */,
+				937B9F8E2F202A1000C08885 /* FirstSyncView.swift in Sources */,
+				937B9F3F2F2023AC00C08885 /* CalicCollectionV2App.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -399,7 +568,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 47QE7X5PR9;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -431,7 +601,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 47QE7X5PR9;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

@@ -12,7 +12,12 @@ import SwiftData
 struct CalicCollectionV2App: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Item.self,
+            // Browse cache (temporary data from API)
+            Critter.self,
+            CritterVariant.self,
+            Family.self,
+            // User collection (permanent data)
+            OwnedVariant.self
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
@@ -26,7 +31,8 @@ struct CalicCollectionV2App: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .modelContainer(sharedModelContainer)
+                .environmentObject(SyncService.shared)
         }
-        .modelContainer(sharedModelContainer)
     }
 }
