@@ -18,8 +18,8 @@ struct Config {
     
     // MARK: - App Information
     
-    static let appName = "CalicCollection"
-    static let appVersion = "1.0"
+    static let appName = "CaliCollection"
+    static let appVersion = "2.0alpha"
     
     // MARK: - Sync Settings
     
