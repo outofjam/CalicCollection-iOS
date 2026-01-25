@@ -240,8 +240,13 @@ struct SearchView: View {
         return types.sorted()
     }
     
+    // Optimization: Create lookup dictionary for owned variants by critter UUID
+    private var ownedVariantsByCritter: [String: [OwnedVariant]] {
+        Dictionary(grouping: ownedVariants) { $0.critterUuid }
+    }
+    
     private func ownedVariantsFor(_ critter: Critter) -> [OwnedVariant] {
-        ownedVariants.filter { $0.critterUuid == critter.uuid }
+        ownedVariantsByCritter[critter.uuid] ?? []
     }
     
     // MARK: - Actions

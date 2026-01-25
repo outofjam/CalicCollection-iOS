@@ -82,53 +82,7 @@ struct SettingsView: View {
                     }
                 }
                 
-                // MARK: - API Database Stats
-                Section {
-                    if isLoadingStats {
-                        HStack {
-                            Spacer()
-                            ProgressView()
-                            Spacer()
-                        }
-                    } else if let stats = apiStats {
-                        HStack {
-                            Label("Critters", systemImage: "pawprint.fill")
-                            Spacer()
-                            Text("\(stats.crittersCount)")
-                                .foregroundColor(.secondary)
-                        }
-                        
-                        HStack {
-                            Label("Variants", systemImage: "photo.stack")
-                            Spacer()
-                            Text("\(stats.variantsCount)")
-                                .foregroundColor(.secondary)
-                        }
-                        
-                        HStack {
-                            Label("Sets", systemImage: "shippingbox")
-                            Spacer()
-                            Text("\(stats.setsCount)")
-                                .foregroundColor(.secondary)
-                        }
-                    } else {
-                        HStack {
-                            Text("Unable to load stats")
-                                .foregroundColor(.secondary)
-                            Spacer()
-                            Button("Retry") {
-                                Task {
-                                    await loadStats()
-                                }
-                            }
-                            .font(.subheadline)
-                        }
-                    }
-                } header: {
-                    Text("Available in Database")
-                } footer: {
-                    Text("Total critters, variants, and sets available in the CalicCollection database")
-                }
+
                 
                 // MARK: - Preferences Section
                 Section {
@@ -147,42 +101,16 @@ struct SettingsView: View {
                     Text("Purchase details are optional collector features. Turn off to simplify the interface for younger users.")
                 }
                 
-                // MARK: - About Section
+                // MARK: - About
                 Section {
-                    HStack {
-                        Text("Version")
-                        Spacer()
-                        Text(Config.appVersion)
-                            .foregroundColor(.secondary)
+                    NavigationLink {
+                        AboutView()
+                    } label: {
+                        Label("About", systemImage: "info.circle")
                     }
-                    
-                    HStack {
-                        Text("App Name")
-                        Spacer()
-                        Text(Config.appName)
-                            .foregroundColor(.secondary)
-                    }
-                    
-                    #if DEBUG
-                    HStack {
-                        Text("Environment")
-                        Spacer()
-                        Text("Development")
-                            .foregroundColor(.orange)
-                    }
-                    
-                    HStack {
-                        Text("API Endpoint")
-                        Spacer()
-                        Text(Config.apiBaseURL.split(separator: "/").last.map(String.init) ?? "")
-                            .foregroundColor(.secondary)
-                            .lineLimit(1)
-                    }
-                    #endif
-                } header: {
-                    Text("About")
                 }
-                
+
+
                 // MARK: - Data Section
                 Section {
                     NavigationLink {
@@ -234,6 +162,7 @@ struct SettingsView: View {
 // MARK: - Data Management View
 struct DataManagementView: View {
     @Environment(\.modelContext) private var modelContext
+    @StateObject private var backupManager = BackupManager.shared
     @Query private var critters: [Critter]
     @Query private var variants: [CritterVariant]
     @Query private var families: [Family]
@@ -353,6 +282,16 @@ struct DataManagementView: View {
             
             // MARK: - Backup & Restore Section
             Section {
+               
+                // Show last backup status
+                HStack {
+                    Text("Last Backup")
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                    Text(BackupManager.shared.lastBackupFormatted)
+                }
+                
+                
                 // Backup reminder banner
                 if AppSettings.shared.shouldShowBackupReminder {
                     backupReminderBanner
@@ -593,4 +532,13 @@ struct DataManagementView: View {
     }
     .environmentObject(SyncService.shared)
     .modelContainer(for: OwnedVariant.self, inMemory: true)
+}
+struct SettingsIcon: View {
+    let systemName: String
+
+    var body: some View {
+        Image(systemName: systemName)
+            .frame(width: 22, alignment: .center)
+            .foregroundStyle(.secondary)
+    }
 }

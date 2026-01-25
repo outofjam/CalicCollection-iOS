@@ -68,7 +68,7 @@ class SyncService: ObservableObject {
             try modelContext.delete(model: Critter.self)
             try modelContext.delete(model: CritterVariant.self)
             
-            // Insert new critters and variants
+            // Batch insert new critters and variants
             for response in critterResponses {
                 let critter = Critter(from: response)
                 modelContext.insert(critter)
@@ -82,7 +82,7 @@ class SyncService: ObservableObject {
                 }
             }
             
-            // Save context
+            // Save context once at the end (batch operation)
             try modelContext.save()
             
             // Update last sync timestamp

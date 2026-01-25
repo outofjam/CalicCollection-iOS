@@ -1,5 +1,6 @@
 import Foundation
 import SwiftData
+import Combine
 
 struct CollectionBackup: Codable {
     let exportDate: Date
@@ -31,10 +32,19 @@ struct CollectionBackup: Codable {
     }
 }
 
-class BackupManager {
+class BackupManager: ObservableObject {
     static let shared = BackupManager()
     
-    private init() {}
+    @Published var lastBackupDate: Date?
+    
+    private let lastBackupKey = "lastBackupDate"
+    
+    private init() {
+        // Load last backup date from UserDefaults
+        if let timestamp = UserDefaults.standard.object(forKey: lastBackupKey) as? Date {
+            lastBackupDate = timestamp
+        }
+    }
     
     // MARK: - Export
     
@@ -81,6 +91,11 @@ class BackupManager {
         let filename = "CalicCollection_Backup_\(Date().formatted(date: .numeric, time: .omitted).replacingOccurrences(of: "/", with: "-")).json"
         let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(filename)
         try data.write(to: tempURL)
+        
+        // Update last backup timestamp
+        let now = Date()
+        lastBackupDate = now
+        UserDefaults.standard.set(now, forKey: lastBackupKey)
         
         return tempURL
     }
@@ -156,6 +171,18 @@ class BackupManager {
             backupDate: backup.exportDate,
             appVersion: backup.appVersion
         )
+    }
+    
+    // MARK: - Helpers
+    
+    var lastBackupFormatted: String {
+        guard let date = lastBackupDate else {
+            return "Never"
+        }
+        
+        let formatter = RelativeDateTimeFormatter()
+        formatter.unitsStyle = .full
+        return formatter.localizedString(for: date, relativeTo: Date())
     }
     
     struct ImportResult {

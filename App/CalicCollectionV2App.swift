@@ -12,18 +12,18 @@ import SwiftData
 struct CalicCollectionV2App: App {
     init() {
         // Configure URLCache for image caching
-        // This gives AsyncImage automatic disk + memory caching
-        ImageCacheManager.shared.configureCache()
-        let memoryCapacity = 50_000_000   // 50 MB memory cache
-        let diskCapacity = 200_000_000    // 200 MB disk cache
+//        // This gives AsyncImage automatic disk + memory caching
+//        ImageCacheManager.shared.configureCache()
+//        let memoryCapacity = 50_000_000   // 50 MB memory cache
+//        let diskCapacity = 200_000_000    // 200 MB disk cache
+//        
+//        URLCache.shared = URLCache(
+//            memoryCapacity: memoryCapacity,
+//            diskCapacity: diskCapacity,
+//            directory: nil  // Uses default cache directory
+//        )
         
-        URLCache.shared = URLCache(
-            memoryCapacity: memoryCapacity,
-            diskCapacity: diskCapacity,
-            directory: nil  // Uses default cache directory
-        )
-        
-        print("✅ URLCache configured: \(memoryCapacity/1_000_000)MB memory, \(diskCapacity/1_000_000)MB disk")
+//        print("✅ URLCache configured: \(memoryCapacity/1_000_000)MB memory, \(diskCapacity/1_000_000)MB disk -- app file")
     }
     
     var sharedModelContainer: ModelContainer = {

@@ -41,6 +41,7 @@
 		93C461EE2F259F2000A8F084 /* PurchaseDetailsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C461ED2F259F2000A8F084 /* PurchaseDetailsSheet.swift */; };
 		93C461F02F26696700A8F084 /* ImageCacheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C461EF2F26696700A8F084 /* ImageCacheManager.swift */; };
 		93C461F22F26699B00A8F084 /* BackupManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C461F12F26699200A8F084 /* BackupManager.swift */; };
+		93C461F62F26AEFB00A8F084 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C461F52F26AEFB00A8F084 /* AboutView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -99,6 +100,7 @@
 		93C461ED2F259F2000A8F084 /* PurchaseDetailsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseDetailsSheet.swift; sourceTree = "<group>"; };
 		93C461EF2F26696700A8F084 /* ImageCacheManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCacheManager.swift; sourceTree = "<group>"; };
 		93C461F12F26699200A8F084 /* BackupManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupManager.swift; sourceTree = "<group>"; };
+		93C461F52F26AEFB00A8F084 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -279,6 +281,7 @@
 		937B9F712F20242500C08885 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
+				93C461F52F26AEFB00A8F084 /* AboutView.swift */,
 				93C461EB2F259F0000A8F084 /* AppSettings.swift */,
 				93C461CA2F22D65600A8F084 /* SettingsView.swift */,
 				937B9F8F2F202B6800C08885 /* Config.swift */,
@@ -476,6 +479,7 @@
 				93C461EC2F259F0000A8F084 /* AppSettings.swift in Sources */,
 				937B9F7A2F2024F100C08885 /* Critter.swift in Sources */,
 				937B9F842F20259400C08885 /* APIService.swift in Sources */,
+				93C461F62F26AEFB00A8F084 /* AboutView.swift in Sources */,
 				93C461D62F22EF5500A8F084 /* StatsView.swift in Sources */,
 				93C461E62F251D6600A8F084 /* BarcodeScannerView.swift in Sources */,
 				937B9F8E2F202A1000C08885 /* FirstSyncView.swift in Sources */,

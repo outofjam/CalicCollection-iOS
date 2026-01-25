@@ -7,21 +7,31 @@ class ToastManager: ObservableObject {
     static let shared = ToastManager()
     
     @Published var toast: Toast?
+    private var dismissTask: Task<Void, Never>?
     
     private init() {}
     
     func show(_ message: String, type: ToastType = .success) {
+        // Cancel any existing dismiss task
+        dismissTask?.cancel()
+        
         // Dismiss existing toast
         toast = nil
         
         // Show new toast after brief delay
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+        Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(100))
+            
             withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                 self.toast = Toast(message: message, type: type)
             }
             
             // Auto dismiss after 2 seconds
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            dismissTask = Task { @MainActor in
+                try? await Task.sleep(for: .seconds(2))
+                
+                guard !Task.isCancelled else { return }
+                
                 withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                     self.toast = nil
                 }

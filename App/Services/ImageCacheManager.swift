@@ -32,6 +32,6 @@ class ImageCacheManager {
         
         URLCache.shared = cache
         
-        print("✅ URLCache configured: \(memoryCapacity / 1024 / 1024)MB memory, \(diskCapacity / 1024 / 1024)MB disk")
+        print("✅ URLCache configured: \(memoryCapacity / 1024 / 1024)MB memory, \(diskCapacity / 1024 / 1024)MB disk -- imagecachemanger.swift")
     }
 }
