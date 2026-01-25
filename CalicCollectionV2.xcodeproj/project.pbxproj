@@ -42,6 +42,7 @@
 		93C461F02F26696700A8F084 /* ImageCacheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C461EF2F26696700A8F084 /* ImageCacheManager.swift */; };
 		93C461F22F26699B00A8F084 /* BackupManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C461F12F26699200A8F084 /* BackupManager.swift */; };
 		93C461F62F26AEFB00A8F084 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C461F52F26AEFB00A8F084 /* AboutView.swift */; };
+		93C462222F26DD9D00A8F084 /* Colours.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C462212F26DD9B00A8F084 /* Colours.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -101,6 +102,7 @@
 		93C461EF2F26696700A8F084 /* ImageCacheManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCacheManager.swift; sourceTree = "<group>"; };
 		93C461F12F26699200A8F084 /* BackupManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupManager.swift; sourceTree = "<group>"; };
 		93C461F52F26AEFB00A8F084 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
+		93C462212F26DD9B00A8F084 /* Colours.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colours.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -219,6 +221,7 @@
 		937B9F6B2F2023F200C08885 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				93C462212F26DD9B00A8F084 /* Colours.swift */,
 				93C461C22F22D4B300A8F084 /* ToastManager.swift */,
 			);
 			path = Helpers;
@@ -457,6 +460,7 @@
 				937B9F7E2F20250300C08885 /* Family.swift in Sources */,
 				93C461C32F22D4BB00A8F084 /* ToastManager.swift in Sources */,
 				93C461E82F251D8200A8F084 /* ScannedSetPickerSheet.swift in Sources */,
+				93C462222F26DD9D00A8F084 /* Colours.swift in Sources */,
 				93C461D82F22F02600A8F084 /* CollectionComponents.swift in Sources */,
 				937B9F762F20248C00C08885 /* VariantResponse.swift in Sources */,
 				937B9F902F202B7400C08885 /* Config.swift in Sources */,

@@ -38,7 +38,7 @@ struct VariantPickerSheet: View {
                     
                     Text("Select variants to add to \(targetStatus == .collection ? "Collection" : "Wishlist")")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.calicoTextSecondary)
                         .multilineTextAlignment(.center)
                 }
                 .padding()
@@ -94,7 +94,7 @@ struct VariantPickerSheet: View {
                     Button("Cancel") {
                         dismiss()
                     }
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.calicoTextSecondary)
                 }
                 .padding()
             }
@@ -232,7 +232,7 @@ struct VariantRow: View {
                             .padding(.horizontal, 6)
                             .padding(.vertical, 2)
                             .background(Color.green.opacity(0.2))
-                            .foregroundColor(.green)
+                            .foregroundColor(.calicoSuccess)
                             .cornerRadius(4)
                     }
                 }
@@ -240,21 +240,21 @@ struct VariantRow: View {
                 if let epochId = variant.epochId, let setName = variant.setName {
                     Text("Set \(epochId) • \(setName)")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.calicoTextSecondary)
                 } else if let epochId = variant.epochId {
                     Text("Set \(epochId)")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.calicoTextSecondary)
                 } else if let sku = variant.sku {
                     Text("SKU: \(sku)")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.calicoTextSecondary)
                 }
                 
                 if let releaseYear = variant.releaseYear {
                     Text("Released: \(String(releaseYear))")
                         .font(.caption2)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.calicoTextSecondary)
                 }
             }
             

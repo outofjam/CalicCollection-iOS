@@ -30,7 +30,7 @@ struct ScannedSetPickerSheet: View {
                 VStack(spacing: 8) {
                     Image(systemName: "checkmark.circle.fill")
                         .font(.system(size: 50))
-                        .foregroundColor(.green)
+                        .foregroundColor(.calicoSuccess)
                     
                     Text(setResponse.set.name)
                         .font(.title2)
@@ -38,7 +38,7 @@ struct ScannedSetPickerSheet: View {
                     
                     Text("Select variants to add to \(targetStatus == .collection ? "Collection" : "Wishlist")")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.calicoTextSecondary)
                         .multilineTextAlignment(.center)
                 }
                 .padding()
@@ -96,7 +96,7 @@ struct ScannedSetPickerSheet: View {
                     Button("Cancel") {
                         dismiss()
                     }
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.calicoTextSecondary)
                 }
                 .padding()
             }
@@ -265,7 +265,7 @@ struct ScannedVariantRow: View {
                             .padding(.horizontal, 6)
                             .padding(.vertical, 2)
                             .background(Color.green.opacity(0.2))
-                            .foregroundColor(.green)
+                            .foregroundColor(.calicoSuccess)
                             .cornerRadius(4)
                     }
                 }
@@ -273,12 +273,12 @@ struct ScannedVariantRow: View {
                 if let role = variant.critter.role {
                     Text(role)
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.calicoTextSecondary)
                 }
                 
                 Text(variant.critter.family.name)
                     .font(.caption2)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.calicoTextSecondary)
             }
             
             Spacer()

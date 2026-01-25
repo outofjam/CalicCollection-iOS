@@ -127,7 +127,7 @@ struct VariantDetailView: View {
                                 
                                 Text("Added \(owned.addedDate.formatted(date: .abbreviated, time: .omitted))")
                                     .font(.caption)
-                                    .foregroundColor(.secondary)
+                                    .foregroundColor(.calicoTextSecondary)
                             }
                             .padding()
                             .background(
@@ -154,7 +154,7 @@ struct VariantDetailView: View {
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text("Notes")
                                         .font(.caption)
-                                        .foregroundColor(.secondary)
+                                        .foregroundColor(.calicoTextSecondary)
                                     Text(notes)
                                         .font(.body)
                                 }
@@ -200,7 +200,7 @@ struct VariantDetailView: View {
                                         VStack(alignment: .leading, spacing: 4) {
                                             Text("Notes")
                                                 .font(.caption)
-                                                .foregroundColor(.secondary)
+                                                .foregroundColor(.calicoTextSecondary)
                                             Text(notes)
                                                 .font(.body)
                                         }
@@ -209,7 +209,7 @@ struct VariantDetailView: View {
                                     HStack(spacing: 16) {
                                         Text("Quantity")
                                             .font(.caption)
-                                            .foregroundColor(.secondary)
+                                            .foregroundColor(.calicoTextSecondary)
                                         
                                         Spacer()
                                         
@@ -241,7 +241,7 @@ struct VariantDetailView: View {
                                 } else {
                                     Text("Tap 'Add' to track purchase details")
                                         .font(.subheadline)
-                                        .foregroundColor(.secondary)
+                                        .foregroundColor(.calicoTextSecondary)
                                 }
                             }
                             .padding()
@@ -323,7 +323,7 @@ struct VariantDetailView: View {
                                     }
                                     .font(.subheadline)
                                     .fontWeight(.semibold)
-                                    .foregroundColor(.red)
+                                    .foregroundColor(.calicoError)
                                     .frame(maxWidth: .infinity)
                                     .padding(.vertical, 12)
                                     .background(Color.red.opacity(0.1))
@@ -430,7 +430,7 @@ struct InfoRow: View {
         HStack {
             Text(label)
                 .font(.caption)
-                .foregroundColor(.secondary)
+                .foregroundColor(.calicoTextSecondary)
             Spacer()
             Text(value)
                 .font(.body)

@@ -22,7 +22,7 @@ struct SettingsView: View {
                         VStack(alignment: .leading, spacing: 4) {
                             Text("Last Synced")
                                 .font(.subheadline)
-                                .foregroundColor(.secondary)
+                                .foregroundColor(.calicoTextSecondary)
                             
                             if let lastSync = syncService.lastSyncDate {
                                 Text(syncService.timeSinceLastSync)
@@ -31,11 +31,11 @@ struct SettingsView: View {
                                 
                                 Text(lastSync.formatted(date: .abbreviated, time: .shortened))
                                     .font(.caption)
-                                    .foregroundColor(.secondary)
+                                    .foregroundColor(.calicoTextSecondary)
                             } else {
                                 Text("Never")
                                     .font(.body)
-                                    .foregroundColor(.secondary)
+                                    .foregroundColor(.calicoTextSecondary)
                             }
                         }
                         
@@ -61,7 +61,7 @@ struct SettingsView: View {
                     if let error = syncService.syncError {
                         HStack(alignment: .top, spacing: 8) {
                             Image(systemName: "exclamationmark.triangle.fill")
-                                .foregroundColor(.red)
+                                .foregroundColor(.calicoError)
                             
                             VStack(alignment: .leading, spacing: 4) {
                                 Text("Sync Error")
@@ -70,7 +70,7 @@ struct SettingsView: View {
                                 
                                 Text(error)
                                     .font(.caption)
-                                    .foregroundColor(.secondary)
+                                    .foregroundColor(.calicoTextSecondary)
                             }
                         }
                     }
@@ -92,7 +92,7 @@ struct SettingsView: View {
                                 .font(.body)
                             Text("Track price, date, location, and condition")
                                 .font(.caption)
-                                .foregroundColor(.secondary)
+                                .foregroundColor(.calicoTextSecondary)
                         }
                     }
                 } header: {
@@ -217,7 +217,7 @@ struct DataManagementView: View {
                     .font(.body)
                 Text("\(variants.count) variants")
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.calicoTextSecondary)
             }
         }
     }
@@ -250,7 +250,7 @@ struct DataManagementView: View {
                     .id(refreshID)
                 Text("of \(memoryCacheCapacity)")
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.calicoTextSecondary)
             }
         }
     }
@@ -265,7 +265,7 @@ struct DataManagementView: View {
                     .id(refreshID)
                 Text("of \(diskCacheCapacity)")
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.calicoTextSecondary)
             }
         }
     }
@@ -417,11 +417,11 @@ struct DataManagementView: View {
             if let lastBackup = AppSettings.shared.lastBackupDate {
                 Text("Last backup: \(lastBackup.formatted(date: .abbreviated, time: .omitted))")
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.calicoTextSecondary)
             } else {
                 Text("You haven't backed up your collection yet")
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.calicoTextSecondary)
             }
         }
     }

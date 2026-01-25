@@ -53,7 +53,7 @@ struct AboutView: View {
                 } else {
                     HStack {
                         Text("Unable to load stats")
-                            .foregroundColor(.secondary)
+                            .foregroundColor(.calicoTextSecondary)
                         Spacer()
                         Button("Retry") {
                             Task { await viewModel.loadStats() }

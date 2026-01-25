@@ -81,7 +81,7 @@ struct StatsView: View {
                     
                     Text("Critters Collected")
                         .font(.title3)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.calicoTextSecondary)
                 }
                 .padding(.top)
                 
@@ -95,7 +95,7 @@ struct StatsView: View {
                     
                     if familyBreakdown.isEmpty {
                         Text("No families yet")
-                            .foregroundColor(.secondary)
+                            .foregroundColor(.calicoTextSecondary)
                     } else {
                         ForEach(familyBreakdown, id: \.family) { item in
                             VStack(alignment: .leading, spacing: 8) {
@@ -105,7 +105,7 @@ struct StatsView: View {
                                     Spacer()
                                     Text("\(item.collected)/\(item.total) critters")
                                         .font(.subheadline)
-                                        .foregroundColor(.secondary)
+                                        .foregroundColor(.calicoTextSecondary)
                                 }
                                 
                                 // Progress bar
@@ -130,7 +130,7 @@ struct StatsView: View {
                                 
                                 Text("\(Int(item.completion * 100))% complete")
                                     .font(.caption)
-                                    .foregroundColor(.secondary)
+                                    .foregroundColor(.calicoTextSecondary)
                             }
                         }
                     }
@@ -147,7 +147,7 @@ struct StatsView: View {
                     
                     if memberTypeBreakdown.isEmpty {
                         Text("No member types yet")
-                            .foregroundColor(.secondary)
+                            .foregroundColor(.calicoTextSecondary)
                     } else {
                         LazyVGrid(columns: [
                             GridItem(.flexible(), spacing: 12),
@@ -186,7 +186,7 @@ struct StatsView: View {
                                         
                                         Text("\(item.collected)/\(item.total)")
                                             .font(.caption)
-                                            .foregroundColor(.secondary)
+                                            .foregroundColor(.calicoTextSecondary)
                                     }
                                 }
                             }
@@ -207,7 +207,7 @@ struct StatsView: View {
                         VStack(alignment: .leading, spacing: 4) {
                             Text("Earliest Added")
                                 .font(.caption)
-                                .foregroundColor(.secondary)
+                                .foregroundColor(.calicoTextSecondary)
                             
                             HStack(spacing: 12) {
                                 // Use thumbnail for timeline images
@@ -234,10 +234,10 @@ struct StatsView: View {
                                         .font(.headline)
                                     Text(earliest.critterName)
                                         .font(.subheadline)
-                                        .foregroundColor(.secondary)
+                                        .foregroundColor(.calicoTextSecondary)
                                     Text(earliest.addedDate.formatted(date: .abbreviated, time: .omitted))
                                         .font(.caption)
-                                        .foregroundColor(.secondary)
+                                        .foregroundColor(.calicoTextSecondary)
                                 }
                             }
                         }
@@ -247,7 +247,7 @@ struct StatsView: View {
                         VStack(alignment: .leading, spacing: 4) {
                             Text("Latest Added")
                                 .font(.caption)
-                                .foregroundColor(.secondary)
+                                .foregroundColor(.calicoTextSecondary)
                             
                             HStack(spacing: 12) {
                                 // Use thumbnail for timeline images
@@ -274,10 +274,10 @@ struct StatsView: View {
                                         .font(.headline)
                                     Text(latest.critterName)
                                         .font(.subheadline)
-                                        .foregroundColor(.secondary)
+                                        .foregroundColor(.calicoTextSecondary)
                                     Text(latest.addedDate.formatted(date: .abbreviated, time: .omitted))
                                         .font(.caption)
-                                        .foregroundColor(.secondary)
+                                        .foregroundColor(.calicoTextSecondary)
                                 }
                             }
                         }

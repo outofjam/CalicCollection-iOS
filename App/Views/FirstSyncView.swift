@@ -27,7 +27,7 @@ struct FirstSyncView: View {
             VStack(spacing: 8) {
                 Text("Welcome to")
                     .font(.title2)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.calicoTextSecondary)
                 
                 Text("CaliCollection")
                     .font(.largeTitle)
@@ -43,19 +43,19 @@ struct FirstSyncView: View {
                     
                     Text("Syncing critters...")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.calicoTextSecondary)
                 } else if let error = syncService.syncError {
                     VStack(spacing: 12) {
                         Image(systemName: "exclamationmark.triangle.fill")
                             .font(.system(size: 40))
-                            .foregroundColor(.red)
+                            .foregroundColor(.calicoError)
                         
                         Text("Sync Failed")
                             .font(.headline)
                         
                         Text(error)
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(.calicoTextSecondary)
                             .multilineTextAlignment(.center)
                         
                         Button {
@@ -73,7 +73,7 @@ struct FirstSyncView: View {
                     VStack(spacing: 12) {
                         Image(systemName: "checkmark.circle.fill")
                             .font(.system(size: 40))
-                            .foregroundColor(.green)
+                            .foregroundColor(.calicoSuccess)
                         
                         Text("All set!")
                             .font(.headline)
@@ -98,7 +98,7 @@ struct FirstSyncView: View {
             // App Version
             Text("Version \(Config.appVersion)")
                 .font(.caption2)
-                .foregroundColor(.secondary)
+                .foregroundColor(.calicoTextSecondary)
         }
         .padding()
     }

@@ -23,7 +23,7 @@ struct CollectionListView: View {
                             if let variants = groupedVariants[familyName] {
                                 Text("\(variants.count) variant\(variants.count == 1 ? "" : "s")")
                                     .font(.caption)
-                                    .foregroundColor(.secondary)
+                                    .foregroundColor(.calicoTextSecondary)
                             }
                         }
                         .padding(.vertical, 4)
@@ -83,18 +83,18 @@ struct CollectionListRow: View {
                 
                 Text(variant.variantName)
                     .font(.subheadline)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.calicoTextSecondary)
                 
                 Text("Added \(variant.addedDate.formatted(date: .abbreviated, time: .omitted))")
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.calicoTextSecondary)
             }
             
             Spacer()
             
             Image(systemName: "chevron.right")
                 .font(.caption)
-                .foregroundColor(.secondary)
+                .foregroundColor(.calicoTextSecondary)
         }
         .padding(.vertical, 4)
     }
@@ -151,7 +151,7 @@ struct CollectionGalleryView: View {
                                 if let variants = groupedVariants[familyName] {
                                     Text("\(variants.count)")
                                         .font(.caption)
-                                        .foregroundColor(.secondary)
+                                        .foregroundColor(.calicoTextSecondary)
                                 }
                             }
                             .padding(.horizontal, 16)

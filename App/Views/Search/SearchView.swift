@@ -75,7 +75,7 @@ struct SearchView: View {
                                             if let critters = groupedCritters[familyName] {
                                                 Text("\(critters.count)")
                                                     .font(.caption)
-                                                    .foregroundColor(.secondary)
+                                                    .foregroundColor(.calicoTextSecondary)
                                             }
                                         }
                                         .padding(.vertical, 4)
@@ -98,7 +98,7 @@ struct SearchView: View {
                                                 } label: {
                                                     Label("Collection", systemImage: "star.fill")
                                                 }
-                                                .tint(.blue)
+                                                .tint(.calicoPrimary)
                                             }
                                             .swipeActions(edge: .trailing) {
                                                 Button {
@@ -106,7 +106,7 @@ struct SearchView: View {
                                                 } label: {
                                                     Label("Wishlist", systemImage: "heart.fill")
                                                 }
-                                                .tint(.pink)
+                                                .tint(.calicoSecondary)
                                             }
                                         }
                                     }
@@ -434,7 +434,7 @@ struct FilterChipsView: View {
                         .padding(.horizontal, 12)
                         .padding(.vertical, 6)
                         .background(Color.red.opacity(0.1))
-                        .foregroundColor(.red)
+                        .foregroundColor(.calicoError)
                         .clipShape(Capsule())
                     }
                 }
@@ -483,7 +483,7 @@ struct CritterRow: View {
                     }
                 }
                 .font(.subheadline)
-                .foregroundColor(.secondary)
+                .foregroundColor(.calicoTextSecondary)
                 
                 if critter.variantsCount > 0 {
                     HStack(spacing: 4) {

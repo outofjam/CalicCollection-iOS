@@ -118,7 +118,7 @@ struct FamilyDetailView: View {
                                 } label: {
                                     Label("Collection", systemImage: "star.fill")
                                 }
-                                .tint(.blue)
+                                .tint(.calicoPrimary)
                             }
                             .swipeActions(edge: .trailing) {
                                 Button {
@@ -126,7 +126,7 @@ struct FamilyDetailView: View {
                                 } label: {
                                     Label("Wishlist", systemImage: "heart.fill")
                                 }
-                                .tint(.pink)
+                                .tint(.calicoSecondary)
                             }
                         }
                     }
@@ -137,7 +137,7 @@ struct FamilyDetailView: View {
                         if let critters = groupedByMemberType[memberType] {
                             Text("\(critters.count)")
                                 .font(.caption)
-                                .foregroundColor(.secondary)
+                                .foregroundColor(.calicoTextSecondary)
                         }
                     }
                 }
@@ -242,7 +242,7 @@ struct StatBadge: View {
                     .font(.caption)
                 Text(label)
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.calicoTextSecondary)
             }
             
             Text(value)

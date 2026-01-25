@@ -130,12 +130,12 @@ struct CritterDetailView: View {
                             
                             Text("\(ownedCritterVariants.count) of \(critter.variantsCount) owned")
                                 .font(.subheadline)
-                                .foregroundColor(.secondary)
+                                .foregroundColor(.calicoTextSecondary)
                         }
                         
                         if critterVariants.isEmpty {
                             Text("No variants available")
-                                .foregroundColor(.secondary)
+                                .foregroundColor(.calicoTextSecondary)
                                 .frame(maxWidth: .infinity, alignment: .center)
                                 .padding()
                         } else {
@@ -268,7 +268,7 @@ struct VariantCard: View {
                 // Owned checkmark
                 if isOwned {
                     Image(systemName: "checkmark.circle.fill")
-                        .foregroundColor(.green)
+                        .foregroundColor(.calicoSuccess)
                         .background(
                             Circle()
                                 .fill(Color.white)
@@ -291,19 +291,19 @@ struct VariantCard: View {
                 if let epochId = variant.epochId, let setName = variant.setName {
                     Text("Set \(epochId)")
                         .font(.caption2)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.calicoTextSecondary)
                     Text(setName)
                         .font(.caption2)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.calicoTextSecondary)
                         .lineLimit(1)
                 } else if let epochId = variant.epochId {
                     Text("Set \(epochId)")
                         .font(.caption2)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.calicoTextSecondary)
                 } else if let sku = variant.sku {
                     Text("SKU: \(sku)")
                         .font(.caption2)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.calicoTextSecondary)
                 }
             }
         }

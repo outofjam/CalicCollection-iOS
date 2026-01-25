@@ -36,7 +36,7 @@ struct BarcodeScannerView: View {
                     
                     Text("This device doesn't support barcode scanning")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.calicoTextSecondary)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal)
                 }
