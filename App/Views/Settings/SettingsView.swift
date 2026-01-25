@@ -281,38 +281,49 @@ struct DataManagementView: View {
             }
             
             // MARK: - Backup & Restore Section
+            // MARK: - Backup Status
             Section {
-               
-                // Show last backup status
-                HStack {
-                    Text("Last Backup")
-                        .foregroundStyle(.secondary)
-                    Spacer()
-                    Text(BackupManager.shared.lastBackupFormatted)
-                }
-                
-                
-                // Backup reminder banner
                 if AppSettings.shared.shouldShowBackupReminder {
                     backupReminderBanner
                 }
-                
+
+                LabeledContent("Last Backup") {
+                    Text(BackupManager.shared.lastBackupFormatted)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
+            // MARK: - Backup & Restore Actions
+            Section {
                 Button {
                     presentShareSheet()
                 } label: {
-                    Label("Export Backup", systemImage: "square.and.arrow.up")
+                    HStack(spacing: 12) {
+                        Image(systemName: "arrow.down.doc")
+                            .foregroundStyle(.blue)
+
+                        Text("Export Backup")
+                    }
                 }
-                
+                .buttonStyle(.plain)
+
                 Button {
                     showingImportPicker = true
                 } label: {
-                    Label("Import Backup", systemImage: "square.and.arrow.down")
+                    HStack(spacing: 12) {
+                        Image(systemName: "arrow.up.doc")
+                            .foregroundStyle(.green)
+
+                        Text("Import Backup")
+                    }
                 }
-            } header: {
-                Text("Backup & Restore")
+                .buttonStyle(.plain)
             } footer: {
                 Text("Export your collection as a JSON file to save to iCloud Drive or Files. Import to restore or transfer your collection to a new device.")
             }
+
+
+
             
             // MARK: - Image Cache Section
             Section {
@@ -388,19 +399,21 @@ struct DataManagementView: View {
     }
     
     // MARK: - Subviews
-    
     private var backupReminderBanner: some View {
         HStack(alignment: .top, spacing: 12) {
             Image(systemName: "exclamationmark.triangle.fill")
-                .foregroundColor(.orange)
-                .font(.title3)
-            
+                .foregroundStyle(.orange)
+
             backupReminderText
-            
-            Spacer()
+                .font(.subheadline)
+                .foregroundStyle(.primary)
         }
-        .padding(.vertical, 8)
+        .padding(12)
+        .foregroundStyle(.secondary)
+        .background(.orange.opacity(0.08))
+        .clipShape(RoundedRectangle(cornerRadius: 10))
     }
+
     
     private var backupReminderText: some View {
         VStack(alignment: .leading, spacing: 4) {
