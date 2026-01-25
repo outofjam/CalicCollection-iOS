@@ -29,7 +29,7 @@ struct FirstSyncView: View {
                     .font(.title2)
                     .foregroundColor(.secondary)
                 
-                Text("CalicCollection")
+                Text("CaliCollection")
                     .font(.largeTitle)
                     .fontWeight(.bold)
             }

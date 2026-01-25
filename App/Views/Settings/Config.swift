@@ -9,7 +9,8 @@ struct Config {
     static var apiBaseURL: String {
         #if DEBUG
         // Development URL
-        return "http://callicollection.test/api/v1"
+        return "https://calicoprod.thetechnodro.me/api/v1"
+        //return "http://callicollection.test/api/v1"
         #else
         // Production URL
         return "http://api.callicollection.com/api/v1"
@@ -19,7 +20,7 @@ struct Config {
     // MARK: - App Information
     
     static let appName = "CaliCollection"
-    static let appVersion = "2.0alpha"
+    static let appVersion = "2.1a"
     
     // MARK: - Sync Settings
     

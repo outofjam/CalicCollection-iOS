@@ -14,9 +14,18 @@ final class OwnedVariant {
     var memberType: String
     var role: String?
     var imageURL: String?
+    var thumbnailURL: String?
     var statusRaw: String
     var photoPath: String?
     var addedDate: Date
+    
+    // Purchase tracking (optional, for collectors)
+    var pricePaid: Double?
+    var purchaseDate: Date?
+    var purchaseLocation: String?
+    var condition: String?
+    var notes: String?
+    var quantity: Int = 1
     
     /// Computed property for status enum
     var status: CritterStatus? {
@@ -35,9 +44,16 @@ final class OwnedVariant {
         memberType: String,
         role: String? = nil,
         imageURL: String? = nil,
+        thumbnailURL: String? = nil,
         status: CritterStatus,
         photoPath: String? = nil,
-        addedDate: Date = Date()
+        addedDate: Date = Date(),
+        pricePaid: Double? = nil,
+        purchaseDate: Date? = nil,
+        purchaseLocation: String? = nil,
+        condition: String? = nil,
+        notes: String? = nil,
+        quantity: Int = 1
     ) {
         self.variantUuid = variantUuid
         self.critterUuid = critterUuid
@@ -49,9 +65,16 @@ final class OwnedVariant {
         self.memberType = memberType
         self.role = role
         self.imageURL = imageURL
+        self.thumbnailURL = thumbnailURL
         self.statusRaw = status.rawValue
         self.photoPath = photoPath
         self.addedDate = addedDate
+        self.pricePaid = pricePaid
+        self.purchaseDate = purchaseDate
+        self.purchaseLocation = purchaseLocation
+        self.condition = condition
+        self.notes = notes
+        self.quantity = quantity
     }
 }
 
@@ -74,6 +97,7 @@ extension OwnedVariant {
         if let existing = try? context.fetch(descriptor).first {
             // Update existing
             existing.status = status
+            existing.thumbnailURL = variant.thumbnailURL // Update thumbnail too
             if status == .collection && existing.photoPath == nil {
                 existing.addedDate = Date()
             }
@@ -90,6 +114,7 @@ extension OwnedVariant {
                 memberType: critter.memberType,
                 role: critter.role,
                 imageURL: variant.imageURL,
+                thumbnailURL: variant.thumbnailURL,
                 status: status
             )
             context.insert(owned)

@@ -10,8 +10,12 @@ final class CritterVariant {
     var sku: String?
     var barcode: String?
     var imageURL: String?
+    var thumbnailURL: String?
     var releaseYear: Int?
     var notes: String?
+    var setId: String?
+    var setName: String?
+    var epochId: String?
     var lastSynced: Date
     
     init(
@@ -21,8 +25,12 @@ final class CritterVariant {
         sku: String? = nil,
         barcode: String? = nil,
         imageURL: String? = nil,
+        thumbnailURL: String? = nil,
         releaseYear: Int? = nil,
         notes: String? = nil,
+        setId: String? = nil,
+        setName: String? = nil,
+        epochId: String? = nil,
         lastSynced: Date = Date()
     ) {
         self.uuid = uuid
@@ -31,8 +39,12 @@ final class CritterVariant {
         self.sku = sku
         self.barcode = barcode
         self.imageURL = imageURL
+        self.thumbnailURL = thumbnailURL
         self.releaseYear = releaseYear
         self.notes = notes
+        self.setId = setId
+        self.setName = setName
+        self.epochId = epochId
         self.lastSynced = lastSynced
     }
     
@@ -45,8 +57,12 @@ final class CritterVariant {
             sku: response.sku,
             barcode: response.barcode,
             imageURL: response.imageUrl,
+            thumbnailURL: response.thumbnailUrl,
             releaseYear: response.releaseYear,
-            notes: response.notes
+            notes: response.notes,
+            setId: response.setId,
+            setName: response.setName,
+            epochId: response.epochId
         )
     }
 }

@@ -91,6 +91,9 @@ class SyncService: ObservableObject {
             
             print("✅ Synced \(critterResponses.count) critters successfully")
             
+            // Show success toast
+            ToastManager.shared.show("✓ Synced \(critterResponses.count) critters", type: .success)
+            
         } catch {
             syncError = error.localizedDescription
             print("❌ Sync failed: \(error)")

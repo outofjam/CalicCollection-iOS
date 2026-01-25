@@ -1,5 +1,4 @@
 import SwiftUI
-import SwiftUI
 import SwiftData
 
 struct VariantPickerSheet: View {
@@ -20,6 +19,12 @@ struct VariantPickerSheet: View {
     
     private func isVariantOwned(_ variantUuid: String, status: CritterStatus) -> Bool {
         ownedVariants.contains { $0.variantUuid == variantUuid && $0.status == status }
+    }
+    
+    private var hasOwnedVariants: Bool {
+        critterVariants.contains { variant in
+            isVariantOwned(variant.uuid, status: targetStatus)
+        }
     }
     
     var body: some View {
@@ -64,21 +69,27 @@ struct VariantPickerSheet: View {
                 
                 // Action buttons
                 VStack(spacing: 12) {
-                    Button {
-                        saveSelection()
-                    } label: {
-                        HStack {
-                            Image(systemName: targetStatus == .collection ? "star.fill" : "heart.fill")
-                            Text("Add Selected (\(selectedVariantIds.count))")
+                    // Only show button if there are selections OR owned variants to remove
+                    if !selectedVariantIds.isEmpty || hasOwnedVariants {
+                        Button {
+                            saveSelection()
+                        } label: {
+                            HStack {
+                                Image(systemName: targetStatus == .collection ? "star.fill" : "heart.fill")
+                                if selectedVariantIds.isEmpty {
+                                    Text("Remove All from \(targetStatus == .collection ? "Collection" : "Wishlist")")
+                                } else {
+                                    Text("Add to \(targetStatus == .collection ? "Collection" : "Wishlist") (\(selectedVariantIds.count))")
+                                }
+                            }
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(selectedVariantIds.isEmpty ? Color.red : (targetStatus == .collection ? Color.blue : Color.pink))
+                            .cornerRadius(12)
                         }
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(selectedVariantIds.isEmpty ? Color.gray : (targetStatus == .collection ? Color.blue : Color.pink))
-                        .cornerRadius(12)
                     }
-                    .disabled(selectedVariantIds.isEmpty)
                     
                     Button("Cancel") {
                         dismiss()
@@ -108,6 +119,9 @@ struct VariantPickerSheet: View {
     }
     
     private func toggleVariant(_ uuid: String) {
+        let generator = UISelectionFeedbackGenerator()
+        generator.selectionChanged()
+        
         if selectedVariantIds.contains(uuid) {
             selectedVariantIds.remove(uuid)
         } else {
@@ -116,9 +130,24 @@ struct VariantPickerSheet: View {
     }
     
     private func saveSelection() {
-        // Add selected variants
+        var movedCount = 0
+        var addedCount = 0
+        var removedCount = 0
+        
+        // Add/update selected variants
         for variantUuid in selectedVariantIds {
             guard let variant = critterVariants.first(where: { $0.uuid == variantUuid }) else { continue }
+            
+            // Check if exists in opposite status
+            let existsInOpposite = ownedVariants.contains {
+                $0.variantUuid == variantUuid && $0.status?.rawValue != targetStatus.rawValue
+            }
+            
+            if existsInOpposite {
+                movedCount += 1
+            } else if !isVariantOwned(variantUuid, status: targetStatus) {
+                addedCount += 1
+            }
             
             try? OwnedVariant.create(
                 variant: variant,
@@ -136,7 +165,19 @@ struct VariantPickerSheet: View {
         for variantUuid in previouslyOwned {
             if !selectedVariantIds.contains(variantUuid) {
                 try? OwnedVariant.remove(variantUuid: variantUuid, in: modelContext)
+                removedCount += 1
             }
+        }
+        
+        // Show appropriate toast
+        let statusName = targetStatus == .collection ? "Collection" : "Wishlist"
+        
+        if movedCount > 0 {
+            ToastManager.shared.show("✓ Moved \(movedCount) to \(statusName)", type: .success)
+        } else if addedCount > 0 {
+            ToastManager.shared.show("✓ Added \(addedCount) to \(statusName)", type: .success)
+        } else if removedCount > 0 {
+            ToastManager.shared.show("Removed \(removedCount) from \(statusName)", type: .info)
         }
         
         dismiss()
@@ -156,13 +197,15 @@ struct VariantRow: View {
                 .foregroundColor(isSelected ? .blue : .gray)
                 .font(.title3)
             
-            // Variant image placeholder
+            // Variant image (use thumbnail for list performance)
             RoundedRectangle(cornerRadius: 8)
                 .fill(Color.gray.opacity(0.2))
                 .frame(width: 60, height: 60)
                 .overlay {
-                    if let imageURL = variant.imageURL {
-                        AsyncImage(url: URL(string: imageURL)) { image in
+                    // Use thumbnail if available, fallback to full image
+                    if let urlString = variant.thumbnailURL ?? variant.imageURL,
+                       let url = URL(string: urlString) {
+                        AsyncImage(url: url) { image in
                             image
                                 .resizable()
                                 .aspectRatio(contentMode: .fill)
@@ -194,7 +237,15 @@ struct VariantRow: View {
                     }
                 }
                 
-                if let sku = variant.sku {
+                if let epochId = variant.epochId, let setName = variant.setName {
+                    Text("Set \(epochId) • \(setName)")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                } else if let epochId = variant.epochId {
+                    Text("Set \(epochId)")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                } else if let sku = variant.sku {
                     Text("SKU: \(sku)")
                         .font(.caption)
                         .foregroundColor(.secondary)

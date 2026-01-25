@@ -13,30 +13,33 @@ struct ContentView: View {
     @AppStorage(Config.UserDefaultsKeys.hasCompletedFirstSync) private var hasCompletedFirstSync = false
     
     var body: some View {
-        if !hasCompletedFirstSync {
-            FirstSyncView()
-        } else {
-            TabView {
-                Tab("Collection", systemImage: "star.fill") {
-                    Text("Collection Coming Soon")
-                }
-                
-                Tab("Wishlist", systemImage: "heart.fill") {
-                    Text("Wishlist Coming Soon")
-                }
-                
-                Tab("Settings", systemImage: "gearshape.fill") {
-                    Text("Settings Coming Soon")
-                }
-                
-                // Search Tab - expands when tapped
-                Tab(role: .search) {
-                    NavigationStack {
-                        SearchView(searchText: $searchText)
+        Group {
+            if !hasCompletedFirstSync {
+                FirstSyncView()
+            } else {
+                TabView {
+                    Tab("Collection", systemImage: "star.fill") {
+                        CollectionView()
+                    }
+                    
+                    Tab("Wishlist", systemImage: "heart.fill") {
+                        WishlistView()
+                    }
+                    
+                    Tab("Settings", systemImage: "gearshape.fill") {
+                        SettingsView()
+                    }
+                    
+                    // Search Tab - expands when tapped
+                    Tab(role: .search) {
+                        NavigationStack {
+                            SearchView(searchText: $searchText)
+                        }
                     }
                 }
             }
         }
+        .toast()
     }
 }
 
