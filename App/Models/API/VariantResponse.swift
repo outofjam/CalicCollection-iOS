@@ -1,5 +1,6 @@
 import Foundation
 
+
 /// API response for a critter variant (specific product release)
 struct VariantResponse: Codable, Identifiable {
     let uuid: String
@@ -16,7 +17,7 @@ struct VariantResponse: Codable, Identifiable {
     let epochId: String?
     let createdAt: String
     let updatedAt: String
-    
+    let isPrimary: Bool?
     var id: String { uuid }
     
     enum CodingKeys: String, CodingKey {
@@ -32,5 +33,6 @@ struct VariantResponse: Codable, Identifiable {
         case epochId = "epoch_id"
         case createdAt = "created_at"
         case updatedAt = "updated_at"
+        case isPrimary = "is_primary" // ADD THIS
     }
 }

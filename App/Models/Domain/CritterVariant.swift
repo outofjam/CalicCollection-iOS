@@ -17,6 +17,7 @@ final class CritterVariant {
     var setName: String?
     var epochId: String?
     var lastSynced: Date
+    var isPrimary: Bool? = false
     
     init(
         uuid: String,
@@ -31,7 +32,8 @@ final class CritterVariant {
         setId: String? = nil,
         setName: String? = nil,
         epochId: String? = nil,
-        lastSynced: Date = Date()
+        lastSynced: Date = Date(),
+        isPrimary: Bool? = nil
     ) {
         self.uuid = uuid
         self.critterId = critterId
@@ -46,6 +48,7 @@ final class CritterVariant {
         self.setName = setName
         self.epochId = epochId
         self.lastSynced = lastSynced
+        self.isPrimary = isPrimary
     }
     
     /// Create from API response
@@ -62,7 +65,8 @@ final class CritterVariant {
             notes: response.notes,
             setId: response.setId,
             setName: response.setName,
-            epochId: response.epochId
+            epochId: response.epochId,
+            isPrimary: response.isPrimary
         )
     }
 }

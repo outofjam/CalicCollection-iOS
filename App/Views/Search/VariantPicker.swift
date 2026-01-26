@@ -14,7 +14,9 @@ struct VariantPickerSheet: View {
     @State private var selectedVariantIds: Set<String> = []
     
     private var critterVariants: [CritterVariant] {
-        allVariants.filter { $0.critterId == critter.uuid }
+        allVariants
+            .filter { $0.critterId == critter.uuid }
+            .sorted { ($0.isPrimary ?? false) && !($1.isPrimary ?? false) }
     }
     
     private func isVariantOwned(_ variantUuid: String, status: CritterStatus) -> Bool {
