@@ -33,7 +33,8 @@ struct CalicCollectionV2App: App {
             CritterVariant.self,
             Family.self,
             // User collection (permanent data)
-            OwnedVariant.self
+            OwnedVariant.self,
+            VariantPhoto.self
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 

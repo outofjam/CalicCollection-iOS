@@ -4,7 +4,7 @@ import SwiftData
 // MARK: - List View
 struct CollectionListView: View {
     let groupedVariants: [String: [OwnedVariant]]
-    let sortedGroupNames: [String]  // Changed from sortedCritterNames - now holds family names
+    let sortedGroupNames: [String]
     @Binding var selectedVariant: OwnedVariant?
     
     var body: some View {
@@ -51,11 +51,37 @@ struct CollectionListView: View {
 struct CollectionListRow: View {
     let variant: OwnedVariant
     
+    @Environment(\.modelContext) private var modelContext
+    @Query private var allPhotos: [VariantPhoto]
+    
+    private var firstPhoto: VariantPhoto? {
+        allPhotos
+            .filter { $0.variantUuid == variant.variantUuid }
+            .sorted { $0.sortOrder < $1.sortOrder }
+            .first
+    }
+    
     var body: some View {
         HStack(spacing: 12) {
-            // Variant image (use thumbnail for list performance)
-            if let urlString = variant.thumbnailURL ?? variant.imageURL,
-               let url = URL(string: urlString) {
+            // Show user photo if available, otherwise official image
+            if let photo = firstPhoto, let uiImage = UIImage(data: photo.imageData) {
+                ZStack(alignment: .topTrailing) {
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 60, height: 60)
+                    
+                    // Badge to indicate user photo
+                    Image(systemName: "camera.fill")
+                        .font(.system(size: 8))
+                        .foregroundColor(.white)
+                        .padding(3)
+                        .background(Circle().fill(Color.calicoPrimary))
+                        .offset(x: -2, y: 2)
+                }
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+            } else if let urlString = variant.thumbnailURL ?? variant.imageURL,
+                      let url = URL(string: urlString) {
                 AsyncImage(url: url) { phase in
                     switch phase {
                     case .success(let image):
@@ -85,9 +111,21 @@ struct CollectionListRow: View {
                     .font(.subheadline)
                     .foregroundColor(.calicoTextSecondary)
                 
-                Text("Added \(variant.addedDate.formatted(date: .abbreviated, time: .omitted))")
-                    .font(.caption)
-                    .foregroundColor(.calicoTextSecondary)
+                // Single line with date and photo count
+                HStack(spacing: 4) {
+                    Text("Added \(variant.addedDate.formatted(date: .abbreviated, time: .omitted))")
+                    
+                    if firstPhoto != nil {
+                        let photoCount = allPhotos.filter { $0.variantUuid == variant.variantUuid }.count
+                        Text("•")
+                        Image(systemName: "photo")
+                            .font(.system(size: 10))
+                        Text("\(photoCount)")
+                            .foregroundColor(.calicoPrimary)
+                    }
+                }
+                .font(.caption)
+                .foregroundColor(.calicoTextSecondary)
             }
             
             Spacer()
@@ -96,7 +134,12 @@ struct CollectionListRow: View {
                 .font(.caption)
                 .foregroundColor(.calicoTextSecondary)
         }
-        .padding(.vertical, 4)
+        .listRowSeparator(.visible)
+        .alignmentGuide(.listRowSeparatorLeading) { _ in
+            60 + 12   // image width + HStack spacing
+        }
+
+        .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
     }
     
     private var placeholderImage: some View {
@@ -170,12 +213,37 @@ struct CollectionGalleryView: View {
 struct GalleryImageCard: View {
     let variant: OwnedVariant
     
+    @Environment(\.modelContext) private var modelContext
+    @Query private var allPhotos: [VariantPhoto]
+    
+    private var firstPhoto: VariantPhoto? {
+        allPhotos
+            .filter { $0.variantUuid == variant.variantUuid }
+            .sorted { $0.sortOrder < $1.sortOrder }
+            .first
+    }
+    
     var body: some View {
         GeometryReader { geometry in
             ZStack(alignment: .bottomLeading) {
-                // Image (use thumbnail for gallery performance)
-                if let urlString = variant.thumbnailURL ?? variant.imageURL,
-                   let url = URL(string: urlString) {
+                // Show user photo if available, otherwise official image
+                if let photo = firstPhoto, let uiImage = UIImage(data: photo.imageData) {
+                    ZStack(alignment: .topTrailing) {
+                        Image(uiImage: uiImage)
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: geometry.size.width, height: geometry.size.height)
+                        
+                        // Badge to indicate user photo
+                        Image(systemName: "camera.fill")
+                            .font(.system(size: 10))
+                            .foregroundColor(.white)
+                            .padding(4)
+                            .background(Circle().fill(Color.calicoPrimary))
+                            .offset(x: -4, y: 4)
+                    }
+                } else if let urlString = variant.thumbnailURL ?? variant.imageURL,
+                          let url = URL(string: urlString) {
                     AsyncImage(url: url) { phase in
                         switch phase {
                         case .success(let image):

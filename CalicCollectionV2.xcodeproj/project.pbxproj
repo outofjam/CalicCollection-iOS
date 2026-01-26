@@ -43,6 +43,11 @@
 		93C461F22F26699B00A8F084 /* BackupManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C461F12F26699200A8F084 /* BackupManager.swift */; };
 		93C461F62F26AEFB00A8F084 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C461F52F26AEFB00A8F084 /* AboutView.swift */; };
 		93C462222F26DD9D00A8F084 /* Colours.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C462212F26DD9B00A8F084 /* Colours.swift */; };
+		93C4623C2F26E5B000A8F084 /* VariantPhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C4623B2F26E5B000A8F084 /* VariantPhoto.swift */; };
+		93C4623E2F26E5E200A8F084 /* PhotoPickerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C4623D2F26E5E200A8F084 /* PhotoPickerSheet.swift */; };
+		93C462402F26E5EC00A8F084 /* PhotoGallerySection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C4623F2F26E5EC00A8F084 /* PhotoGallerySection.swift */; };
+		93C462422F26E5F800A8F084 /* PhotoDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C462412F26E5F800A8F084 /* PhotoDetailView.swift */; };
+		93C462442F26E8C400A8F084 /* VariantPhoto+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C462432F26E8BD00A8F084 /* VariantPhoto+Helpers.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -103,6 +108,11 @@
 		93C461F12F26699200A8F084 /* BackupManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupManager.swift; sourceTree = "<group>"; };
 		93C461F52F26AEFB00A8F084 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
 		93C462212F26DD9B00A8F084 /* Colours.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colours.swift; sourceTree = "<group>"; };
+		93C4623B2F26E5B000A8F084 /* VariantPhoto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VariantPhoto.swift; sourceTree = "<group>"; };
+		93C4623D2F26E5E200A8F084 /* PhotoPickerSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoPickerSheet.swift; sourceTree = "<group>"; };
+		93C4623F2F26E5EC00A8F084 /* PhotoGallerySection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoGallerySection.swift; sourceTree = "<group>"; };
+		93C462412F26E5F800A8F084 /* PhotoDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoDetailView.swift; sourceTree = "<group>"; };
+		93C462432F26E8BD00A8F084 /* VariantPhoto+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "VariantPhoto+Helpers.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -221,6 +231,7 @@
 		937B9F6B2F2023F200C08885 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				93C462432F26E8BD00A8F084 /* VariantPhoto+Helpers.swift */,
 				93C462212F26DD9B00A8F084 /* Colours.swift */,
 				93C461C22F22D4B300A8F084 /* ToastManager.swift */,
 			);
@@ -241,6 +252,7 @@
 		937B9F6D2F20240500C08885 /* Domain */ = {
 			isa = PBXGroup;
 			children = (
+				93C4623B2F26E5B000A8F084 /* VariantPhoto.swift */,
 				937B9F812F20254800C08885 /* CritterStatus.swift */,
 				937B9F7F2F20250800C08885 /* OwnedVariant.swift */,
 				937B9F7D2F20250200C08885 /* Family.swift */,
@@ -266,6 +278,9 @@
 		937B9F6F2F20241700C08885 /* Collection */ = {
 			isa = PBXGroup;
 			children = (
+				93C462412F26E5F800A8F084 /* PhotoDetailView.swift */,
+				93C4623F2F26E5EC00A8F084 /* PhotoGallerySection.swift */,
+				93C4623D2F26E5E200A8F084 /* PhotoPickerSheet.swift */,
 				93C461ED2F259F2000A8F084 /* PurchaseDetailsSheet.swift */,
 				93C461D52F22EF5300A8F084 /* StatsView.swift */,
 				93C461CE2F22EC5F00A8F084 /* CollectionView.swift */,
@@ -461,6 +476,7 @@
 				93C461C32F22D4BB00A8F084 /* ToastManager.swift in Sources */,
 				93C461E82F251D8200A8F084 /* ScannedSetPickerSheet.swift in Sources */,
 				93C462222F26DD9D00A8F084 /* Colours.swift in Sources */,
+				93C462422F26E5F800A8F084 /* PhotoDetailView.swift in Sources */,
 				93C461D82F22F02600A8F084 /* CollectionComponents.swift in Sources */,
 				937B9F762F20248C00C08885 /* VariantResponse.swift in Sources */,
 				937B9F902F202B7400C08885 /* Config.swift in Sources */,
@@ -470,8 +486,10 @@
 				93C461F22F26699B00A8F084 /* BackupManager.swift in Sources */,
 				93C461CF2F22EC6100A8F084 /* CollectionView.swift in Sources */,
 				937B9F782F20249B00C08885 /* CritterResponse.swift in Sources */,
+				93C462442F26E8C400A8F084 /* VariantPhoto+Helpers.swift in Sources */,
 				93C461EE2F259F2000A8F084 /* PurchaseDetailsSheet.swift in Sources */,
 				937B9F802F20250A00C08885 /* OwnedVariant.swift in Sources */,
+				93C462402F26E5EC00A8F084 /* PhotoGallerySection.swift in Sources */,
 				93C461D42F22EE4A00A8F084 /* WishlistView.swift in Sources */,
 				937B9F412F2023AC00C08885 /* ContentView.swift in Sources */,
 				93C461E42F251D5400A8F084 /* SetResponse.swift in Sources */,
@@ -485,7 +503,9 @@
 				937B9F842F20259400C08885 /* APIService.swift in Sources */,
 				93C461F62F26AEFB00A8F084 /* AboutView.swift in Sources */,
 				93C461D62F22EF5500A8F084 /* StatsView.swift in Sources */,
+				93C4623C2F26E5B000A8F084 /* VariantPhoto.swift in Sources */,
 				93C461E62F251D6600A8F084 /* BarcodeScannerView.swift in Sources */,
+				93C4623E2F26E5E200A8F084 /* PhotoPickerSheet.swift in Sources */,
 				937B9F8E2F202A1000C08885 /* FirstSyncView.swift in Sources */,
 				937B9F3F2F2023AC00C08885 /* CalicCollectionV2App.swift in Sources */,
 				93C461CB2F22D65B00A8F084 /* SettingsView.swift in Sources */,
