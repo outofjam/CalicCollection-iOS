@@ -23,7 +23,9 @@ struct APIStats: Codable {
 class StatsService {
     static let shared = StatsService()
     
-    private let baseURL = "https://calicoprod.thetechnodro.me/api/v1"
+    private var baseURL: String {
+        Config.apiBaseURL
+    }
     
     private init() {}
     

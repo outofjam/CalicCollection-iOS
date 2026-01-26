@@ -73,8 +73,9 @@ struct SetFamily: Codable {
 class SetService {
     static let shared = SetService()
     
-    private let baseURL = "https://calicoprod.thetechnodro.me/api/v1"
-    
+    private var baseURL: String {
+        Config.apiBaseURL
+    }
     private init() {}
     
     /// Fetch set by barcode
