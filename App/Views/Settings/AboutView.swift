@@ -64,7 +64,7 @@ struct AboutView: View {
             } header: {
                 Text("Database Stats")
             } footer: {
-                Text("Total critters, variants, and sets available in the CalicCollection database")
+                Text("Total critters, variants, and sets available in the CaliCollection database")
             }
         }
         .navigationTitle("About")

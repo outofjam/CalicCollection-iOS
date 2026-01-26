@@ -1,6 +1,6 @@
 //
-//  CalicCollectionV2UITestsLaunchTests.swift
-//  CalicCollectionV2UITests
+//  CaliCollectionV2UITestsLaunchTests.swift
+//  CaliCollectionV2UITests
 //
 //  Created by Ismail Dawoodjee on 2026-01-20.
 //

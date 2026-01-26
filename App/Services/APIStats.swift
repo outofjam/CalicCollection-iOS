@@ -1,6 +1,6 @@
 //
 //  APIStats.swift
-//  CalicCollectionV2
+//  CaliCollectionV2
 //
 //  Created by Ismail Dawoodjee on 2026-01-24.
 //
