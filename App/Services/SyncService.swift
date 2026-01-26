@@ -124,6 +124,25 @@ class SyncService: ObservableObject {
             }
             
             try modelContext.save()
+            // MARK: - Pre-cache thumbnails for offline use
+            Task.detached(priority: .utility) {
+                print("🖼️ Pre-caching variant thumbnails...")
+                
+                for response in critterResponses {
+                    guard let variants = response.variants else { continue }
+                    
+                    for variant in variants {
+                        if let thumbnailURL = variant.thumbnailURL ?? variant.imageURL {
+                            await ImageCacheManager.shared.downloadAndCache(
+                                urlString: thumbnailURL
+                            )
+                        }
+                    }
+                }
+                
+                print("✅ Thumbnail pre-caching complete")
+            }
+
             print("✅ Synced \(familyResponses.count) families successfully")
             
         } catch {
