@@ -113,7 +113,6 @@ class BackupManager: ObservableObject {
         let backup = try decoder.decode(CollectionBackup.self, from: data)
         
         var imported = 0
-        var skipped = 0
         var updated = 0
         
         for backupVariant in backup.ownedVariants {
@@ -166,7 +165,7 @@ class BackupManager: ObservableObject {
         return ImportResult(
             imported: imported,
             updated: updated,
-            skipped: skipped,
+
             totalInBackup: backup.ownedVariants.count,
             backupDate: backup.exportDate,
             appVersion: backup.appVersion
@@ -188,7 +187,6 @@ class BackupManager: ObservableObject {
     struct ImportResult {
         let imported: Int
         let updated: Int
-        let skipped: Int
         let totalInBackup: Int
         let backupDate: Date
         let appVersion: String
