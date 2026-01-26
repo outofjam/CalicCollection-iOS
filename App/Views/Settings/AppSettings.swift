@@ -6,16 +6,16 @@ class AppSettings: ObservableObject {
     
     @Published var showPurchaseDetails: Bool {
         didSet {
-            UserDefaults.standard.set(showPurchaseDetails, forKey: "showPurchaseDetails")
+            UserDefaults.standard.set(showPurchaseDetails, forKey: Config.UserDefaultsKeys.showPurchaseDetails)
         }
     }
     
     var lastBackupDate: Date? {
         get {
-            UserDefaults.standard.object(forKey: "lastBackupDate") as? Date
+            UserDefaults.standard.object(forKey: Config.UserDefaultsKeys.lastBackupDate) as? Date
         }
         set {
-            UserDefaults.standard.set(newValue, forKey: "lastBackupDate")
+            UserDefaults.standard.set(newValue, forKey: Config.UserDefaultsKeys.lastBackupDate)
         }
     }
     
@@ -29,6 +29,6 @@ class AppSettings: ObservableObject {
     }
     
     private init() {
-        self.showPurchaseDetails = UserDefaults.standard.bool(forKey: "showPurchaseDetails")
+        self.showPurchaseDetails = UserDefaults.standard.bool(forKey: Config.UserDefaultsKeys.showPurchaseDetails)
     }
 }
