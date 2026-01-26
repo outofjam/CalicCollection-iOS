@@ -48,6 +48,7 @@
 		93C462402F26E5EC00A8F084 /* PhotoGallerySection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C4623F2F26E5EC00A8F084 /* PhotoGallerySection.swift */; };
 		93C462422F26E5F800A8F084 /* PhotoDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C462412F26E5F800A8F084 /* PhotoDetailView.swift */; };
 		93C462442F26E8C400A8F084 /* VariantPhoto+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C462432F26E8BD00A8F084 /* VariantPhoto+Helpers.swift */; };
+		93C4625E2F27B6D400A8F084 /* CachedAsyncImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C4625D2F27B6D400A8F084 /* CachedAsyncImage.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -113,6 +114,7 @@
 		93C4623F2F26E5EC00A8F084 /* PhotoGallerySection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoGallerySection.swift; sourceTree = "<group>"; };
 		93C462412F26E5F800A8F084 /* PhotoDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoDetailView.swift; sourceTree = "<group>"; };
 		93C462432F26E8BD00A8F084 /* VariantPhoto+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "VariantPhoto+Helpers.swift"; sourceTree = "<group>"; };
+		93C4625D2F27B6D400A8F084 /* CachedAsyncImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CachedAsyncImage.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -204,6 +206,7 @@
 		937B9F692F2023E400C08885 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				93C4625D2F27B6D400A8F084 /* CachedAsyncImage.swift */,
 				93C461F12F26699200A8F084 /* BackupManager.swift */,
 				93C461EF2F26696700A8F084 /* ImageCacheManager.swift */,
 				93C461E92F2524B300A8F084 /* APIStats.swift */,
@@ -508,6 +511,7 @@
 				93C4623E2F26E5E200A8F084 /* PhotoPickerSheet.swift in Sources */,
 				937B9F8E2F202A1000C08885 /* FirstSyncView.swift in Sources */,
 				937B9F3F2F2023AC00C08885 /* CalicCollectionV2App.swift in Sources */,
+				93C4625E2F27B6D400A8F084 /* CachedAsyncImage.swift in Sources */,
 				93C461CB2F22D65B00A8F084 /* SettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

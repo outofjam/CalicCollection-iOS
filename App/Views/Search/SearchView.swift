@@ -535,38 +535,24 @@ struct StackedVariantImages: View {
                 let displayVariants = variants.prefix(2)
                 
                 ForEach(Array(displayVariants.enumerated()), id: \.element.uuid) { index, variant in
-                    if let urlString = variant.thumbnailURL ?? variant.imageURL,
-                       let url = URL(string: urlString) {
-                        AsyncImage(url: url) { phase in
-                            switch phase {
-                            case .empty:
-                                RoundedRectangle(cornerRadius: 8)
-                                    .fill(Color.gray.opacity(0.2))
-                                    .frame(width: imageSize, height: imageSize)
-                                    .overlay { ProgressView() }
-                            case .success(let image):
-                                image
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fill)
-                                    .frame(width: imageSize, height: imageSize)
-                                    .clipped()
-                                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 8)
-                                            .stroke(Color.white, lineWidth: 2.5)
-                                    )
-                                    .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
-                            case .failure:
-                                RoundedRectangle(cornerRadius: 8)
-                                    .fill(Color.gray.opacity(0.2))
-                                    .frame(width: imageSize, height: imageSize)
-                                    .overlay {
-                                        Image(systemName: "photo")
-                                            .foregroundColor(.gray)
-                                    }
-                            @unknown default:
-                                EmptyView()
-                            }
+                    if let urlString = variant.thumbnailURL ?? variant.imageURL {
+                        CachedAsyncImage(url: urlString) { image in
+                            image
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .frame(width: imageSize, height: imageSize)
+                                .clipped()
+                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .stroke(Color.white, lineWidth: 2.5)
+                                )
+                                .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
+                        } placeholder: {
+                            RoundedRectangle(cornerRadius: 8)
+                                .fill(Color.gray.opacity(0.2))
+                                .frame(width: imageSize, height: imageSize)
+                                .overlay { ProgressView() }
                         }
                         .offset(x: CGFloat(index) * stackOffset)
                         .zIndex(Double(displayVariants.count - index))

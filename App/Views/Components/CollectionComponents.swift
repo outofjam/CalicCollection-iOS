@@ -80,23 +80,15 @@ struct CollectionListRow: View {
                         .offset(x: -2, y: 2)
                 }
                 .clipShape(RoundedRectangle(cornerRadius: 8))
-            } else if let urlString = variant.thumbnailURL ?? variant.imageURL,
-                      let url = URL(string: urlString) {
-                AsyncImage(url: url) { phase in
-                    switch phase {
-                    case .success(let image):
-                        image
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .frame(width: 60, height: 60)
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
-                    case .empty:
-                        placeholderImage
-                    case .failure:
-                        placeholderImage
-                    @unknown default:
-                        placeholderImage
-                    }
+            } else if let urlString = variant.thumbnailURL ?? variant.imageURL {
+                CachedAsyncImage(url: urlString) { image in
+                    image
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 60, height: 60)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                } placeholder: {
+                    placeholderImage
                 }
             } else {
                 placeholderImage
@@ -242,22 +234,14 @@ struct GalleryImageCard: View {
                             .background(Circle().fill(Color.calicoPrimary))
                             .offset(x: -4, y: 4)
                     }
-                } else if let urlString = variant.thumbnailURL ?? variant.imageURL,
-                          let url = URL(string: urlString) {
-                    AsyncImage(url: url) { phase in
-                        switch phase {
-                        case .success(let image):
-                            image
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                                .frame(width: geometry.size.width, height: geometry.size.height)
-                        case .empty:
-                            placeholderImage(width: geometry.size.width, height: geometry.size.height)
-                        case .failure:
-                            placeholderImage(width: geometry.size.width, height: geometry.size.height)
-                        @unknown default:
-                            placeholderImage(width: geometry.size.width, height: geometry.size.height)
-                        }
+                } else if let urlString = variant.thumbnailURL ?? variant.imageURL {
+                    CachedAsyncImage(url: urlString) { image in
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: geometry.size.width, height: geometry.size.height)
+                    } placeholder: {
+                        placeholderImage(width: geometry.size.width, height: geometry.size.height)
                     }
                 } else {
                     placeholderImage(width: geometry.size.width, height: geometry.size.height)

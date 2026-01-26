@@ -53,23 +53,15 @@ struct CritterDetailView: View {
                     ZStack(alignment: .bottomLeading) {
                         // Background image - first variant (use full image for hero)
                         if let firstVariant = critterVariants.first,
-                           let imageURL = firstVariant.imageURL,
-                           let url = URL(string: imageURL) {
-                            AsyncImage(url: url) { phase in
-                                switch phase {
-                                case .empty:
-                                    gradientPlaceholder
-                                case .success(let image):
-                                    image
-                                        .resizable()
-                                        .aspectRatio(contentMode: .fill)
-                                        .frame(width: geometry.size.width, height: 280, alignment: .top)
-                                        .clipped()
-                                case .failure:
-                                    gradientPlaceholder
-                                @unknown default:
-                                    gradientPlaceholder
-                                }
+                           let imageURL = firstVariant.imageURL {
+                            CachedAsyncImage(url: imageURL) { image in
+                                image
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                                    .frame(width: geometry.size.width, height: 280, alignment: .top)
+                                    .clipped()
+                            } placeholder: {
+                                gradientPlaceholder
                             }
                         } else {
                             gradientPlaceholder
@@ -233,29 +225,17 @@ struct VariantCard: View {
             // Image container (use thumbnail for grid performance)
             ZStack(alignment: .topTrailing) {
                 // Use thumbnail if available, fallback to full image
-                if let urlString = variant.thumbnailURL ?? variant.imageURL,
-                   let url = URL(string: urlString) {
-                    AsyncImage(url: url) { phase in
-                        switch phase {
-                        case .empty:
-                            Color.gray.opacity(0.2)
-                                .overlay {
-                                    ProgressView()
-                                }
-                        case .success(let image):
-                            image
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                                .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
-                        case .failure:
-                            Color.gray.opacity(0.2)
-                                .overlay {
-                                    Image(systemName: "photo")
-                                        .foregroundColor(.gray)
-                                }
-                        @unknown default:
-                            Color.gray.opacity(0.2)
-                        }
+                if let urlString = variant.thumbnailURL ?? variant.imageURL {
+                    CachedAsyncImage(url: urlString) { image in
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
+                    } placeholder: {
+                        Color.gray.opacity(0.2)
+                            .overlay {
+                                ProgressView()
+                            }
                     }
                 } else {
                     Color.gray.opacity(0.2)

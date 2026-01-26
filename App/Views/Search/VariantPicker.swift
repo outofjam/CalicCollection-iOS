@@ -203,17 +203,16 @@ struct VariantRow: View {
                 .frame(width: 60, height: 60)
                 .overlay {
                     // Use thumbnail if available, fallback to full image
-                    if let urlString = variant.thumbnailURL ?? variant.imageURL,
-                       let url = URL(string: urlString) {
-                        AsyncImage(url: url) { image in
+                    if let urlString = variant.thumbnailURL ?? variant.imageURL {
+                        CachedAsyncImage(url: urlString) { image in
                             image
                                 .resizable()
                                 .aspectRatio(contentMode: .fill)
+                                .frame(width: 60, height: 60)
+                                .clipShape(RoundedRectangle(cornerRadius: 8))
                         } placeholder: {
                             ProgressView()
                         }
-                        .frame(width: 60, height: 60)
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
                     } else {
                         Image(systemName: "photo")
                             .foregroundColor(.gray)
