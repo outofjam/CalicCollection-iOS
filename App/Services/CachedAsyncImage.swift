@@ -1,11 +1,3 @@
-//
-//  CachedAsyncImage.swift
-//  CalicCollectionV2
-//
-//  Created by Ismail Dawoodjee on 2026-01-26.
-//
-
-
 import SwiftUI
 
 struct CachedAsyncImage<Content: View, Placeholder: View>: View {
@@ -28,28 +20,33 @@ struct CachedAsyncImage<Content: View, Placeholder: View>: View {
     
     var body: some View {
         Group {
-            if let image = image {
+            if let image {
                 content(Image(uiImage: image))
             } else {
                 placeholder()
             }
         }
-        .task {
+        .task(id: url) {
             await loadImage()
+        }
+        .onChange(of: url) {
+            image = nil
         }
     }
     
     private func loadImage() async {
-        guard !isLoading else { return }
+        guard !isLoading, !url.isEmpty else { return }
         isLoading = true
         
-        image = await ImageCacheManager.shared.downloadAndCache(urlString: url)
+        image = await ImageCacheManager.shared.downloadAndCache(
+            urlString: url
+        )
         
         isLoading = false
     }
 }
 
-// Convenience init for URL instead of String
+// MARK: - Convenience init
 extension CachedAsyncImage {
     init(
         url: URL?,
