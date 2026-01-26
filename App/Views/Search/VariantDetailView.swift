@@ -39,25 +39,19 @@ struct VariantDetailView: View {
                         ZStack(alignment: .bottomLeading) {
                             // Variant image
                             if let imageURL = variant.imageURL, let url = URL(string: imageURL) {
-                                AsyncImage(url: url) { phase in
-                                    switch phase {
-                                    case .empty:
-                                        gradientPlaceholder
-                                    case .success(let image):
-                                        image
-                                            .resizable()
-                                            .aspectRatio(contentMode: .fill)
-                                            .frame(width: geometry.size.width, height: 300, alignment: .top)
-                                            .clipped()
-                                            .onTapGesture {
-                                                showingFullscreenImage = true
-                                            }
-                                    case .failure:
-                                        gradientPlaceholder
-                                    @unknown default:
-                                        gradientPlaceholder
-                                    }
+                                CachedAsyncImage(url: imageURL) { image in
+                                    image
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fill)
+                                        .frame(width: geometry.size.width, height: 300, alignment: .top)
+                                        .clipped()
+                                        .onTapGesture {
+                                            showingFullscreenImage = true
+                                        }
+                                } placeholder: {
+                                    gradientPlaceholder
                                 }
+
                             } else {
                                 gradientPlaceholder
                             }
