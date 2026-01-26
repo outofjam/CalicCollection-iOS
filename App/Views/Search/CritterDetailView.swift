@@ -13,7 +13,9 @@ struct CritterDetailView: View {
     @State private var selectedVariantForDetail: CritterVariant?
     
     private var critterVariants: [CritterVariant] {
-        allVariants.filter { $0.critterId == critter.uuid }
+        allVariants
+            .filter { $0.critterId == critter.uuid }
+            .sorted { ($0.isPrimary ?? false) && !($1.isPrimary ?? false) }
     }
     
     private var ownedCritterVariants: [OwnedVariant] {
@@ -51,9 +53,9 @@ struct CritterDetailView: View {
                 // MARK: - Hero Section (Image + Info Overlay)
                 GeometryReader { geometry in
                     ZStack(alignment: .bottomLeading) {
-                        // Background image - first variant (use full image for hero)
-                        if let firstVariant = critterVariants.first,
-                           let imageURL = firstVariant.imageURL {
+                        // Background image - use primary variant or first variant
+                        if let primaryVariant = critterVariants.primaryOrFirst(),
+                           let imageURL = primaryVariant.imageURL {
                             CachedAsyncImage(url: imageURL) { image in
                                 image
                                     .resizable()
@@ -245,7 +247,23 @@ struct VariantCard: View {
                         }
                 }
                 
-                // Owned checkmark
+                // Primary badge
+                if variant.isPrimary == true {
+                    HStack(spacing: 2) {
+                        Image(systemName: "star.fill")
+                            .font(.system(size: 8))
+                        Text("Primary")
+                            .font(.system(size: 9, weight: .semibold))
+                    }
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 3)
+                    .background(Color.orange)
+                    .cornerRadius(4)
+                    .padding(6)
+                }
+                
+                // Owned checkmark (show below primary badge if both exist)
                 if isOwned {
                     Image(systemName: "checkmark.circle.fill")
                         .foregroundColor(.calicoSuccess)
@@ -255,13 +273,14 @@ struct VariantCard: View {
                                 .frame(width: 20, height: 20)
                         )
                         .padding(8)
+                        .offset(y: variant.isPrimary == true ? 28 : 0) // Offset if primary badge exists
                 }
             }
             .aspectRatio(1, contentMode: .fit)
             .clipped()
             .clipShape(RoundedRectangle(cornerRadius: 8))
             
-            // Variant info
+            // Variant info (existing code)
             VStack(alignment: .leading, spacing: 4) {
                 Text(variant.name)
                     .font(.caption)

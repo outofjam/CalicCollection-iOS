@@ -532,7 +532,10 @@ struct StackedVariantImages: View {
                             .foregroundColor(.gray)
                     }
             } else {
-                let displayVariants = variants.prefix(2)
+                // Use primary variant first, then up to 2 total
+                let primaryVariant = variants.primaryOrFirst()
+                let displayVariants = [primaryVariant].compactMap { $0 } +
+                    variants.filter { $0.uuid != primaryVariant?.uuid }.prefix(1)
                 
                 ForEach(Array(displayVariants.enumerated()), id: \.element.uuid) { index, variant in
                     if let urlString = variant.thumbnailURL ?? variant.imageURL {
