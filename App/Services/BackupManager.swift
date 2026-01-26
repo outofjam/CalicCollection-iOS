@@ -41,9 +41,9 @@ class BackupManager: ObservableObject {
     
     private init() {
         // Load last backup date from UserDefaults
-        if let timestamp = UserDefaults.standard.object(forKey: lastBackupKey) as? Date {
-            lastBackupDate = timestamp
-        }
+        if let timestamp = UserDefaults.standard.object(forKey: Config.UserDefaultsKeys.lastBackupDate) as? Date {
+                 lastBackupDate = timestamp
+             }
     }
     
     // MARK: - Export
@@ -95,8 +95,7 @@ class BackupManager: ObservableObject {
         // Update last backup timestamp
         let now = Date()
         lastBackupDate = now
-        UserDefaults.standard.set(now, forKey: lastBackupKey)
-        
+        UserDefaults.standard.set(now, forKey: Config.UserDefaultsKeys.lastBackupDate)
         return tempURL
     }
     

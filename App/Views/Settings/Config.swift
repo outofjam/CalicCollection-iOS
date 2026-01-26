@@ -7,14 +7,14 @@ struct Config {
     
     /// Base API URL
     static var apiBaseURL: String {
-        #if DEBUG
+#if DEBUG
         // Development URL
         return "https://calicoprod.thetechnodro.me/api/v1"
         //return "http://callicollection.test/api/v1"
-        #else
+#else
         // Production URL
         return "http://api.callicollection.com/api/v1"
-        #endif
+#endif
     }
     
     // MARK: - App Information
@@ -27,10 +27,16 @@ struct Config {
     /// Days before requiring sync
     static let syncIntervalDays = 7
     
-    // MARK: - User Defaults Keys
-    
+    // MARK: - UserDefaults Keys
     struct UserDefaultsKeys {
+        // Sync
         static let hasCompletedFirstSync = "hasCompletedFirstSync"
-        static let lastSyncDate = "lastCritterSync"
+        static let lastSyncDate = "lastSyncDate"
+        
+        // Settings
+        static let showPurchaseDetails = "showPurchaseDetails"
+        
+        // Backup
+        static let lastBackupDate = "lastBackupDate"
     }
 }
