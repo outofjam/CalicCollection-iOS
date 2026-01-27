@@ -8,9 +8,13 @@ struct BarcodeScannerView: View {
     @State private var scannerIsActive = true
     @State private var showError = false
     @State private var errorMessage = ""
+    @State private var cameraReady = false
     
     var body: some View {
         ZStack {
+            // Black background to prevent white flash
+            Color.black.ignoresSafeArea()
+            
             // Camera scanner
             if DataScannerViewController.isSupported && DataScannerViewController.isAvailable {
                 DataScannerRepresentable(
@@ -23,6 +27,7 @@ struct BarcodeScannerView: View {
                     }
                 )
                 .ignoresSafeArea()
+                .opacity(cameraReady ? 1 : 0)
             } else {
                 // Fallback for unsupported devices
                 VStack(spacing: 20) {
@@ -40,6 +45,13 @@ struct BarcodeScannerView: View {
                         .multilineTextAlignment(.center)
                         .padding(.horizontal)
                 }
+            }
+            
+            // Loading indicator while camera initializes
+            if !cameraReady && DataScannerViewController.isSupported && DataScannerViewController.isAvailable {
+                ProgressView()
+                    .tint(.white)
+                    .scaleEffect(1.5)
             }
             
             // Overlay UI
@@ -81,6 +93,14 @@ struct BarcodeScannerView: View {
                 .padding(.bottom, 60)
             }
         }
+        .onAppear {
+            // Give camera time to initialize, then fade in
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                withAnimation(.easeIn(duration: 0.2)) {
+                    cameraReady = true
+                }
+            }
+        }
         .alert("Scanner Error", isPresented: $showError) {
             Button("OK", role: .cancel) { }
         } message: {
@@ -99,9 +119,9 @@ struct DataScannerRepresentable: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> DataScannerViewController {
         let scanner = DataScannerViewController(
             recognizedDataTypes: recognizedDataTypes,
-            qualityLevel: .fast,  // Changed from .balanced to .fast
+            qualityLevel: .fast,
             recognizesMultipleItems: false,
-            isHighFrameRateTrackingEnabled: false,  // Disabled for better performance
+            isHighFrameRateTrackingEnabled: false,
             isPinchToZoomEnabled: true,
             isGuidanceEnabled: true,
             isHighlightingEnabled: true
