@@ -5,7 +5,7 @@ import UniformTypeIdentifiers
 struct SettingsView: View {
     @Environment(\.modelContext) private var modelContext
     @EnvironmentObject private var syncService: SyncService
-    @StateObject private var appSettings = AppSettings.shared
+    @ObservedObject private var appSettings = AppSettings.shared
     
     @State private var showingSyncConfirmation = false
     @State private var refreshID = UUID()
@@ -162,7 +162,8 @@ struct SettingsView: View {
 // MARK: - Data Management View
 struct DataManagementView: View {
     @Environment(\.modelContext) private var modelContext
-    @StateObject private var backupManager = BackupManager.shared
+    @ObservedObject private var backupManager = BackupManager.shared
+    
     @Query private var critters: [Critter]
     @Query private var variants: [CritterVariant]
     @Query private var families: [Family]
