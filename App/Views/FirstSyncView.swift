@@ -13,15 +13,12 @@ struct FirstSyncView: View {
             Spacer()
             
             // App Icon / Logo
-            Image(systemName: "pawprint.fill")
-                .font(.system(size: 80))
-                .foregroundStyle(
-                    LinearGradient(
-                        colors: [.blue, .pink],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
+            // App Icon / Logo
+            Image("LaunchIcon")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 120, height: 120)
+                .clipShape(RoundedRectangle(cornerRadius: 24))
             
             // Welcome Text
             VStack(spacing: 8) {
