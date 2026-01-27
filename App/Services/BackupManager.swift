@@ -88,7 +88,7 @@ class BackupManager: ObservableObject {
         let data = try encoder.encode(backup)
         
         // Save to temporary file
-        let filename = "CalicCollection_Backup_\(Date().formatted(date: .numeric, time: .omitted).replacingOccurrences(of: "/", with: "-")).json"
+        let filename = "\(Config.appName)_Backup_\(Date().formatted(date: .numeric, time: .omitted).replacingOccurrences(of: "/", with: "-")).json"
         let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(filename)
         try data.write(to: tempURL)
         
