@@ -149,6 +149,7 @@ class AboutViewModel: ObservableObject {
         } catch {
             AppLogger.error("Failed to load stats: \(error)")
             apiStats = nil
+            ToastManager.shared.show("Couldn't load database stats", type: .error)
         }
         isLoadingStats = false
     }
