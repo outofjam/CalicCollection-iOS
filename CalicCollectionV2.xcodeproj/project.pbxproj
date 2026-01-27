@@ -27,6 +27,7 @@
 		93ADCD182F29271600351CE9 /* BottomActionBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93ADCD172F29271600351CE9 /* BottomActionBar.swift */; };
 		93ADCD1A2F29272300351CE9 /* FullscreenImageViewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93ADCD192F29272300351CE9 /* FullscreenImageViewer.swift */; };
 		93ADCD1C2F29275D00351CE9 /* InfoRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93ADCD1B2F29275D00351CE9 /* InfoRow.swift */; };
+		93ADCD462F292DFC00351CE9 /* NetworkConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93ADCD452F292DFC00351CE9 /* NetworkConfig.swift */; };
 		93C461C32F22D4BB00A8F084 /* ToastManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C461C22F22D4B300A8F084 /* ToastManager.swift */; };
 		93C461CB2F22D65B00A8F084 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C461CA2F22D65600A8F084 /* SettingsView.swift */; };
 		93C461CD2F22EB3400A8F084 /* VariantDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C461CC2F22EB3100A8F084 /* VariantDetailView.swift */; };
@@ -100,6 +101,7 @@
 		93ADCD172F29271600351CE9 /* BottomActionBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomActionBar.swift; sourceTree = "<group>"; };
 		93ADCD192F29272300351CE9 /* FullscreenImageViewer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullscreenImageViewer.swift; sourceTree = "<group>"; };
 		93ADCD1B2F29275D00351CE9 /* InfoRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoRow.swift; sourceTree = "<group>"; };
+		93ADCD452F292DFC00351CE9 /* NetworkConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkConfig.swift; sourceTree = "<group>"; };
 		93C461C22F22D4B300A8F084 /* ToastManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastManager.swift; sourceTree = "<group>"; };
 		93C461CA2F22D65600A8F084 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		93C461CC2F22EB3100A8F084 /* VariantDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VariantDetailView.swift; sourceTree = "<group>"; };
@@ -221,12 +223,13 @@
 			isa = PBXGroup;
 			children = (
 				93C462932F2807F000A8F084 /* APIError.swift */,
-				93C4625D2F27B6D400A8F084 /* CachedAsyncImage.swift */,
-				93C461F12F26699200A8F084 /* BackupManager.swift */,
-				93C461EF2F26696700A8F084 /* ImageCacheManager.swift */,
-				93C461E92F2524B300A8F084 /* APIStats.swift */,
-				937B9F852F20259900C08885 /* SyncService.swift */,
 				937B9F832F20259100C08885 /* APIService.swift */,
+				93C461E92F2524B300A8F084 /* APIStats.swift */,
+				93C461F12F26699200A8F084 /* BackupManager.swift */,
+				93C4625D2F27B6D400A8F084 /* CachedAsyncImage.swift */,
+				93C461EF2F26696700A8F084 /* ImageCacheManager.swift */,
+				93ADCD452F292DFC00351CE9 /* NetworkConfig.swift */,
+				937B9F852F20259900C08885 /* SyncService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -538,6 +541,7 @@
 				937B9F8E2F202A1000C08885 /* FirstSyncView.swift in Sources */,
 				937B9F3F2F2023AC00C08885 /* CalicCollectionV2App.swift in Sources */,
 				93C462782F27F31C00A8F084 /* CritterExtensions.swift in Sources */,
+				93ADCD462F292DFC00351CE9 /* NetworkConfig.swift in Sources */,
 				93C4625E2F27B6D400A8F084 /* CachedAsyncImage.swift in Sources */,
 				93ADCD1A2F29272300351CE9 /* FullscreenImageViewer.swift in Sources */,
 				93C461CB2F22D65B00A8F084 /* SettingsView.swift in Sources */,

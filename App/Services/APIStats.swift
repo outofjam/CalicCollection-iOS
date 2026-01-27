@@ -28,7 +28,10 @@ class StatsService {
             throw APIError.invalidURL
         }
         
-        let (data, response) = try await URLSession.shared.data(from: url)
+        var request = URLRequest(url: url)
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        
+        let (data, response) = try await NetworkConfig.performRequest(request)
         
         guard let httpResponse = response as? HTTPURLResponse else {
             throw APIError.invalidResponse

@@ -79,7 +79,6 @@ class SetService {
     
     private init() {}
     
-    /// Fetch set by barcode
     func fetchSetByBarcode(_ barcode: String) async throws -> SetResponse {
         let urlString = "\(baseURL)/sets/barcode/\(barcode)"
         
@@ -90,7 +89,10 @@ class SetService {
             throw APIError.invalidURL
         }
         
-        let (data, response) = try await URLSession.shared.data(from: url)
+        var request = URLRequest(url: url)
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        
+        let (data, response) = try await NetworkConfig.performRequest(request)
         
         guard let httpResponse = response as? HTTPURLResponse else {
             throw APIError.invalidResponse
@@ -101,9 +103,6 @@ class SetService {
         guard httpResponse.statusCode == 200 else {
             if httpResponse.statusCode == 404 {
                 print("❌ Set not found (404)")
-                if let responseString = String(data: data, encoding: .utf8) {
-                    print("Response body: \(responseString)")
-                }
                 throw APIError.notFound(message: "No set found with this barcode")
             }
             throw APIError.httpError(statusCode: httpResponse.statusCode)
