@@ -3,7 +3,7 @@ import Combine
 
 // MARK: - AboutView
 struct AboutView: View {
-    @StateObject private var viewModel = AboutViewModel.shared
+    @ObservedObject private var viewModel = AboutViewModel.shared
     
     var body: some View {
         List {

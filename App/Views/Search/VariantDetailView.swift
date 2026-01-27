@@ -8,7 +8,7 @@ struct VariantDetailView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
     @Query private var ownedVariants: [OwnedVariant]
-    @StateObject private var appSettings = AppSettings.shared
+    @ObservedObject private var appSettings = AppSettings.shared
     
     @State private var showingFullscreenImage = false
     @State private var showingPurchaseDetails = false
