@@ -12,6 +12,7 @@ struct VariantDetailView: View {
     
     @State private var showingFullscreenImage = false
     @State private var showingPurchaseDetails = false
+    @State private var showingReportIssue = false
     
     private var ownedVariant: OwnedVariant? {
         ownedVariants.first { $0.variantUuid == variant.uuid }
@@ -37,8 +38,7 @@ struct VariantDetailView: View {
                     // MARK: - Hero Image
                     GeometryReader { geometry in
                         ZStack(alignment: .bottomLeading) {
-                            // Variant image
-                            if let imageURL = variant.imageURL, let url = URL(string: imageURL) {
+                            if let imageURL = variant.imageURL {
                                 CachedAsyncImage(url: imageURL) { image in
                                     image
                                         .resizable()
@@ -51,7 +51,6 @@ struct VariantDetailView: View {
                                 } placeholder: {
                                     gradientPlaceholder
                                 }
-
                             } else {
                                 gradientPlaceholder
                             }
@@ -161,92 +160,14 @@ struct VariantDetailView: View {
                             }
                         }
                         
-                        // MARK: - Purchase Details Section (if enabled and owned)
+                        // MARK: - Purchase Details Section
                         if appSettings.showPurchaseDetails, let owned = ownedVariant, owned.status == .collection {
-                            VStack(alignment: .leading, spacing: 12) {
-                                HStack {
-                                    Text("Purchase Details")
-                                        .font(.headline)
-                                    
-                                    Spacer()
-                                    
-                                    Button {
-                                        showingPurchaseDetails = true
-                                    } label: {
-                                        Text(hasPurchaseDetails ? "Edit" : "Add")
-                                            .font(.subheadline)
-                                            .foregroundColor(.calicoPrimary)
-                                    }
-                                }
-                                
-                                if hasPurchaseDetails {
-                                    if let price = owned.pricePaid {
-                                        InfoRow(label: "Price Paid", value: String(format: "$%.2f", price))
-                                    }
-                                    
-                                    if let date = owned.purchaseDate {
-                                        InfoRow(label: "Purchase Date", value: date.formatted(date: .abbreviated, time: .omitted))
-                                    }
-                                    
-                                    if let location = owned.purchaseLocation {
-                                        InfoRow(label: "Store", value: location)
-                                    }
-                                    
-                                    if let condition = owned.condition {
-                                        InfoRow(label: "Condition", value: condition)
-                                    }
-                                    
-                                    if let notes = owned.notes {
-                                        VStack(alignment: .leading, spacing: 4) {
-                                            Text("Notes")
-                                                .font(.caption)
-                                                .foregroundColor(.calicoTextSecondary)
-                                            Text(notes)
-                                                .font(.body)
-                                        }
-                                    }
-                                    
-                                    HStack(spacing: 16) {
-                                        Text("Quantity")
-                                            .font(.caption)
-                                            .foregroundColor(.calicoTextSecondary)
-                                        
-                                        Spacer()
-                                        
-                                        HStack(spacing: 12) {
-                                            Button {
-                                                if owned.quantity > 1 {
-                                                    owned.quantity -= 1
-                                                    try? modelContext.save()
-                                                }
-                                            } label: {
-                                                Image(systemName: "minus.circle.fill")
-                                                    .foregroundColor(owned.quantity > 1 ? .calicoPrimary : .gray)
-                                            }
-                                            .disabled(owned.quantity <= 1)
-                                            
-                                            Text("\(owned.quantity)")
-                                                .font(.headline)
-                                                .frame(minWidth: 30)
-                                            
-                                            Button {
-                                                owned.quantity += 1
-                                                try? modelContext.save()
-                                            } label: {
-                                                Image(systemName: "plus.circle.fill")
-                                                    .foregroundColor(.calicoPrimary)
-                                            }
-                                        }
-                                    }
-                                } else {
-                                    Text("Tap 'Add' to track purchase details")
-                                        .font(.subheadline)
-                                        .foregroundColor(.calicoTextSecondary)
-                                }
-                            }
-                            .padding()
-                            .background(Color(uiColor: .secondarySystemGroupedBackground))
-                            .cornerRadius(12)
+                            PurchaseDetailsSection(
+                                ownedVariant: owned,
+                                hasPurchaseDetails: hasPurchaseDetails,
+                                showingPurchaseDetails: $showingPurchaseDetails,
+                                modelContext: modelContext
+                            )
                         }
                         
                         // Extra bottom padding for sticky action bar
@@ -260,6 +181,18 @@ struct VariantDetailView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
+                    Menu {
+                        Button {
+                            showingReportIssue = true
+                        } label: {
+                            Label("Report Issue", systemImage: "flag")
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
+                    }
+                }
+                
+                ToolbarItem(placement: .topBarLeading) {
                     Button("Done") {
                         dismiss()
                     }
@@ -286,7 +219,10 @@ struct VariantDetailView: View {
                     PurchaseDetailsSheet(ownedVariant: owned)
                 }
             }
-        }
+            .sheet(isPresented: $showingReportIssue) {
+                ReportIssueSheet(variant: variant)
+            }
+        }.toast()
     }
     
     private var gradientPlaceholder: some View {
@@ -347,234 +283,98 @@ struct VariantDetailView: View {
     }
 }
 
-// MARK: - Bottom Action Bar
-struct BottomActionBar: View {
-    let isInCollection: Bool
-    let isInWishlist: Bool
-    let variantName: String
-    let onAddToCollection: () -> Void
-    let onAddToWishlist: () -> Void
-    let onMoveToWishlist: () -> Void
-    let onRemove: () -> Void
-    
-    @State private var showingRemoveAlert = false
+// MARK: - Purchase Details Section
+struct PurchaseDetailsSection: View {
+    let ownedVariant: OwnedVariant
+    let hasPurchaseDetails: Bool
+    @Binding var showingPurchaseDetails: Bool
+    let modelContext: ModelContext
     
     var body: some View {
-        VStack(spacing: 0) {
-            Divider()
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("Purchase Details")
+                    .font(.headline)
+                
+                Spacer()
+                
+                Button {
+                    showingPurchaseDetails = true
+                } label: {
+                    Text(hasPurchaseDetails ? "Edit" : "Add")
+                        .font(.subheadline)
+                        .foregroundColor(.calicoPrimary)
+                }
+            }
             
-            HStack(spacing: 12) {
-                // Primary action button
-                if !isInCollection {
-                    Button {
-                        onAddToCollection()
-                    } label: {
-                        HStack {
-                            Image(systemName: "star.fill")
-                            Text("Add to Collection")
-                        }
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 14)
-                        .background(Color.calicoPrimary)
-                        .cornerRadius(12)
-                    }
-                } else {
-                    Button {
-                        onMoveToWishlist()
-                    } label: {
-                        HStack {
-                            Image(systemName: "heart.fill")
-                            Text("Move to Wishlist")
-                        }
-                        .font(.headline)
-                        .foregroundColor(.pink)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 14)
-                        .background(Color.pink.opacity(0.1))
-                        .cornerRadius(12)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color.pink, lineWidth: 1.5)
-                        )
+            if hasPurchaseDetails {
+                if let price = ownedVariant.pricePaid {
+                    InfoRow(label: "Price Paid", value: String(format: "$%.2f", price))
+                }
+                
+                if let date = ownedVariant.purchaseDate {
+                    InfoRow(label: "Purchase Date", value: date.formatted(date: .abbreviated, time: .omitted))
+                }
+                
+                if let location = ownedVariant.purchaseLocation {
+                    InfoRow(label: "Store", value: location)
+                }
+                
+                if let condition = ownedVariant.condition {
+                    InfoRow(label: "Condition", value: condition)
+                }
+                
+                if let notes = ownedVariant.notes {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Notes")
+                            .font(.caption)
+                            .foregroundColor(.calicoTextSecondary)
+                        Text(notes)
+                            .font(.body)
                     }
                 }
                 
-                // Secondary actions menu
-                if isInCollection || isInWishlist {
-                    Menu {
-                        if !isInWishlist && !isInCollection {
-                            Button {
-                                onAddToWishlist()
-                            } label: {
-                                Label("Add to Wishlist", systemImage: "heart")
-                            }
-                        }
-                        
-                        Button(role: .destructive) {
-                            showingRemoveAlert = true
-                        } label: {
-                            Label("Remove from \(isInCollection ? "Collection" : "Wishlist")", systemImage: "trash")
-                        }
-                    } label: {
-                        Image(systemName: "ellipsis.circle.fill")
-                            .font(.title2)
-                            .foregroundColor(.calicoTextSecondary)
-                            .frame(width: 50, height: 50)
-                            .background(Color(uiColor: .secondarySystemGroupedBackground))
-                            .cornerRadius(12)
-                    }
-                } else if !isInCollection {
-                    // Wishlist button when not in collection and not in wishlist
-                    Button {
-                        onAddToWishlist()
-                    } label: {
-                        Image(systemName: "heart")
-                            .font(.title2)
-                            .foregroundColor(.pink)
-                            .frame(width: 50, height: 50)
-                            .background(Color.pink.opacity(0.1))
-                            .cornerRadius(12)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .stroke(Color.pink, lineWidth: 1.5)
-                            )
-                    }
-                }
-            }
-            .padding(.horizontal)
-            .padding(.vertical, 12)
-        }
-        .background(.regularMaterial)
-        .alert("Remove \(variantName)?", isPresented: $showingRemoveAlert) {
-            Button("Cancel", role: .cancel) { }
-            Button("Remove", role: .destructive) {
-                onRemove()
-            }
-        } message: {
-            Text("This will remove \(variantName) from your \(isInCollection ? "collection" : "wishlist").")
-        }
-    }
-}
-
-// MARK: - Info Row
-struct InfoRow: View {
-    let label: String
-    let value: String
-    
-    var body: some View {
-        HStack {
-            Text(label)
-                .font(.caption)
-                .foregroundColor(.calicoTextSecondary)
-            Spacer()
-            Text(value)
-                .font(.body)
-        }
-    }
-}
-
-// MARK: - Fullscreen Image Viewer
-struct FullscreenImageViewer: View {
-    let imageURL: String
-    @Environment(\.dismiss) private var dismiss
-    
-    @State private var scale: CGFloat = 1.0
-    @State private var lastScale: CGFloat = 1.0
-    @State private var offset: CGSize = .zero
-    @State private var lastOffset: CGSize = .zero
-    
-    var body: some View {
-        ZStack {
-            Color.black.ignoresSafeArea()
-            
-            if let url = URL(string: imageURL) {
-                AsyncImage(url: url) { phase in
-                    switch phase {
-                    case .success(let image):
-                        image
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .scaleEffect(scale)
-                            .offset(offset)
-                            .gesture(
-                                MagnificationGesture()
-                                    .onChanged { value in
-                                        scale = lastScale * value
-                                    }
-                                    .onEnded { _ in
-                                        lastScale = scale
-                                        // Reset if zoomed out too far
-                                        if scale < 1 {
-                                            withAnimation {
-                                                scale = 1
-                                                lastScale = 1
-                                                offset = .zero
-                                                lastOffset = .zero
-                                            }
-                                        }
-                                    }
-                            )
-                            .simultaneousGesture(
-                                DragGesture()
-                                    .onChanged { value in
-                                        if scale > 1 {
-                                            offset = CGSize(
-                                                width: lastOffset.width + value.translation.width,
-                                                height: lastOffset.height + value.translation.height
-                                            )
-                                        }
-                                    }
-                                    .onEnded { _ in
-                                        lastOffset = offset
-                                    }
-                            )
-                    case .empty:
-                        ProgressView()
-                            .tint(.white)
-                    case .failure:
-                        Image(systemName: "photo")
-                            .font(.system(size: 60))
-                            .foregroundColor(.white.opacity(0.5))
-                    @unknown default:
-                        EmptyView()
-                    }
-                }
-            }
-            
-            // Close button
-            VStack {
-                HStack {
+                HStack(spacing: 16) {
+                    Text("Quantity")
+                        .font(.caption)
+                        .foregroundColor(.calicoTextSecondary)
+                    
                     Spacer()
-                    Button {
-                        dismiss()
-                    } label: {
-                        Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: 30))
-                            .foregroundColor(.white)
-                            .shadow(radius: 2)
+                    
+                    HStack(spacing: 12) {
+                        Button {
+                            if ownedVariant.quantity > 1 {
+                                ownedVariant.quantity -= 1
+                                try? modelContext.save()
+                            }
+                        } label: {
+                            Image(systemName: "minus.circle.fill")
+                                .foregroundColor(ownedVariant.quantity > 1 ? .calicoPrimary : .gray)
+                        }
+                        .disabled(ownedVariant.quantity <= 1)
+                        
+                        Text("\(ownedVariant.quantity)")
+                            .font(.headline)
+                            .frame(minWidth: 30)
+                        
+                        Button {
+                            ownedVariant.quantity += 1
+                            try? modelContext.save()
+                        } label: {
+                            Image(systemName: "plus.circle.fill")
+                                .foregroundColor(.calicoPrimary)
+                        }
                     }
-                    .padding()
                 }
-                Spacer()
+            } else {
+                Text("Tap 'Add' to track purchase details")
+                    .font(.subheadline)
+                    .foregroundColor(.calicoTextSecondary)
             }
         }
-        .statusBar(hidden: true)
-        .onTapGesture(count: 2) {
-            // Double tap to zoom
-            withAnimation {
-                if scale == 1 {
-                    scale = 2
-                    lastScale = 2
-                } else {
-                    scale = 1
-                    lastScale = 1
-                    offset = .zero
-                    lastOffset = .zero
-                }
-            }
-        }
+        .padding()
+        .background(Color(uiColor: .secondarySystemGroupedBackground))
+        .cornerRadius(12)
     }
 }
 

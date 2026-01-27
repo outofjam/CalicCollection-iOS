@@ -1,11 +1,3 @@
-//
-//  APIStats.swift
-//  CaliCollectionV2
-//
-//  Created by Ismail Dawoodjee on 2026-01-24.
-//
-
-
 import Foundation
 
 struct APIStats: Codable {
@@ -33,17 +25,17 @@ class StatsService {
         let urlString = "\(baseURL)/stats"
         
         guard let url = URL(string: urlString) else {
-            throw StatsServiceError.invalidURL
+            throw APIError.invalidURL
         }
         
         let (data, response) = try await URLSession.shared.data(from: url)
         
         guard let httpResponse = response as? HTTPURLResponse else {
-            throw StatsServiceError.invalidResponse
+            throw APIError.invalidResponse
         }
         
         guard httpResponse.statusCode == 200 else {
-            throw StatsServiceError.httpError(statusCode: httpResponse.statusCode)
+            throw APIError.httpError(statusCode: httpResponse.statusCode)
         }
         
         let decoder = JSONDecoder()
@@ -54,21 +46,4 @@ class StatsService {
 
 private struct StatsResponseWrapper: Codable {
     let data: APIStats
-}
-
-enum StatsServiceError: LocalizedError {
-    case invalidURL
-    case invalidResponse
-    case httpError(statusCode: Int)
-    
-    var errorDescription: String? {
-        switch self {
-        case .invalidURL:
-            return "Invalid URL"
-        case .invalidResponse:
-            return "Invalid response from server"
-        case .httpError(let code):
-            return "Server error: \(code)"
-        }
-    }
 }

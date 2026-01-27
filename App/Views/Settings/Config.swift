@@ -32,11 +32,19 @@ struct Config {
         // Sync
         static let hasCompletedFirstSync = "hasCompletedFirstSync"
         static let lastSyncDate = "lastSyncDate"
-        
-        // Settings
         static let showPurchaseDetails = "showPurchaseDetails"
-        
-        // Backup
         static let lastBackupDate = "lastBackupDate"
+        static let deviceId = "deviceId"
+    }
+    
+    // MARK: - Device Identifier
+    static var deviceId: String {
+        if let existingId = UserDefaults.standard.string(forKey: UserDefaultsKeys.deviceId) {
+            return existingId
+        }
+        
+        let newId = UUID().uuidString
+        UserDefaults.standard.set(newId, forKey: UserDefaultsKeys.deviceId)
+        return newId
     }
 }

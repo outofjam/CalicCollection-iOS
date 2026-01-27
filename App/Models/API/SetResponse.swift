@@ -76,6 +76,7 @@ class SetService {
     private var baseURL: String {
         Config.apiBaseURL
     }
+    
     private init() {}
     
     /// Fetch set by barcode
@@ -86,13 +87,13 @@ class SetService {
         print("🌐 URL: \(urlString)")
         
         guard let url = URL(string: urlString) else {
-            throw SetServiceError.invalidURL
+            throw APIError.invalidURL
         }
         
         let (data, response) = try await URLSession.shared.data(from: url)
         
         guard let httpResponse = response as? HTTPURLResponse else {
-            throw SetServiceError.invalidResponse
+            throw APIError.invalidResponse
         }
         
         print("📡 Response status: \(httpResponse.statusCode)")
@@ -100,16 +101,14 @@ class SetService {
         guard httpResponse.statusCode == 200 else {
             if httpResponse.statusCode == 404 {
                 print("❌ Set not found (404)")
-                // Print response body for debugging
                 if let responseString = String(data: data, encoding: .utf8) {
                     print("Response body: \(responseString)")
                 }
-                throw SetServiceError.setNotFound
+                throw APIError.notFound(message: "No set found with this barcode")
             }
-            throw SetServiceError.httpError(statusCode: httpResponse.statusCode)
+            throw APIError.httpError(statusCode: httpResponse.statusCode)
         }
         
-        // Print response for debugging
         if let responseString = String(data: data, encoding: .utf8) {
             print("✅ Response: \(responseString.prefix(200))...")
         }
@@ -124,25 +123,4 @@ class SetService {
 /// Wrapper for API response format
 private struct SetResponseWrapper: Codable {
     let data: SetResponse
-}
-
-/// Errors for SetService
-enum SetServiceError: LocalizedError {
-    case invalidURL
-    case invalidResponse
-    case setNotFound
-    case httpError(statusCode: Int)
-    
-    var errorDescription: String? {
-        switch self {
-        case .invalidURL:
-            return "Invalid URL"
-        case .invalidResponse:
-            return "Invalid response from server"
-        case .setNotFound:
-            return "No set found with this barcode"
-        case .httpError(let code):
-            return "Server error: \(code)"
-        }
-    }
 }
