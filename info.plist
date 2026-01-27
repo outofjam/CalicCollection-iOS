@@ -2,6 +2,13 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+    <key>UILaunchScreen</key>
+    <dict>
+        <key>UIColorName</key>
+        <string>LaunchBackgroundColor</string>
+        <key>UIImageName</key>
+        <string>LaunchIcon</string>
+    </dict>
     <key>NSCameraUsageDescription</key>
     <string>Camera is used to scan barcodes on Calico Critters sets and to take photos of your collection</string>
     <key>NSPhotoLibraryAddUsageDescription</key>
@@ -39,8 +46,6 @@
             </dict>
         </dict>
     </dict>
-    <key>UILaunchScreen</key>
-    <dict/>
     <key>UIStatusBarStyle</key>
     <string></string>
     <key>UISupportedInterfaceOrientations</key>
