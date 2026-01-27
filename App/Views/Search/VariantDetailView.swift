@@ -12,6 +12,7 @@ struct VariantDetailView: View {
     
     @State private var showingFullscreenImage = false
     @State private var showingPurchaseDetails = false
+    @State private var showingReportIssue = false
     
     private var ownedVariant: OwnedVariant? {
         ownedVariants.first { $0.variantUuid == variant.uuid }
@@ -260,6 +261,18 @@ struct VariantDetailView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
+                    Menu {
+                        Button {
+                            showingReportIssue = true
+                        } label: {
+                            Label("Report Issue", systemImage: "flag")
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
+                    }
+                }
+                
+                ToolbarItem(placement: .topBarLeading) {
                     Button("Done") {
                         dismiss()
                     }
@@ -284,6 +297,12 @@ struct VariantDetailView: View {
             .sheet(isPresented: $showingPurchaseDetails) {
                 if let owned = ownedVariant {
                     PurchaseDetailsSheet(ownedVariant: owned)
+                }
+            }
+            .sheet(isPresented: $showingReportIssue) {
+                ReportIssueSheet(variant: variant) { message in
+                    // This runs after the sheet dismisses
+                    ToastManager.shared.show(message, type: .success)
                 }
             }
         }

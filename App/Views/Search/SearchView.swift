@@ -337,7 +337,7 @@ struct SearchView: View {
             isLoadingSet = false
             
             let errorMessage: String
-            if let setError = error as? SetServiceError {
+            if let setError = error as? APIError {
                 errorMessage = setError.localizedDescription
             } else {
                 errorMessage = "Failed to load set"

@@ -13,7 +13,7 @@ struct ContentView: View {
     @AppStorage(Config.UserDefaultsKeys.hasCompletedFirstSync) private var hasCompletedFirstSync = false
     
     var body: some View {
-        Group {
+        ZStack {
             if !hasCompletedFirstSync {
                 FirstSyncView()
             } else {
@@ -30,7 +30,6 @@ struct ContentView: View {
                         SettingsView()
                     }
                     
-                    // Search Tab - expands when tapped
                     Tab(role: .search) {
                         NavigationStack {
                             SearchView(searchText: $searchText)
@@ -42,6 +41,7 @@ struct ContentView: View {
         .toast()
     }
 }
+
 
 #Preview {
     ContentView()

@@ -50,6 +50,9 @@
 		93C462442F26E8C400A8F084 /* VariantPhoto+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C462432F26E8BD00A8F084 /* VariantPhoto+Helpers.swift */; };
 		93C4625E2F27B6D400A8F084 /* CachedAsyncImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C4625D2F27B6D400A8F084 /* CachedAsyncImage.swift */; };
 		93C462782F27F31C00A8F084 /* CritterExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C462772F27F31500A8F084 /* CritterExtensions.swift */; };
+		93C462922F28075000A8F084 /* ReportRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C462912F28075000A8F084 /* ReportRequest.swift */; };
+		93C462942F2807F000A8F084 /* APIError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C462932F2807F000A8F084 /* APIError.swift */; };
+		93C462962F28098300A8F084 /* ReportIssueSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C462952F28098300A8F084 /* ReportIssueSheet.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -117,6 +120,9 @@
 		93C462432F26E8BD00A8F084 /* VariantPhoto+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "VariantPhoto+Helpers.swift"; sourceTree = "<group>"; };
 		93C4625D2F27B6D400A8F084 /* CachedAsyncImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CachedAsyncImage.swift; sourceTree = "<group>"; };
 		93C462772F27F31500A8F084 /* CritterExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CritterExtensions.swift; sourceTree = "<group>"; };
+		93C462912F28075000A8F084 /* ReportRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportRequest.swift; sourceTree = "<group>"; };
+		93C462932F2807F000A8F084 /* APIError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIError.swift; sourceTree = "<group>"; };
+		93C462952F28098300A8F084 /* ReportIssueSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportIssueSheet.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -208,6 +214,7 @@
 		937B9F692F2023E400C08885 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				93C462932F2807F000A8F084 /* APIError.swift */,
 				93C4625D2F27B6D400A8F084 /* CachedAsyncImage.swift */,
 				93C461F12F26699200A8F084 /* BackupManager.swift */,
 				93C461EF2F26696700A8F084 /* ImageCacheManager.swift */,
@@ -247,6 +254,7 @@
 		937B9F6C2F2023FC00C08885 /* API */ = {
 			isa = PBXGroup;
 			children = (
+				93C462912F28075000A8F084 /* ReportRequest.swift */,
 				93C461E32F251D5400A8F084 /* SetResponse.swift */,
 				937B9F772F20249800C08885 /* CritterResponse.swift */,
 				937B9F752F20248700C08885 /* VariantResponse.swift */,
@@ -316,6 +324,7 @@
 		937B9F722F20242E00C08885 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				93C462952F28098300A8F084 /* ReportIssueSheet.swift */,
 				93C461D72F22F02300A8F084 /* CollectionComponents.swift */,
 				93C461D02F22EE1800A8F084 /* OwnedVariantsView.swift */,
 			);
@@ -477,14 +486,17 @@
 				937B9F742F20247B00C08885 /* FamilyResponse.swift in Sources */,
 				93C461CD2F22EB3400A8F084 /* VariantDetailView.swift in Sources */,
 				937B9F7C2F2024FB00C08885 /* CritterVariant.swift in Sources */,
+				93C462922F28075000A8F084 /* ReportRequest.swift in Sources */,
 				93C461E22F2511DA00A8F084 /* FamilyDetailView.swift in Sources */,
 				937B9F7E2F20250300C08885 /* Family.swift in Sources */,
 				93C461C32F22D4BB00A8F084 /* ToastManager.swift in Sources */,
 				93C461E82F251D8200A8F084 /* ScannedSetPickerSheet.swift in Sources */,
+				93C462942F2807F000A8F084 /* APIError.swift in Sources */,
 				93C462222F26DD9D00A8F084 /* Colours.swift in Sources */,
 				93C462422F26E5F800A8F084 /* PhotoDetailView.swift in Sources */,
 				93C461D82F22F02600A8F084 /* CollectionComponents.swift in Sources */,
 				937B9F762F20248C00C08885 /* VariantResponse.swift in Sources */,
+				93C462962F28098300A8F084 /* ReportIssueSheet.swift in Sources */,
 				937B9F902F202B7400C08885 /* Config.swift in Sources */,
 				937B9F862F20259D00C08885 /* SyncService.swift in Sources */,
 				937B9F8A2F2028D300C08885 /* VariantPicker.swift in Sources */,
