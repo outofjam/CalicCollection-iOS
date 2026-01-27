@@ -12,48 +12,45 @@ class APIService {
     
     // MARK: - Critters
     
-    /// Fetch all critters with variants from API
     func fetchCritters() async throws -> [CritterResponse] {
         guard let url = URL(string: "\(baseURL)/critters") else {
-            throw URLError(.badURL)
+            throw APIError.invalidURL
         }
         
         var request = URLRequest(url: url)
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         
-        let (data, _) = try await URLSession.shared.data(for: request)
+        let (data, _) = try await NetworkConfig.performRequest(request)
         let response = try JSONDecoder().decode(CritterAPIResponse.self, from: data)
         return response.data
     }
     
     // MARK: - Families
     
-    /// Fetch all families from API
     func fetchFamilies() async throws -> [FamilyResponse] {
         guard let url = URL(string: "\(baseURL)/families") else {
-            throw URLError(.badURL)
+            throw APIError.invalidURL
         }
         
         var request = URLRequest(url: url)
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         
-        let (data, _) = try await URLSession.shared.data(for: request)
+        let (data, _) = try await NetworkConfig.performRequest(request)
         let response = try JSONDecoder().decode(FamilyAPIResponse.self, from: data)
         return response.data
     }
     
-    // Add this method to your APIService class
-
-    /// Submit a variant report
+    // MARK: - Reports
+    
     func submitReport(
         variantUuid: String,
         issueType: ReportIssueType,
         details: String?,
         suggestedCorrection: String?
     ) async throws -> String {
-        let urlString = "\(Config.apiBaseURL)/variants/report"
+        let urlString = "\(baseURL)/variants/report"
         
         guard let url = URL(string: urlString) else {
             throw APIError.invalidURL
@@ -75,13 +72,12 @@ class APIService {
         let encoder = JSONEncoder()
         request.httpBody = try encoder.encode(report)
         
-        let (data, response) = try await URLSession.shared.data(for: request)
+        let (data, response) = try await NetworkConfig.performRequest(request)
         
         guard let httpResponse = response as? HTTPURLResponse else {
             throw APIError.invalidResponse
         }
         
-        // Handle rate limiting
         if httpResponse.statusCode == 429 {
             throw APIError.rateLimited
         }
@@ -95,9 +91,4 @@ class APIService {
         
         return reportResponse.data.message
     }
-
-
-
 }
-
-
