@@ -2,7 +2,6 @@ import SwiftUI
 
 struct ReportIssueSheet: View {
     let variant: CritterVariant
-    let onSuccess: (String) -> Void // ADD THIS
     @Environment(\.dismiss) private var dismiss
     
     @State private var selectedIssueType: ReportIssueType = .incorrectImage
@@ -61,6 +60,7 @@ struct ReportIssueSheet: View {
                         }
                     }
                     .disabled(isSubmitting)
+                    .tint(.calicoPrimary)
                 }
             }
             .disabled(isSubmitting)
@@ -78,16 +78,13 @@ struct ReportIssueSheet: View {
                 }
             }
         }
+        .toast()
     }
     
     private func submitReport() async {
         isSubmitting = true
         
         do {
-            print("📤 Submitting report for variant: \(variant.uuid)")
-            print("📤 Issue type: \(selectedIssueType.rawValue)")
-            print("📤 Details: \(details)")
-            
             let message = try await APIService.shared.submitReport(
                 variantUuid: variant.uuid,
                 issueType: selectedIssueType,
@@ -95,40 +92,34 @@ struct ReportIssueSheet: View {
                 suggestedCorrection: suggestedCorrection.isEmpty ? nil : suggestedCorrection
             )
             
-            print("✅ Report submitted successfully: \(message)")
-            
-            isSubmitting = false
-            // Dismiss FIRST
-            dismiss()
-            
-            onSuccess(message)
-            
-            isSubmitting = false
-            
-        } catch {
-            print("❌ Report submission failed: \(error)")
-            print("❌ Error details: \(error.localizedDescription)")
-            
-            isSubmitting = false
-            
-            // Better error messages for users
-            let userMessage: String
-            if let apiError = error as? APIError {
-                switch apiError {
-                case .rateLimited:
-                    userMessage = "You've submitted too many reports. Please try again later."
-                case .notFound:
-                    userMessage = "Couldn't submit report. Please try again."
-                case .httpError(let code):
-                    userMessage = "Server error (\(code)). Please try again later."
-                default:
-                    userMessage = apiError.localizedDescription
-                }
-            } else {
-                userMessage = "Couldn't submit report. Please check your connection."
+            await MainActor.run {
+                isSubmitting = false
+                ToastManager.shared.show(message, type: .success)
+                dismiss()
             }
             
-            ToastManager.shared.show(userMessage, type: .error)
+        } catch {
+            await MainActor.run {
+                isSubmitting = false
+                
+                let userMessage: String
+                if let apiError = error as? APIError {
+                    switch apiError {
+                    case .rateLimited:
+                        userMessage = "You've submitted too many reports. Please try again later."
+                    case .notFound:
+                        userMessage = "Couldn't submit report. Please try again."
+                    case .httpError(let code):
+                        userMessage = "Server error (\(code)). Please try again later."
+                    default:
+                        userMessage = apiError.localizedDescription
+                    }
+                } else {
+                    userMessage = "Couldn't submit report. Please check your connection."
+                }
+                
+                ToastManager.shared.show(userMessage, type: .error)
+            }
         }
     }
 }
