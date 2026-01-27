@@ -151,7 +151,7 @@ struct SettingsView: View {
             let stats = try await StatsService.shared.fetchStats()
             apiStats = stats
         } catch {
-            print("Failed to load stats: \(error)")
+            AppLogger.error("Failed to load stats: \(error)")
             apiStats = nil
         }
         
@@ -449,14 +449,14 @@ struct DataManagementView: View {
                 appVersion: Config.appVersion
             )
             
-            print("📦 Export URL: \(url)")
-            print("📦 File exists: \(FileManager.default.fileExists(atPath: url.path))")
+            AppLogger.debug("Export URL: \(url)")
+            AppLogger.debug("File exists: \(FileManager.default.fileExists(atPath: url.path))")
             
             // Get the window scene
             guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
                   let window = windowScene.windows.first,
                   let rootViewController = window.rootViewController else {
-                print("❌ Could not find root view controller")
+                AppLogger.error("Could not find root view controller")
                 return
             }
             
@@ -473,12 +473,12 @@ struct DataManagementView: View {
             }
             
             rootViewController.present(activityVC, animated: true) {
-                print("✅ Share sheet presented")
+                AppLogger.debug("Share sheet presented")
                 AppSettings.shared.lastBackupDate = Date()
             }
             
         } catch {
-            print("❌ Export error: \(error)")
+            AppLogger.error("Export error: \(error)")
             ToastManager.shared.show("Export failed: \(error.localizedDescription)", type: .error)
         }
     }

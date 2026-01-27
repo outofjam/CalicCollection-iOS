@@ -147,7 +147,7 @@ class AboutViewModel: ObservableObject {
         do {
             apiStats = try await StatsService.shared.fetchStats()
         } catch {
-            print("Failed to load stats: \(error)")
+            AppLogger.error("Failed to load stats: \(error)")
             apiStats = nil
         }
         isLoadingStats = false

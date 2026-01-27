@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		931E2EBE2F29401700F1EA33 /* AppLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931E2EBD2F29401700F1EA33 /* AppLogger.swift */; };
 		937B9F3F2F2023AC00C08885 /* CalicCollectionV2App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937B9F3E2F2023AC00C08885 /* CalicCollectionV2App.swift */; };
 		937B9F412F2023AC00C08885 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937B9F402F2023AC00C08885 /* ContentView.swift */; };
 		937B9F742F20247B00C08885 /* FamilyResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937B9F732F20247800C08885 /* FamilyResponse.swift */; };
@@ -77,6 +78,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		931E2EBD2F29401700F1EA33 /* AppLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLogger.swift; sourceTree = "<group>"; };
 		937B9F3B2F2023AC00C08885 /* CalicCollectionV2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CalicCollectionV2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		937B9F3E2F2023AC00C08885 /* CalicCollectionV2App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalicCollectionV2App.swift; sourceTree = "<group>"; };
 		937B9F402F2023AC00C08885 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -222,6 +224,7 @@
 		937B9F692F2023E400C08885 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				931E2EBD2F29401700F1EA33 /* AppLogger.swift */,
 				93C462932F2807F000A8F084 /* APIError.swift */,
 				937B9F832F20259100C08885 /* APIService.swift */,
 				93C461E92F2524B300A8F084 /* APIStats.swift */,
@@ -513,6 +516,7 @@
 				937B9F862F20259D00C08885 /* SyncService.swift in Sources */,
 				937B9F8A2F2028D300C08885 /* VariantPicker.swift in Sources */,
 				93C461EA2F2524B300A8F084 /* APIStats.swift in Sources */,
+				931E2EBE2F29401700F1EA33 /* AppLogger.swift in Sources */,
 				93C461F22F26699B00A8F084 /* BackupManager.swift in Sources */,
 				93C461CF2F22EC6100A8F084 /* CollectionView.swift in Sources */,
 				937B9F782F20249B00C08885 /* CritterResponse.swift in Sources */,
