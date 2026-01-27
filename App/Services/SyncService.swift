@@ -97,6 +97,7 @@ class SyncService: ObservableObject {
         } catch {
             syncError = error.localizedDescription
             AppLogger.syncError(error.localizedDescription)
+            ToastManager.shared.show("Sync failed: \(error.localizedDescription)", type: .error)
         }
         
         isSyncing = false
@@ -129,6 +130,7 @@ class SyncService: ObservableObject {
         } catch {
             syncError = error.localizedDescription
             AppLogger.syncError(error.localizedDescription)
+            ToastManager.shared.show("Family sync failed", type: .error)
         }
         
         isSyncing = false
