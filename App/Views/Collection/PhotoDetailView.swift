@@ -1,11 +1,3 @@
-//
-//  PhotoDetailView.swift
-//  CaliCollectionV2
-//
-//  Created by Ismail Dawoodjee on 2026-01-25.
-//
-
-
 import SwiftUI
 import SwiftData
 
@@ -72,18 +64,17 @@ struct PhotoDetailView: View {
                     Spacer()
                     
                     Menu {
+                        Button {
+                            sharePhoto()
+                        } label: {
+                            Label("Share", systemImage: "square.and.arrow.up")
+                        }
+                        
                         Button(role: .destructive) {
                             showingDeleteAlert = true
                         } label: {
                             Label("Delete Photo", systemImage: "trash")
                         }
-                        
-                        // Future: Share button
-                        // Button {
-                        //     sharePhoto()
-                        // } label: {
-                        //     Label("Share", systemImage: "square.and.arrow.up")
-                        // }
                     } label: {
                         Image(systemName: "ellipsis.circle.fill")
                             .font(.system(size: 30))
@@ -163,6 +154,36 @@ struct PhotoDetailView: View {
         }
     }
     
+    // MARK: - Actions
+    
+    private func sharePhoto() {
+        guard let uiImage = UIImage(data: currentPhoto.imageData) else {
+            ToastManager.shared.show("Couldn't load photo", type: .error)
+            return
+        }
+        
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let window = windowScene.windows.first,
+              let rootViewController = window.rootViewController else {
+            AppLogger.error("Could not find root view controller")
+            return
+        }
+        
+        let activityVC = UIActivityViewController(
+            activityItems: [uiImage],
+            applicationActivities: nil
+        )
+        
+        // For iPad
+        if let popover = activityVC.popoverPresentationController {
+            popover.sourceView = window
+            popover.sourceRect = CGRect(x: window.bounds.midX, y: window.bounds.midY, width: 0, height: 0)
+            popover.permittedArrowDirections = []
+        }
+        
+        rootViewController.present(activityVC, animated: true)
+    }
+    
     private func deleteCurrentPhoto() {
         modelContext.delete(currentPhoto)
         try? modelContext.save()
@@ -173,7 +194,6 @@ struct PhotoDetailView: View {
         if allPhotos.count == 1 {
             dismiss()
         } else if currentIndex >= allPhotos.count - 1 {
-            // If we're at the end, go back one
             currentIndex = max(0, currentIndex - 1)
         }
     }
