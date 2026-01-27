@@ -82,8 +82,7 @@ class SetService {
     func fetchSetByBarcode(_ barcode: String) async throws -> SetResponse {
         let urlString = "\(baseURL)/sets/barcode/\(barcode)"
         
-        print("🔍 Fetching set with barcode: \(barcode)")
-        print("🌐 URL: \(urlString)")
+        AppLogger.networkRequest(urlString)
         
         guard let url = URL(string: urlString) else {
             throw APIError.invalidURL
@@ -98,23 +97,20 @@ class SetService {
             throw APIError.invalidResponse
         }
         
-        print("📡 Response status: \(httpResponse.statusCode)")
+        AppLogger.networkResponse(status: httpResponse.statusCode, url: urlString)
         
         guard httpResponse.statusCode == 200 else {
             if httpResponse.statusCode == 404 {
-                print("❌ Set not found (404)")
+                AppLogger.networkError("Set not found (404)")
                 throw APIError.notFound(message: "No set found with this barcode")
             }
             throw APIError.httpError(statusCode: httpResponse.statusCode)
         }
         
-        if let responseString = String(data: data, encoding: .utf8) {
-            print("✅ Response: \(responseString.prefix(200))...")
-        }
         
         let decoder = JSONDecoder()
         let wrapper = try decoder.decode(SetResponseWrapper.self, from: data)
-        print("✅ Successfully decoded set: \(wrapper.data.set.name)")
+        AppLogger.networkSuccess("Successfully decoded set: \(wrapper.data.set.name)")
         return wrapper.data
     }
 }

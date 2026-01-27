@@ -50,7 +50,7 @@ class SyncService: ObservableObject {
         guard !isSyncing else { return }
         
         if !force && !needsSync {
-            print("⏭️ Sync skipped - last sync was recent")
+            AppLogger.syncSkipped("last sync was recent")
             return
         }
         
@@ -58,11 +58,11 @@ class SyncService: ObservableObject {
         syncError = nil
         
         do {
-            print("🔄 Starting critter sync...")
+            AppLogger.syncStart("critter")
             
             // Fetch from API
             let critterResponses = try await APIService.shared.fetchCritters()
-            print("📦 Received \(critterResponses.count) critters from API")
+            AppLogger.debug("Received \(critterResponses.count) critters from API")
             
             // Clear existing browse cache
             try modelContext.delete(model: Critter.self)
@@ -89,14 +89,14 @@ class SyncService: ObservableObject {
             lastSyncDate = Date()
             UserDefaults.standard.set(lastSyncDate, forKey: Config.UserDefaultsKeys.lastSyncDate)
             
-            print("✅ Synced \(critterResponses.count) critters successfully")
+            AppLogger.syncComplete("Synced \(critterResponses.count) critters successfully")
             
             // Show success toast
             ToastManager.shared.show("✓ Synced \(critterResponses.count) critters", type: .success)
             
         } catch {
             syncError = error.localizedDescription
-            print("❌ Sync failed: \(error)")
+            AppLogger.syncError(error.localizedDescription)
         }
         
         isSyncing = false
@@ -109,10 +109,10 @@ class SyncService: ObservableObject {
         isSyncing = true
         
         do {
-            print("🔄 Starting family sync...")
+            AppLogger.syncStart("family")
             
             let familyResponses = try await APIService.shared.fetchFamilies()
-            print("📦 Received \(familyResponses.count) families from API")
+            AppLogger.debug("Received \(familyResponses.count) families from API")
             
             // Clear existing families
             try modelContext.delete(model: Family.self)
@@ -124,11 +124,11 @@ class SyncService: ObservableObject {
             }
             
             try modelContext.save()
-            print("✅ Synced \(familyResponses.count) families successfully")
+            AppLogger.syncComplete("Synced \(familyResponses.count) families successfully")
             
         } catch {
             syncError = error.localizedDescription
-            print("❌ Family sync failed: \(error)")
+            AppLogger.syncError(error.localizedDescription)
         }
         
         isSyncing = false

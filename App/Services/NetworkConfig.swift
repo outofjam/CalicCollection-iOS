@@ -56,7 +56,7 @@ enum NetworkConfig {
                    retryableStatusCodes.contains(httpResponse.statusCode) {
                     
                     if attempt < maxRetries - 1 {
-                        print("⚠️ Retryable status \(httpResponse.statusCode), attempt \(attempt + 1)/\(maxRetries)")
+                        AppLogger.warning("Retryable status \(httpResponse.statusCode), attempt \(attempt + 1)/\(maxRetries)")
                         try await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
                         delay *= retryMultiplier
                         continue
@@ -71,7 +71,7 @@ enum NetworkConfig {
                 lastError = error
                 
                 if attempt < maxRetries - 1 {
-                    print("⚠️ Network error: \(error.localizedDescription), attempt \(attempt + 1)/\(maxRetries)")
+                    AppLogger.warning("Network error: \(error.localizedDescription), attempt \(attempt + 1)/\(maxRetries)")
                     try await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
                     delay *= retryMultiplier
                     continue
