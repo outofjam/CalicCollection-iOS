@@ -164,9 +164,14 @@ struct PhotoDetailView: View {
         
         guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
               let window = windowScene.windows.first,
-              let rootViewController = window.rootViewController else {
+              var topController = window.rootViewController else {
             AppLogger.error("Could not find root view controller")
             return
+        }
+        
+        // Find the topmost presented controller
+        while let presented = topController.presentedViewController {
+            topController = presented
         }
         
         let activityVC = UIActivityViewController(
@@ -176,12 +181,12 @@ struct PhotoDetailView: View {
         
         // For iPad
         if let popover = activityVC.popoverPresentationController {
-            popover.sourceView = window
-            popover.sourceRect = CGRect(x: window.bounds.midX, y: window.bounds.midY, width: 0, height: 0)
+            popover.sourceView = topController.view
+            popover.sourceRect = CGRect(x: topController.view.bounds.midX, y: topController.view.bounds.midY, width: 0, height: 0)
             popover.permittedArrowDirections = []
         }
         
-        rootViewController.present(activityVC, animated: true)
+        topController.present(activityVC, animated: true)
     }
     
     private func deleteCurrentPhoto() {
