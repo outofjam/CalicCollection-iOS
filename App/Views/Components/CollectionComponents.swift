@@ -12,9 +12,25 @@ struct CollectionListView: View {
             ForEach(sortedGroupNames, id: \.self) { familyName in
                 Section {
                     // Family header as first tappable row
-                    NavigationLink {
-                        FamilyDetailView(familyName: familyName)
-                    } label: {
+                    if let familyUuid = groupedVariants[familyName]?.first?.familyId {
+                        NavigationLink {
+                            FamilyDetailView(familyUuid: familyUuid, familyName: familyName)
+                        } label: {
+                            HStack {
+                                Text(familyName)
+                                    .font(.headline)
+                                    .foregroundColor(.primary)
+                                Spacer()
+                                if let variants = groupedVariants[familyName] {
+                                    Text("\(variants.count) variant\(variants.count == 1 ? "" : "s")")
+                                        .font(.caption)
+                                        .foregroundColor(.calicoTextSecondary)
+                                }
+                            }
+                            .padding(.vertical, 4)
+                        }
+                    } else {
+                        // Fallback if no UUID (shouldn't happen)
                         HStack {
                             Text(familyName)
                                 .font(.headline)
@@ -63,7 +79,7 @@ struct CollectionListRow: View {
     
     var body: some View {
         HStack(spacing: 12) {
-            // Show user photo if available, otherwise official image
+            // Show user photo if available, then local cached image, then remote
             if let photo = firstPhoto, let uiImage = UIImage(data: photo.imageData) {
                 ZStack(alignment: .topTrailing) {
                     Image(uiImage: uiImage)
@@ -80,15 +96,28 @@ struct CollectionListRow: View {
                         .offset(x: -2, y: 2)
                 }
                 .clipShape(RoundedRectangle(cornerRadius: 8))
-            } else if let urlString = variant.thumbnailURL ?? variant.imageURL {
-                CachedAsyncImage(url: urlString) { image in
-                    image
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: 60, height: 60)
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                } placeholder: {
-                    placeholderImage
+            } else if let localPath = variant.localThumbnailPath,
+                      let uiImage = UIImage(contentsOfFile: localPath) {
+                // Local cached thumbnail
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 60, height: 60)
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+            } else if let urlString = variant.thumbnailURL ?? variant.imageURL,
+                      let url = URL(string: urlString) {
+                // Remote URL fallback
+                AsyncImage(url: url) { phase in
+                    switch phase {
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 60, height: 60)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                    default:
+                        placeholderImage
+                    }
                 }
             } else {
                 placeholderImage
@@ -130,7 +159,6 @@ struct CollectionListRow: View {
         .alignmentGuide(.listRowSeparatorLeading) { _ in
             60 + 12   // image width + HStack spacing
         }
-
         .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
     }
     
@@ -175,29 +203,37 @@ struct CollectionGalleryView: View {
                             .padding(.bottom, 16)
                         }
                     } header: {
-                        NavigationLink {
-                            FamilyDetailView(familyName: familyName)
-                        } label: {
-                            HStack {
-                                Text(familyName)
-                                    .font(.headline)
-                                    .foregroundColor(.primary)
-                                Spacer()
-                                if let variants = groupedVariants[familyName] {
-                                    Text("\(variants.count)")
-                                        .font(.caption)
-                                        .foregroundColor(.calicoTextSecondary)
-                                }
+                        if let familyUuid = groupedVariants[familyName]?.first?.familyId {
+                            NavigationLink {
+                                FamilyDetailView(familyUuid: familyUuid, familyName: familyName)
+                            } label: {
+                                familyHeader(familyName: familyName)
                             }
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 12)
-                            .frame(maxWidth: .infinity)
-                            .background(Color(uiColor: .systemBackground))
+                        } else {
+                            familyHeader(familyName: familyName)
                         }
                     }
                 }
             }
         }
+    }
+    
+    private func familyHeader(familyName: String) -> some View {
+        HStack {
+            Text(familyName)
+                .font(.headline)
+                .foregroundColor(.primary)
+            Spacer()
+            if let variants = groupedVariants[familyName] {
+                Text("\(variants.count)")
+                    .font(.caption)
+                    .foregroundColor(.calicoTextSecondary)
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .frame(maxWidth: .infinity)
+        .background(Color(uiColor: .systemBackground))
     }
 }
 
@@ -218,7 +254,7 @@ struct GalleryImageCard: View {
     var body: some View {
         GeometryReader { geometry in
             ZStack(alignment: .bottomLeading) {
-                // Show user photo if available, otherwise official image
+                // Show user photo if available, then local cached, then remote
                 if let photo = firstPhoto, let uiImage = UIImage(data: photo.imageData) {
                     ZStack(alignment: .topTrailing) {
                         Image(uiImage: uiImage)
@@ -234,14 +270,26 @@ struct GalleryImageCard: View {
                             .background(Circle().fill(Color.calicoPrimary))
                             .offset(x: -4, y: 4)
                     }
-                } else if let urlString = variant.thumbnailURL ?? variant.imageURL {
-                    CachedAsyncImage(url: urlString) { image in
-                        image
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .frame(width: geometry.size.width, height: geometry.size.height)
-                    } placeholder: {
-                        placeholderImage(width: geometry.size.width, height: geometry.size.height)
+                } else if let localPath = variant.localThumbnailPath,
+                          let uiImage = UIImage(contentsOfFile: localPath) {
+                    // Local cached thumbnail
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: geometry.size.width, height: geometry.size.height)
+                } else if let urlString = variant.thumbnailURL ?? variant.imageURL,
+                          let url = URL(string: urlString) {
+                    // Remote URL fallback
+                    AsyncImage(url: url) { phase in
+                        switch phase {
+                        case .success(let image):
+                            image
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .frame(width: geometry.size.width, height: geometry.size.height)
+                        default:
+                            placeholderImage(width: geometry.size.width, height: geometry.size.height)
+                        }
                     }
                 } else {
                     placeholderImage(width: geometry.size.width, height: geometry.size.height)

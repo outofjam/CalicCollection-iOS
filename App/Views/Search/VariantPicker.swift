@@ -2,123 +2,186 @@ import SwiftUI
 import SwiftData
 
 struct VariantPickerSheet: View {
-    let critter: Critter
+    let critterUuid: String
     let targetStatus: CritterStatus
     
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
     
-    @Query private var allVariants: [CritterVariant]
     @Query private var ownedVariants: [OwnedVariant]
     
+    @State private var critterData: CritterVariantsResponse?
+    @State private var isLoading = true
+    @State private var errorMessage: String?
     @State private var selectedVariantIds: Set<String> = []
-    
-    private var critterVariants: [CritterVariant] {
-        allVariants
-            .filter { $0.critterId == critter.uuid }
-            .sorted { ($0.isPrimary ?? false) && !($1.isPrimary ?? false) }
-    }
+    @State private var isSaving = false
     
     private func isVariantOwned(_ variantUuid: String, status: CritterStatus) -> Bool {
         ownedVariants.contains { $0.variantUuid == variantUuid && $0.status == status }
     }
     
     private var hasOwnedVariants: Bool {
-        critterVariants.contains { variant in
+        guard let variants = critterData?.variants else { return false }
+        return variants.contains { variant in
             isVariantOwned(variant.uuid, status: targetStatus)
         }
     }
     
     var body: some View {
         NavigationStack {
-            VStack(spacing: 0) {
-                // Header
-                VStack(spacing: 8) {
-                    Text(critter.name)
-                        .font(.title2)
-                        .fontWeight(.bold)
-                    
-                    Text("Select variants to add to \(targetStatus == .collection ? "Collection" : "Wishlist")")
-                        .font(.subheadline)
-                        .foregroundColor(.calicoTextSecondary)
-                        .multilineTextAlignment(.center)
-                }
-                .padding()
-                
-                // Variants list
-                if critterVariants.isEmpty {
-                    ContentUnavailableView(
-                        "No Variants Available",
-                        systemImage: "photo.stack",
-                        description: Text("This critter has no variants yet")
-                    )
-                } else {
-                    List {
-                        ForEach(critterVariants) { variant in
-                            VariantRow(
-                                variant: variant,
-                                isSelected: selectedVariantIds.contains(variant.uuid),
-                                isOwned: isVariantOwned(variant.uuid, status: targetStatus)
-                            )
-                            .contentShape(Rectangle())
-                            .onTapGesture {
-                                toggleVariant(variant.uuid)
-                            }
+            Group {
+                if isLoading {
+                    ProgressView("Loading variants...")
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else if let error = errorMessage {
+                    ContentUnavailableView {
+                        Label("Error", systemImage: "exclamationmark.triangle")
+                    } description: {
+                        Text(error)
+                    } actions: {
+                        Button("Retry") {
+                            Task { await loadVariants() }
                         }
                     }
-                    .listStyle(.plain)
+                } else if let data = critterData {
+                    pickerContent(data)
                 }
-                
-                // Action buttons
-                VStack(spacing: 12) {
-                    // Only show button if there are selections OR owned variants to remove
-                    if !selectedVariantIds.isEmpty || hasOwnedVariants {
-                        Button {
-                            saveSelection()
-                        } label: {
-                            HStack {
-                                Image(systemName: targetStatus == .collection ? "star.fill" : "heart.fill")
-                                if selectedVariantIds.isEmpty {
-                                    Text("Remove All from \(targetStatus == .collection ? "Collection" : "Wishlist")")
-                                } else {
-                                    Text("Add to \(targetStatus == .collection ? "Collection" : "Wishlist") (\(selectedVariantIds.count))")
-                                }
-                            }
-                            .font(.headline)
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(selectedVariantIds.isEmpty ? Color.red : (targetStatus == .collection ? Color.blue : Color.pink))
-                            .cornerRadius(12)
-                        }
-                    }
-                    
-                    Button("Cancel") {
-                        dismiss()
-                    }
-                    .foregroundColor(.calicoTextSecondary)
-                }
-                .padding()
             }
             .navigationBarTitleDisplayMode(.inline)
         }
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
-        .onAppear {
-            loadPreselectedVariants()
+        .task {
+            await loadVariants()
+        }
+        .overlay {
+            if isSaving {
+                ZStack {
+                    Color.black.opacity(0.3)
+                    VStack(spacing: 12) {
+                        ProgressView()
+                            .scaleEffect(1.5)
+                        Text("Saving...")
+                            .font(.subheadline)
+                    }
+                    .padding(20)
+                    .background(Color(uiColor: .systemBackground))
+                    .cornerRadius(12)
+                }
+                .ignoresSafeArea()
+            }
         }
     }
     
-    // MARK: - Helper Methods
-    
-    private func loadPreselectedVariants() {
-        // Pre-select already owned variants
-        selectedVariantIds = Set(
-            critterVariants
-                .filter { isVariantOwned($0.uuid, status: targetStatus) }
-                .map { $0.uuid }
-        )
+    @ViewBuilder
+    private func pickerContent(_ data: CritterVariantsResponse) -> some View {
+        VStack(spacing: 0) {
+            // Header
+            VStack(spacing: 8) {
+                Text(data.critter.name)
+                    .font(.title2)
+                    .fontWeight(.bold)
+                
+                if let familyName = data.critter.familyName {
+                    Text(familyName)
+                        .font(.subheadline)
+                        .foregroundColor(.calicoTextSecondary)
+                }
+                
+                Text("Select variants to add to \(targetStatus == .collection ? "Collection" : "Wishlist")")
+                    .font(.subheadline)
+                    .foregroundColor(.calicoTextSecondary)
+                    .multilineTextAlignment(.center)
+            }
+            .padding()
+            
+            // Variants list
+            if data.variants.isEmpty {
+                ContentUnavailableView(
+                    "No Variants Available",
+                    systemImage: "photo.stack",
+                    description: Text("This critter has no variants yet")
+                )
+            } else {
+                List {
+                    ForEach(data.variants) { variant in
+                        VariantRowOnline(
+                            variant: variant,
+                            isSelected: selectedVariantIds.contains(variant.uuid),
+                            isOwned: isVariantOwned(variant.uuid, status: targetStatus)
+                        )
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            toggleVariant(variant.uuid)
+                        }
+                    }
+                }
+                .listStyle(.plain)
+            }
+            
+            // Action buttons
+            VStack(spacing: 12) {
+                if !selectedVariantIds.isEmpty || hasOwnedVariants {
+                    Button {
+                        Task { await saveSelection(data) }
+                    } label: {
+                        HStack {
+                            Image(systemName: targetStatus == .collection ? "star.fill" : "heart.fill")
+                            if selectedVariantIds.isEmpty {
+                                Text("Remove All from \(targetStatus == .collection ? "Collection" : "Wishlist")")
+                            } else {
+                                Text("Add to \(targetStatus == .collection ? "Collection" : "Wishlist") (\(selectedVariantIds.count))")
+                            }
+                        }
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(selectedVariantIds.isEmpty ? Color.red : (targetStatus == .collection ? Color.blue : Color.pink))
+                        .cornerRadius(12)
+                    }
+                    .disabled(isSaving)
+                }
+                
+                Button("Cancel") {
+                    dismiss()
+                }
+                .foregroundColor(.calicoTextSecondary)
+            }
+            .padding()
+        }
     }
+    
+    // MARK: - Data Loading
+    
+    private func loadVariants() async {
+        isLoading = true
+        errorMessage = nil
+        
+        print("🔍 Loading variants for critter: \(critterUuid)")
+        
+        do {
+            critterData = try await BrowseService.shared.fetchCritterVariants(critterUuid: critterUuid)
+            print("✅ Got response: \(String(describing: critterData))")
+            print("✅ Variants count: \(critterData?.variants.count ?? 0)")
+            
+            // Pre-select already owned variants
+            if let variants = critterData?.variants {
+                selectedVariantIds = Set(
+                    variants
+                        .filter { isVariantOwned($0.uuid, status: targetStatus) }
+                        .map { $0.uuid }
+                )
+            }
+        } catch {
+            print("❌ Error: \(error)")
+            errorMessage = error.localizedDescription
+        }
+        
+        isLoading = false
+    }
+    
+    // MARK: - Helper Methods
     
     private func toggleVariant(_ uuid: String) {
         let generator = UISelectionFeedbackGenerator()
@@ -131,39 +194,43 @@ struct VariantPickerSheet: View {
         }
     }
     
-    private func saveSelection() {
-        var movedCount = 0
+    private func saveSelection(_ data: CritterVariantsResponse) async {
+        isSaving = true
+        
         var addedCount = 0
         var removedCount = 0
         
-        // Add/update selected variants
+        let variants = data.variants
+        let critter = data.critter
+        
+        // Get previously owned variant UUIDs for this critter & status
+        let previouslyOwned = Set(
+            variants
+                .filter { isVariantOwned($0.uuid, status: targetStatus) }
+                .map { $0.uuid }
+        )
+        
+        // Add selected variants (that weren't already owned)
         for variantUuid in selectedVariantIds {
-            guard let variant = critterVariants.first(where: { $0.uuid == variantUuid }) else { continue }
+            guard let variant = variants.first(where: { $0.uuid == variantUuid }) else { continue }
             
-            // Check if exists in opposite status
-            let existsInOpposite = ownedVariants.contains {
-                $0.variantUuid == variantUuid && $0.status?.rawValue != targetStatus.rawValue
+            if !previouslyOwned.contains(variantUuid) {
+                do {
+                    try await OwnedVariant.create(
+                        variant: variant,
+                        critter: critter,
+                        familyId: critter.familyUuid ?? "",
+                        status: targetStatus,
+                        in: modelContext
+                    )
+                    addedCount += 1
+                } catch {
+                    AppLogger.error("Failed to add variant: \(error)")
+                }
             }
-            
-            if existsInOpposite {
-                movedCount += 1
-            } else if !isVariantOwned(variantUuid, status: targetStatus) {
-                addedCount += 1
-            }
-            
-            try? OwnedVariant.create(
-                variant: variant,
-                critter: critter,
-                status: targetStatus,
-                in: modelContext
-            )
         }
         
-        // Remove deselected variants
-        let previouslyOwned = critterVariants
-            .filter { isVariantOwned($0.uuid, status: targetStatus) }
-            .map { $0.uuid }
-        
+        // Remove deselected variants (that were previously owned)
         for variantUuid in previouslyOwned {
             if !selectedVariantIds.contains(variantUuid) {
                 try? OwnedVariant.remove(variantUuid: variantUuid, in: modelContext)
@@ -174,21 +241,24 @@ struct VariantPickerSheet: View {
         // Show appropriate toast
         let statusName = targetStatus == .collection ? "Collection" : "Wishlist"
         
-        if movedCount > 0 {
-            ToastManager.shared.show("✓ Moved \(movedCount) to \(statusName)", type: .success)
-        } else if addedCount > 0 {
+        if addedCount > 0 {
+            let generator = UINotificationFeedbackGenerator()
+            generator.notificationOccurred(.success)
             ToastManager.shared.show("✓ Added \(addedCount) to \(statusName)", type: .success)
         } else if removedCount > 0 {
+            let generator = UINotificationFeedbackGenerator()
+            generator.notificationOccurred(.warning)
             ToastManager.shared.show("Removed \(removedCount) from \(statusName)", type: .info)
         }
         
+        isSaving = false
         dismiss()
     }
 }
 
-// MARK: - Variant Row
-struct VariantRow: View {
-    let variant: CritterVariant
+// MARK: - Variant Row (Online Version)
+struct VariantRowOnline: View {
+    let variant: VariantResponse
     let isSelected: Bool
     let isOwned: Bool
     
@@ -199,33 +269,41 @@ struct VariantRow: View {
                 .foregroundColor(isSelected ? .blue : .gray)
                 .font(.title3)
             
-            // Variant image (use thumbnail for list performance)
-            RoundedRectangle(cornerRadius: 8)
-                .fill(Color.gray.opacity(0.2))
-                .frame(width: 60, height: 60)
-                .overlay {
-                    // Use thumbnail if available, fallback to full image
-                    if let urlString = variant.thumbnailURL ?? variant.imageURL {
-                        CachedAsyncImage(url: urlString) { image in
-                            image
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                                .frame(width: 60, height: 60)
-                                .clipShape(RoundedRectangle(cornerRadius: 8))
-                        } placeholder: {
-                            ProgressView()
-                        }
-                    } else {
-                        Image(systemName: "photo")
-                            .foregroundColor(.gray)
+            // Variant image
+            if let urlString = variant.thumbnailUrl ?? variant.imageUrl,
+               let url = URL(string: urlString) {
+                AsyncImage(url: url) { phase in
+                    switch phase {
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 60, height: 60)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                    default:
+                        placeholderView
                     }
                 }
+                .frame(width: 60, height: 60)
+            } else {
+                placeholderView
+            }
             
             // Variant info
             VStack(alignment: .leading, spacing: 4) {
                 HStack {
                     Text(variant.name)
                         .font(.headline)
+                    
+                    if variant.isPrimary == true {
+                        Text("Primary")
+                            .font(.caption2)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(Color.orange.opacity(0.2))
+                            .foregroundColor(.orange)
+                            .cornerRadius(4)
+                    }
                     
                     if isOwned {
                         Text("✓ Owned")
@@ -242,6 +320,7 @@ struct VariantRow: View {
                     Text("Set \(epochId) • \(setName)")
                         .font(.caption)
                         .foregroundColor(.calicoTextSecondary)
+                        .lineLimit(1)
                 } else if let epochId = variant.epochId {
                     Text("Set \(epochId)")
                         .font(.caption)
@@ -263,21 +342,24 @@ struct VariantRow: View {
         }
         .padding(.vertical, 8)
     }
+    
+    private var placeholderView: some View {
+        RoundedRectangle(cornerRadius: 8)
+            .fill(Color.gray.opacity(0.2))
+            .frame(width: 60, height: 60)
+            .overlay {
+                Image(systemName: "photo")
+                    .foregroundColor(.gray)
+            }
+    }
 }
 
 #Preview {
     Text("Picker Preview")
         .sheet(isPresented: .constant(true)) {
             VariantPickerSheet(
-                critter: Critter(
-                    uuid: "1",
-                    familyId: "1",
-                    name: "Test Critter",
-                    memberType: "Parents",
-                    variantsCount: 3
-                ),
+                critterUuid: "test-uuid",
                 targetStatus: .collection
             )
-            .modelContainer(for: OwnedVariant.self, inMemory: true)
         }
 }

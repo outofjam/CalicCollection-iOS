@@ -74,7 +74,7 @@ struct SettingsView: View {
                     Text("Sync")
                 } footer: {
                     if syncService.needsSync {
-                        Text("It's been a while since your last sync. Consider syncing to get the latest critters.")
+                        Text("It's been a while since your last sync. Consider syncing to get the latest families.")
                     }
                 }
                 
@@ -126,11 +126,10 @@ struct SettingsView: View {
                 Button("Cancel", role: .cancel) { }
                 Button("Sync Now") {
                     Task {
-                        await syncService.syncAll(modelContext: modelContext, force: true)
-                    }
+                        await syncService.syncFamilies(modelContext: modelContext, force: true)                    }
                 }
             } message: {
-                Text("This will refresh all critters and variants from the server.")
+                Text("This will refresh family data from the server.")
             }
         }
     }

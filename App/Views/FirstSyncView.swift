@@ -13,7 +13,6 @@ struct FirstSyncView: View {
             Spacer()
             
             // App Icon / Logo
-            // App Icon / Logo
             Image("LaunchIcon")
                 .resizable()
                 .aspectRatio(contentMode: .fit)
@@ -38,7 +37,7 @@ struct FirstSyncView: View {
                         .progressViewStyle(.linear)
                         .frame(width: 200)
                     
-                    Text("Syncing critters...")
+                    Text("Setting up...")
                         .font(.subheadline)
                         .foregroundColor(.calicoTextSecondary)
                 } else if let error = syncService.syncError {
@@ -47,7 +46,7 @@ struct FirstSyncView: View {
                             .font(.system(size: 40))
                             .foregroundColor(.calicoError)
                         
-                        Text("Sync Failed")
+                        Text("Setup Failed")
                             .font(.headline)
                         
                         Text(error)
@@ -105,11 +104,11 @@ struct FirstSyncView: View {
             // Simulate progress
             syncProgress = 0.0
             
-            // Start sync
-            await syncService.syncAll(modelContext: modelContext, force: true)
+            // Start sync (only families now)
+            await syncService.syncFamilies(modelContext: modelContext, force: true)
             
             // Animate progress
-            withAnimation(.easeInOut(duration: 1.5)) {
+            withAnimation(.easeInOut(duration: 1.0)) {
                 syncProgress = 1.0
             }
             
@@ -132,5 +131,5 @@ struct FirstSyncView: View {
 #Preview {
     FirstSyncView()
         .environmentObject(SyncService.shared)
-        .modelContainer(for: OwnedVariant.self, inMemory: true)
+        .modelContainer(for: [OwnedVariant.self, Family.self], inMemory: true)
 }

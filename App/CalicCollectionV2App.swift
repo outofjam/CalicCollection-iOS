@@ -1,9 +1,3 @@
-//
-//  CaliCollectionV2App.swift
-//  CaliCollectionV2
-//
-//  Created by Ismail Dawoodjee on 2026-01-20.
-//
 import SwiftUI
 import SwiftData
 
@@ -11,11 +5,9 @@ import SwiftData
 struct CalicCollectionV2App: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            // Browse cache (temporary data from API)
-            Critter.self,
-            CritterVariant.self,
+            // Cached data (small dataset)
             Family.self,
-            // User collection (permanent data)
+            // User collection (permanent data, offline)
             OwnedVariant.self,
             VariantPhoto.self
         ])

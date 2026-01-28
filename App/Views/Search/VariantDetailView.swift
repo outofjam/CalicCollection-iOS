@@ -2,8 +2,9 @@ import SwiftUI
 import SwiftData
 
 struct VariantDetailView: View {
-    let variant: CritterVariant
-    let critter: Critter
+    let variant: VariantResponse
+    let critter: CritterInfo
+    let familyUuid: String
     
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
@@ -13,6 +14,7 @@ struct VariantDetailView: View {
     @State private var showingFullscreenImage = false
     @State private var showingPurchaseDetails = false
     @State private var showingReportIssue = false
+    @State private var isAdding = false
     
     private var ownedVariant: OwnedVariant? {
         ownedVariants.first { $0.variantUuid == variant.uuid }
@@ -38,18 +40,21 @@ struct VariantDetailView: View {
                     // MARK: - Hero Image
                     GeometryReader { geometry in
                         ZStack(alignment: .bottomLeading) {
-                            if let imageURL = variant.imageURL {
-                                CachedAsyncImage(url: imageURL) { image in
-                                    image
-                                        .resizable()
-                                        .aspectRatio(contentMode: .fill)
-                                        .frame(width: geometry.size.width, height: 300, alignment: .top)
-                                        .clipped()
-                                        .onTapGesture {
-                                            showingFullscreenImage = true
-                                        }
-                                } placeholder: {
-                                    gradientPlaceholder
+                            if let imageURL = variant.imageUrl, let url = URL(string: imageURL) {
+                                AsyncImage(url: url) { phase in
+                                    switch phase {
+                                    case .success(let image):
+                                        image
+                                            .resizable()
+                                            .aspectRatio(contentMode: .fill)
+                                            .frame(width: geometry.size.width, height: 300, alignment: .top)
+                                            .clipped()
+                                            .onTapGesture {
+                                                showingFullscreenImage = true
+                                            }
+                                    default:
+                                        gradientPlaceholder
+                                    }
                                 }
                             } else {
                                 gradientPlaceholder
@@ -95,7 +100,7 @@ struct VariantDetailView: View {
                     // MARK: - Content
                     VStack(spacing: 24) {
                         // Tap to expand hint
-                        if variant.imageURL != nil {
+                        if variant.imageUrl != nil {
                             Button {
                                 showingFullscreenImage = true
                             } label: {
@@ -137,6 +142,12 @@ struct VariantDetailView: View {
                         
                         // Info Section
                         VStack(alignment: .leading, spacing: 12) {
+                            if let familyName = critter.familyName {
+                                InfoRow(label: "Family", value: familyName)
+                            }
+                            
+                            InfoRow(label: "Member Type", value: critter.memberType.capitalized)
+                            
                             if let sku = variant.sku {
                                 InfoRow(label: "SKU", value: sku)
                             }
@@ -203,14 +214,14 @@ struct VariantDetailView: View {
                     isInCollection: isInCollection,
                     isInWishlist: isInWishlist,
                     variantName: variant.name,
-                    onAddToCollection: addToCollection,
-                    onAddToWishlist: addToWishlist,
-                    onMoveToWishlist: moveToWishlist,
+                    onAddToCollection: { Task { await addToCollection() } },
+                    onAddToWishlist: { Task { await addToWishlist() } },
+                    onMoveToWishlist: { Task { await moveToWishlist() } },
                     onRemove: removeVariant
                 )
             }
             .fullScreenCover(isPresented: $showingFullscreenImage) {
-                if let imageURL = variant.imageURL {
+                if let imageURL = variant.imageUrl {
                     FullscreenImageViewer(imageURL: imageURL)
                 }
             }
@@ -220,7 +231,18 @@ struct VariantDetailView: View {
                 }
             }
             .sheet(isPresented: $showingReportIssue) {
-                ReportIssueSheet(variant: variant)
+                ReportIssueSheetOnline(variantUuid: variant.uuid, variantName: variant.name)
+            }
+            .overlay {
+                if isAdding {
+                    ZStack {
+                        Color.black.opacity(0.3)
+                        ProgressView()
+                            .scaleEffect(1.5)
+                            .tint(.white)
+                    }
+                    .ignoresSafeArea()
+                }
             }
         }.toast()
     }
@@ -244,31 +266,70 @@ struct VariantDetailView: View {
     
     // MARK: - Actions
     
-    private func addToCollection() {
-        let generator = UINotificationFeedbackGenerator()
-        generator.notificationOccurred(.success)
+    private func addToCollection() async {
+        isAdding = true
         
-        try? OwnedVariant.create(variant: variant, critter: critter, status: .collection, in: modelContext)
+        do {
+            try await OwnedVariant.create(
+                variant: variant,
+                critter: critter,
+                familyId: familyUuid,
+                status: .collection,
+                in: modelContext
+            )
+            
+            let generator = UINotificationFeedbackGenerator()
+            generator.notificationOccurred(.success)
+            ToastManager.shared.show("✓ Added \(variant.name) to Collection", type: .success)
+        } catch {
+            ToastManager.shared.show("Failed to add", type: .error)
+        }
         
-        ToastManager.shared.show("✓ Added \(variant.name) to Collection", type: .success)
+        isAdding = false
     }
     
-    private func addToWishlist() {
-        let generator = UINotificationFeedbackGenerator()
-        generator.notificationOccurred(.success)
+    private func addToWishlist() async {
+        isAdding = true
         
-        try? OwnedVariant.create(variant: variant, critter: critter, status: .wishlist, in: modelContext)
+        do {
+            try await OwnedVariant.create(
+                variant: variant,
+                critter: critter,
+                familyId: familyUuid,
+                status: .wishlist,
+                in: modelContext
+            )
+            
+            let generator = UINotificationFeedbackGenerator()
+            generator.notificationOccurred(.success)
+            ToastManager.shared.show("✓ Added \(variant.name) to Wishlist", type: .success)
+        } catch {
+            ToastManager.shared.show("Failed to add", type: .error)
+        }
         
-        ToastManager.shared.show("✓ Added \(variant.name) to Wishlist", type: .success)
+        isAdding = false
     }
     
-    private func moveToWishlist() {
-        let generator = UINotificationFeedbackGenerator()
-        generator.notificationOccurred(.success)
+    private func moveToWishlist() async {
+        isAdding = true
         
-        try? OwnedVariant.create(variant: variant, critter: critter, status: .wishlist, in: modelContext)
+        do {
+            try await OwnedVariant.create(
+                variant: variant,
+                critter: critter,
+                familyId: familyUuid,
+                status: .wishlist,
+                in: modelContext
+            )
+            
+            let generator = UINotificationFeedbackGenerator()
+            generator.notificationOccurred(.success)
+            ToastManager.shared.show("✓ Moved \(variant.name) to Wishlist", type: .success)
+        } catch {
+            ToastManager.shared.show("Failed to move", type: .error)
+        }
         
-        ToastManager.shared.show("✓ Moved \(variant.name) to Wishlist", type: .success)
+        isAdding = false
     }
     
     private func removeVariant() {
@@ -282,6 +343,7 @@ struct VariantDetailView: View {
         dismiss()
     }
 }
+
 
 // MARK: - Purchase Details Section
 struct PurchaseDetailsSection: View {
@@ -378,25 +440,108 @@ struct PurchaseDetailsSection: View {
     }
 }
 
+// MARK: - Report Issue Sheet (Online version)
+struct ReportIssueSheetOnline: View {
+    let variantUuid: String
+    let variantName: String
+    
+    @Environment(\.dismiss) private var dismiss
+    @State private var issueType: ReportIssueType = .incorrectImage
+    @State private var details: String = ""
+    @State private var suggestedCorrection: String = ""
+    @State private var isSubmitting = false
+    
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section("Issue Type") {
+                    Picker("Type", selection: $issueType) {
+                        ForEach(ReportIssueType.allCases, id: \.self) { type in
+                            Text(type.displayName).tag(type)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                }
+                
+                Section("Details") {
+                    TextField("Describe the issue...", text: $details, axis: .vertical)
+                        .lineLimit(3...6)
+                }
+                
+                Section("Suggested Correction (Optional)") {
+                    TextField("What should it be?", text: $suggestedCorrection, axis: .vertical)
+                        .lineLimit(2...4)
+                }
+            }
+            .navigationTitle("Report Issue")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { dismiss() }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Submit") {
+                        Task { await submitReport() }
+                    }
+                    .disabled(details.isEmpty || isSubmitting)
+                }
+            }
+            .overlay {
+                if isSubmitting {
+                    ProgressView()
+                }
+            }
+        }
+    }
+    
+    private func submitReport() async {
+        isSubmitting = true
+        
+        do {
+            let message = try await APIService.shared.submitReport(
+                variantUuid: variantUuid,
+                issueType: issueType,
+                details: details.isEmpty ? nil : details,
+                suggestedCorrection: suggestedCorrection.isEmpty ? nil : suggestedCorrection
+            )
+            
+            ToastManager.shared.show(message, type: .success)
+            dismiss()
+        } catch {
+            ToastManager.shared.show("Failed to submit report", type: .error)
+        }
+        
+        isSubmitting = false
+    }
+}
+
 #Preview {
     VariantDetailView(
-        variant: CritterVariant(
+        variant: VariantResponse(
             uuid: "1",
             critterId: "1",
             name: "Royal Princess Set",
             sku: "CC-1234",
             barcode: "123456789",
-            imageURL: nil,
+            imageUrl: nil,
+            thumbnailUrl: nil,
             releaseYear: 2023,
-            notes: "Limited edition"
+            notes: "Limited edition",
+            setId: nil,
+            setName: nil,
+            epochId: nil,
+            createdAt: "",
+            updatedAt: "",
+            isPrimary: true
         ),
-        critter: Critter(
+        critter: CritterInfo(
             uuid: "1",
-            familyId: "1",
             name: "Bruce Husky",
-            memberType: "Kids",
-            variantsCount: 1
-        )
+            memberType: "kids",
+            familyName: "Husky Family",
+            familyUuid: "de7237f6-7f2e-4dc1-959b-a5dc02bb677c"
+            
+        ),
+        familyUuid: "family-1"
     )
-    .modelContainer(for: OwnedVariant.self, inMemory: true)
 }

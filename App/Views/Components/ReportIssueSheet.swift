@@ -1,7 +1,9 @@
 import SwiftUI
 
 struct ReportIssueSheet: View {
-    let variant: CritterVariant
+    let variantUuid: String
+    let variantName: String
+    
     @Environment(\.dismiss) private var dismiss
     
     @State private var selectedIssueType: ReportIssueType = .incorrectImage
@@ -13,7 +15,7 @@ struct ReportIssueSheet: View {
         NavigationStack {
             Form {
                 Section {
-                    Text(variant.name)
+                    Text(variantName)
                         .font(.headline)
                 } header: {
                     Text("Reporting Issue For")
@@ -86,7 +88,7 @@ struct ReportIssueSheet: View {
         
         do {
             let message = try await APIService.shared.submitReport(
-                variantUuid: variant.uuid,
+                variantUuid: variantUuid,
                 issueType: selectedIssueType,
                 details: details.isEmpty ? nil : details,
                 suggestedCorrection: suggestedCorrection.isEmpty ? nil : suggestedCorrection
@@ -122,4 +124,8 @@ struct ReportIssueSheet: View {
             }
         }
     }
+}
+
+#Preview {
+    ReportIssueSheet(variantUuid: "test-uuid", variantName: "Royal Princess Set")
 }
