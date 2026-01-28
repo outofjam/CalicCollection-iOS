@@ -53,10 +53,11 @@ enum ReportIssueType: String, Codable, CaseIterable {
 }
 
 struct ReportResponse: Codable {
-    let data: ReportData
-    
-    struct ReportData: Codable {
-        let uuid: String
-        let message: String
-    }
+    let message: String
+        let data: ReportData
+        
+        struct ReportData: Codable {
+            let uuid: String
+        }
+
 }

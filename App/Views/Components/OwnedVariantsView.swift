@@ -119,6 +119,7 @@ struct OwnedVariantDetailView: View {
     
     @State private var showingFullscreenImage = false
     @State private var showingPurchaseDetails = false
+    @State private var showingReportIssue = false
     
     private var hasPurchaseDetails: Bool {
         ownedVariant.pricePaid != nil ||
@@ -269,6 +270,17 @@ struct OwnedVariantDetailView: View {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("Done") { dismiss() }
                 }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Menu {
+                        Button {
+                            showingReportIssue = true
+                        } label: {
+                            Label("Report Issue", systemImage: "flag")
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
+                    }
+                }
             }
             .safeAreaInset(edge: .bottom) {
                 OwnedVariantActionBar(
@@ -287,6 +299,9 @@ struct OwnedVariantDetailView: View {
             }
             .sheet(isPresented: $showingPurchaseDetails) {
                 PurchaseDetailsSheet(ownedVariant: ownedVariant)
+            }
+            .sheet(isPresented: $showingReportIssue) {
+                ReportIssueSheet(variantUuid: ownedVariant.variantUuid, variantName: ownedVariant.variantName)
             }
         }.toast()
     }

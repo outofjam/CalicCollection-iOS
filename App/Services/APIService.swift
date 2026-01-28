@@ -89,6 +89,6 @@ class APIService {
         let decoder = JSONDecoder()
         let reportResponse = try decoder.decode(ReportResponse.self, from: data)
         
-        return reportResponse.data.message
+        return reportResponse.message
     }
 }

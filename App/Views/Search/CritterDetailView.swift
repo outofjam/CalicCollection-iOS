@@ -352,6 +352,9 @@ struct VariantDetailSheet: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var ownedVariants: [OwnedVariant]
     
+    @State private var showingReportIssue = false
+    @State private var isAdding = false
+    
     private var isOwned: Bool {
         ownedVariants.contains { $0.variantUuid == variant.uuid }
     }
@@ -420,9 +423,7 @@ struct VariantDetailSheet: View {
                     // Action Buttons
                     VStack(spacing: 12) {
                         Button {
-                            Task {
-                                await addToCollection()
-                            }
+                            Task { await addToCollection() }
                         } label: {
                             HStack {
                                 Image(systemName: ownedStatus == .collection ? "checkmark.circle.fill" : "star")
@@ -435,11 +436,10 @@ struct VariantDetailSheet: View {
                             .background(ownedStatus == .collection ? Color.green : Color.blue)
                             .cornerRadius(12)
                         }
+                        .disabled(isAdding)
                         
                         Button {
-                            Task {
-                                await addToWishlist()
-                            }
+                            Task { await addToWishlist() }
                         } label: {
                             HStack {
                                 Image(systemName: ownedStatus == .wishlist ? "checkmark.circle.fill" : "heart")
@@ -452,6 +452,7 @@ struct VariantDetailSheet: View {
                             .background(ownedStatus == .wishlist ? Color.green : Color.pink)
                             .cornerRadius(12)
                         }
+                        .disabled(isAdding)
                         
                         if isOwned {
                             Button(role: .destructive) {
@@ -478,16 +479,42 @@ struct VariantDetailSheet: View {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Done") { dismiss() }
                 }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Menu {
+                        Button {
+                            showingReportIssue = true
+                        } label: {
+                            Label("Report Issue", systemImage: "flag")
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
+                    }
+                }
+            }
+            .sheet(isPresented: $showingReportIssue) {
+                ReportIssueSheet(variantUuid: variant.uuid, variantName: variant.name)
+            }
+            .overlay {
+                if isAdding {
+                    ZStack {
+                        Color.black.opacity(0.3)
+                        ProgressView()
+                            .scaleEffect(1.5)
+                            .tint(.white)
+                    }
+                    .ignoresSafeArea()
+                }
             }
         }
     }
     
     private func addToCollection() async {
+        isAdding = true
         do {
             try await OwnedVariant.create(
                 variant: variant,
                 critter: critter,
-                familyId: "", // We don't have familyId in CritterInfo, will need to handle this
+                familyId: critter.familyUuid ?? "",
                 status: .collection,
                 in: modelContext
             )
@@ -495,14 +522,16 @@ struct VariantDetailSheet: View {
         } catch {
             ToastManager.shared.show("Failed to add", type: .error)
         }
+        isAdding = false
     }
     
     private func addToWishlist() async {
+        isAdding = true
         do {
             try await OwnedVariant.create(
                 variant: variant,
                 critter: critter,
-                familyId: "",
+                familyId: critter.familyUuid ?? "",
                 status: .wishlist,
                 in: modelContext
             )
@@ -510,6 +539,7 @@ struct VariantDetailSheet: View {
         } catch {
             ToastManager.shared.show("Failed to add", type: .error)
         }
+        isAdding = false
     }
     
     private func removeFromCollection() {
