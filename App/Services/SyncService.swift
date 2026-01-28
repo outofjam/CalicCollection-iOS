@@ -46,6 +46,7 @@ class SyncService: ObservableObject {
     // MARK: - Sync Methods
     
     /// Sync critters and variants from API to browse cache
+    /// Sync critters and variants from API to browse cache
     func syncCritters(modelContext: ModelContext, force: Bool = false) async {
         guard !isSyncing else { return }
         
@@ -78,6 +79,16 @@ class SyncService: ObservableObject {
                     for variantResponse in variants {
                         let variant = CritterVariant(from: variantResponse)
                         modelContext.insert(variant)
+                        
+                        // Update any OwnedVariants with fresh image URLs
+                        let variantUuid = variantResponse.uuid
+                        let descriptor = FetchDescriptor<OwnedVariant>(
+                            predicate: #Predicate { $0.variantUuid == variantUuid }
+                        )
+                        if let owned = try? modelContext.fetch(descriptor).first {
+                            owned.imageURL = variantResponse.imageUrl
+                            owned.thumbnailURL = variantResponse.thumbnailUrl
+                        }
                     }
                 }
             }
