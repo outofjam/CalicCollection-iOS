@@ -246,19 +246,19 @@
 		937B9F692F2023E400C08885 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				931E2F3E2F2AB08D00F1EA33 /* APIError.swift */,
 				937B9F832F20259100C08885 /* APIService.swift */,
 				93C461E92F2524B300A8F084 /* APIStats.swift */,
-				931E2F3E2F2AB08D00F1EA33 /* APIError.swift */,
-				931E2F3F2F2AB08D00F1EA33 /* BrowseService.swift */,
-				931E2F402F2AB08D00F1EA33 /* ImagePersistenceService.swift */,
-				931E2F412F2AB08D00F1EA33 /* SearchService.swift */,
-				931E2F422F2AB08D00F1EA33 /* SyncService.swift */,
 				931E2EBD2F29401700F1EA33 /* AppLogger.swift */,
+				931E2F1E2F2A52B600F1EA33 /* ARCHITECTURE.md */,
 				93C461F12F26699200A8F084 /* BackupManager.swift */,
+				931E2F3F2F2AB08D00F1EA33 /* BrowseService.swift */,
 				93C4625D2F27B6D400A8F084 /* CachedAsyncImage.swift */,
 				93C461EF2F26696700A8F084 /* ImageCacheManager.swift */,
+				931E2F402F2AB08D00F1EA33 /* ImagePersistenceService.swift */,
 				93ADCD452F292DFC00351CE9 /* NetworkConfig.swift */,
-				931E2F1E2F2A52B600F1EA33 /* ARCHITECTURE.md */,
+				931E2F412F2AB08D00F1EA33 /* SearchService.swift */,
+				931E2F422F2AB08D00F1EA33 /* SyncService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";

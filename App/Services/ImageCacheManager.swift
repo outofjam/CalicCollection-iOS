@@ -22,16 +22,17 @@ final class ImageCacheManager {
     }()
     
     private init() {}
-
+    
     // MARK: - Cache Key (SHA256)
+    
     private func cacheKey(for url: String) -> String {
         let data = Data(url.utf8)
         let hash = SHA256.hash(data: data)
-
         return hash.map { String(format: "%02x", $0) }.joined()
     }
     
     // MARK: - Read
+    
     func getCachedImage(for urlString: String) -> UIImage? {
         let key = cacheKey(for: urlString)
         let fileURL = cacheDirectory.appendingPathComponent(key)
@@ -47,6 +48,7 @@ final class ImageCacheManager {
     }
     
     // MARK: - Write
+    
     func cacheImage(_ image: UIImage, for urlString: String) {
         let key = cacheKey(for: urlString)
         let fileURL = cacheDirectory.appendingPathComponent(key)
@@ -59,30 +61,42 @@ final class ImageCacheManager {
     }
     
     // MARK: - Download + Cache
+    
     func downloadAndCache(urlString: String) async -> UIImage? {
+        // Check cache first
         if let cached = getCachedImage(for: urlString) {
             return cached
         }
         
-        guard
-            let url = URL(string: urlString),
-            let (data, _) = try? await URLSession.shared.data(from: url),
-            let image = UIImage(data: data)
-        else {
+        guard let url = URL(string: urlString) else {
             return nil
         }
         
-        cacheImage(image, for: urlString)
-        return image
+        do {
+            // Use NetworkConfig.session for consistent timeout/retry behavior
+            let (data, _) = try await NetworkConfig.session.data(from: url)
+            
+            guard let image = UIImage(data: data) else {
+                return nil
+            }
+            
+            cacheImage(image, for: urlString)
+            return image
+        } catch {
+            AppLogger.debug("Image download failed for \(urlString): \(error.localizedDescription)")
+            return nil
+        }
     }
     
     // MARK: - Maintenance
+    
     func clearCache() {
         try? fileManager.removeItem(at: cacheDirectory)
         try? fileManager.createDirectory(
             at: cacheDirectory,
             withIntermediateDirectories: true
         )
+        AppLogger.info("Image cache cleared")
     }
     
     func getCacheSize() -> Int64 {

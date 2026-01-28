@@ -1,8 +1,56 @@
 # CaliCollection Architecture Documentation
 
-**Version:** 2.1a  
+**Version:** 2.5a  
 **Last Updated:** January 28, 2026  
 **Platform:** iOS/iPadOS
+
+---
+
+## ⭐ Major Architectural Changes in v2.5a
+
+### Paradigm Shift: From Offline-First to Hybrid
+
+**OLD (v2.1a)**: Everything cached locally
+```
+API → SwiftData (Critters, Variants, Families) → Views
+      └─ Sync every 7 days
+      └─ Stale data between syncs
+      └─ Large storage footprint (10,000+ items)
+```
+
+**NEW (v2.5a)**: Online browsing, offline collection
+```
+API (Browse) → Views (online-only, paginated)
+               └─ Always fresh, no sync needed
+
+SwiftData (Collection) → Views (offline-capable)
+└─ Only user's owned items (~50-500 items)
+└─ Cached images for offline access
+```
+
+### Key Benefits
+
+1. **Reduced Storage**: ~90% reduction (from 10,000+ items to 100-500 items)
+2. **Faster Sync**: <2 seconds (families only) vs. 30-60 seconds (entire catalog)
+3. **Always Fresh Data**: Browse shows latest from API, no stale data
+4. **Better Offline**: Collection fully offline with cached images
+5. **Simpler Code**: No complex dual-storage sync logic
+
+### Migration Impact
+
+**What Changed**:
+- ❌ `Critter` and `CritterVariant` models removed from SwiftData
+- ❌ `SearchView` replaced by `BrowseView` with pagination
+- ✅ `BrowseService` added for online API browsing
+- ✅ `ImagePersistenceService` added for offline image caching
+- ✅ `OwnedVariant` enhanced with `localImagePath`/`localThumbnailPath`
+- ✅ `SyncService` simplified (families only)
+
+**What Stayed the Same**:
+- ✅ `OwnedVariant` and `VariantPhoto` (user data)
+- ✅ `Family` (small cached dataset for filters)
+- ✅ Backup/restore functionality
+- ✅ Purchase tracking and user photos
 
 ---
 
@@ -27,23 +75,25 @@ CaliCollection is an iOS/iPadOS app for managing collectible toy collections (Ca
 
 ### Core Concepts
 
-- **Browse Cache**: Temporary data synced from API (critters, variants, families)
-- **User Collection**: Permanent data owned by the user (owned variants, photos, purchase details)
-- **Dual-Storage Model**: Browse cache is replaceable; collection data persists
+- **Online Browsing**: Real-time API browsing with pagination (no local cache for browse data)
+- **Offline Collection**: User's collection/wishlist with cached images for offline access
+- **Hybrid Architecture**: Browse online, collect offline
+- **Image Persistence**: Local image caching for owned variants
 
 ### Key Technologies
 
 - **SwiftUI**: Declarative UI framework
-- **SwiftData**: Modern persistence with model-driven approach
+- **SwiftData**: Modern persistence for user data only
 - **Swift Concurrency**: Async/await for network and data operations
 - **Combine**: Reactive programming for UI updates
 - **os.log**: Unified logging system
+- **UIKit Integration**: Image persistence and barcode scanning
 
 ---
 
 ## Architecture Patterns
 
-### MVVM + Service Layer
+### MVVM + Service Layer (Online-First Architecture)
 
 ```
 ┌─────────────────────────────────────────┐
@@ -53,22 +103,30 @@ CaliCollection is an iOS/iPadOS app for managing collectible toy collections (Ca
                   │
 ┌─────────────────▼───────────────────────┐
 │          Service Layer                  │
-│  (SyncService, APIService, etc.)        │
+│  • BrowseService (Online API)           │
+│  • SyncService (Families Only)          │
+│  • ImagePersistenceService (Caching)    │
+│  • BackupManager (Import/Export)        │
 └─────────────────┬───────────────────────┘
                   │
 ┌─────────────────▼───────────────────────┐
 │          Data Layer                     │
-│  (SwiftData Models, ModelContext)       │
+│  • SwiftData: OwnedVariant, Family      │
+│  • File System: Cached images           │
+│  • API: Live critter/variant data       │
 └─────────────────────────────────────────┘
 ```
 
 ### Design Principles
 
-1. **Single Responsibility**: Each service/model has one clear purpose
-2. **Dependency Injection**: Services injected via environment or parameters
-3. **Actor Isolation**: `@MainActor` for UI-bound objects
-4. **Type Safety**: Strong typing with Swift's type system
-5. **Error Propagation**: Structured error handling with custom types
+1. **Online-First Browsing**: Critters/variants fetched on-demand from API (no local cache)
+2. **Offline-First Collection**: User's owned items cached locally with images
+3. **Single Responsibility**: Each service has one clear purpose
+4. **Dependency Injection**: Services injected via environment or parameters
+5. **Actor Isolation**: `@MainActor` for UI-bound objects
+6. **Type Safety**: Strong typing with Swift's type system
+7. **Error Propagation**: Structured error handling with custom types
+8. **Image Caching**: Automatic download and caching of images for owned variants
 
 ---
 
@@ -76,65 +134,11 @@ CaliCollection is an iOS/iPadOS app for managing collectible toy collections (Ca
 
 ### SwiftData Models
 
-All models use `@Model` macro for automatic SwiftData persistence.
+**Note**: Major architectural change in v2.5a - SwiftData is now used **only for user data** (OwnedVariant, VariantPhoto, Family). Critters and variants are no longer cached locally; they are fetched on-demand from the API.
 
-#### Browse Cache Models (Temporary, Synced from API)
+#### User Collection Models (Permanent, Offline-Capable)
 
-**Critter** - Base character template
-```swift
-@Model
-final class Critter {
-    @Attribute(.unique) var uuid: String
-    var familyId: String
-    var name: String
-    var memberType: String
-    var role: String?
-    var barcode: String?
-    var familyName: String?
-    var familySpecies: String?
-    var variantsCount: Int
-    var lastSynced: Date
-}
-```
-
-**CritterVariant** - Specific product release
-```swift
-@Model
-final class CritterVariant {
-    @Attribute(.unique) var uuid: String
-    var critterId: String
-    var name: String
-    var sku: String?
-    var barcode: String?
-    var imageURL: String?
-    var thumbnailURL: String?
-    var releaseYear: Int?
-    var notes: String?
-    var setId: String?
-    var setName: String?
-    var epochId: String?
-    var isPrimary: Bool?
-    var lastSynced: Date
-}
-```
-
-**Family** - Critter family/species group
-```swift
-@Model
-final class Family {
-    @Attribute(.unique) var uuid: String
-    var name: String
-    var slug: String
-    var species: String
-    var familyDescription: String?
-    var imageURL: String?
-    var lastSynced: Date
-}
-```
-
-#### User Collection Models (Permanent)
-
-**OwnedVariant** - User's tracked variant
+**OwnedVariant** - User's tracked variant with cached images
 ```swift
 @Model
 final class OwnedVariant {
@@ -147,8 +151,15 @@ final class OwnedVariant {
     var familySpecies: String?
     var memberType: String
     var role: String?
+    
+    // Remote URLs (for reference/re-download)
     var imageURL: String?
     var thumbnailURL: String?
+    
+    // Local cached paths (for offline access) - NEW in 2.5a
+    var localImagePath: String?
+    var localThumbnailPath: String?
+    
     var statusRaw: String  // "collection" or "wishlist"
     var photoPath: String?
     var addedDate: Date
@@ -163,6 +174,11 @@ final class OwnedVariant {
 }
 ```
 
+**Key Changes**:
+- Added `localImagePath` and `localThumbnailPath` for offline image access
+- Images automatically cached when variant is added to collection/wishlist
+- `hasLocalImages` computed property to check cache status
+
 **VariantPhoto** - User-captured photos
 ```swift
 @Model
@@ -176,34 +192,107 @@ final class VariantPhoto {
 }
 ```
 
+**Family** - Family metadata (small dataset, synced for offline filters)
+```swift
+@Model
+final class Family {
+    @Attribute(.unique) var uuid: String
+    var name: String
+    var slug: String
+    var species: String
+    var familyDescription: String?
+    var imageURL: String?
+    var lastSynced: Date
+}
+```
+
+**Why Family is still cached**: Families are a small dataset (~100 items) used for filter dropdowns. Caching them enables offline browsing of the user's collection with family filters.
+
+#### Removed Models (No Longer Cached Locally)
+
+**Critter** and **CritterVariant** models have been **removed** from local storage. These are now fetched on-demand from the API via `BrowseService`.
+
+**Rationale**:
+- Eliminates sync complexity and stale data issues
+- Reduces app storage footprint
+- Ensures users always see latest data when online
+- Simplifies architecture (less dual-storage complexity)
+
 ### Model Relationships
 
 ```
-Family (1) ──── (Many) Critter ──── (Many) CritterVariant
-                                           │
-                                           │ (UUID Reference)
-                                           │
-                                           ▼
-                                    OwnedVariant (1) ──── (Many) VariantPhoto
+Family (1) ──── (Many) [API: Critter] ──── (Many) [API: Variant]
+  │                                              │
+  │ (UUID Reference)                             │ (UUID Reference + Cached Images)
+  │                                              │
+  └─────────────────────► OwnedVariant (1) ──── (Many) VariantPhoto
 ```
 
-**Note**: Relationships are UUID-based, not SwiftData relationships, because browse cache models can be deleted and re-synced.
+**Data Flow**:
+- **Browse**: Families cached locally → Critters fetched from API → Variants fetched from API
+- **Collection**: User adds variant → Images downloaded and cached → OwnedVariant created in SwiftData
+- **Offline**: User views collection → Images loaded from local cache → Full offline support
 
 ### Data Integrity
 
 - **Unique Constraints**: All models use `@Attribute(.unique)` on UUID
-- **Browse Cache Refresh**: OwnedVariants maintain imageURL sync during critter sync
-- **Orphan Prevention**: User photos/data persist even if browse cache is cleared
+- **Image Caching**: OwnedVariants automatically cache images for offline access
+- **Orphan Prevention**: User photos/data persist independently of API data
+- **Cache Management**: ImagePersistenceService handles automatic download, storage, and cleanup
 
 ---
 
 ## Service Layer
 
-### SyncService
+### BrowseService (NEW in 2.5a)
 
-**Purpose**: Manages synchronization of browse cache from API  
+**Purpose**: Online-only browsing of critters and variants with pagination  
+**Pattern**: Singleton with stateless async methods  
+**Network Layer**: Uses `NetworkConfig` for retry logic
+
+```swift
+class BrowseService {
+    static let shared = BrowseService()
+    
+    func fetchCritters(page: Int, perPage: Int, familyUuid: String?) async throws -> BrowseCrittersAPIResponse
+    func fetchCritterVariants(critterUuid: String) async throws -> CritterVariantsResponse
+    func fetchFamilies() async throws -> [FamilyBrowseResponse]
+    func fetchFamily(uuid: String) async throws -> FamilyDetailResponse
+}
+```
+
+**Key Features**:
+- **Pagination**: Fetch critters in pages (default 30 per page)
+- **Family Filtering**: Filter critters by family UUID
+- **On-Demand Loading**: No local caching, always fresh data
+- **Variant Picker Support**: Fetch all variants for a specific critter
+
+**Response Types**:
+```swift
+struct BrowseCrittersAPIResponse {
+    let data: [BrowseCritter]
+    let meta: PaginationMeta
+}
+
+struct CritterVariantsResponse {
+    let critter: CritterInfo
+    let variants: [VariantResponse]
+}
+```
+
+**Use Cases**:
+- Browse all critters with pagination (BrowseView)
+- Search/filter critters by family
+- Select specific variant when adding to collection
+- Always displays latest data from server
+
+### SyncService (Simplified in 2.5a)
+
+**Purpose**: Syncs **only families** from API for offline filter dropdown  
 **Pattern**: Singleton with `@MainActor` isolation  
 **State Management**: `@Published` properties for UI binding
+
+**Major Change**: Now only syncs families. Critters/variants removed from sync.
 
 ```swift
 @MainActor
@@ -217,55 +306,98 @@ class SyncService: ObservableObject {
 ```
 
 **Key Methods**:
-- `syncCritters(modelContext:force:)` - Sync critters and variants
-- `syncFamilies(modelContext:force:)` - Sync families
-- `syncAll(modelContext:force:)` - Full sync operation
+- `syncFamilies(modelContext:force:)` - Sync families (small dataset ~100 items)
+- ~~`syncCritters()`~~ - **REMOVED** (now fetched on-demand via BrowseService)
+- ~~`syncAll()`~~ - **REMOVED** (only families need syncing)
 
-**Sync Strategy**:
+**Sync Strategy** (Families Only):
 1. Check if sync needed (>7 days old or never synced)
-2. Fetch data from API
-3. Delete existing browse cache (`try modelContext.delete(model: Critter.self)`)
-4. Batch insert new data
-5. Update OwnedVariant imageURLs with fresh data
-6. Single save operation at end
-7. Update last sync timestamp
+2. Fetch families from `BrowseService.shared.fetchFamilies()`
+3. Delete existing families (`try modelContext.delete(model: Family.self)`)
+4. Insert new families
+5. Single save operation
+6. Update last sync timestamp
 
-**Performance Optimization**:
-- Batch operations (single save at end)
-- Conditional sync (needsSync check)
-- Error recovery with user feedback
+**Why Only Families?**:
+- Small dataset (~100 items vs. thousands of critters/variants)
+- Used for offline filter dropdowns in collection view
+- Minimal storage impact
+- Rarely changes
 
-### APIService
+### ImagePersistenceService (NEW in 2.5a)
 
-**Purpose**: Centralized API communication  
-**Pattern**: Singleton with stateless methods  
-**Network Layer**: Uses `NetworkConfig` for retry logic
+**Purpose**: Download and cache images locally for offline collection access  
+**Pattern**: Singleton with file system management  
+**Storage**: Documents/CachedImages directory
+
+```swift
+class ImagePersistenceService {
+    static let shared = ImagePersistenceService()
+    
+    func cacheImage(from urlString: String?, for variantUuid: String) async throws -> String?
+    func cacheImages(imageUrl: String?, thumbnailUrl: String?, for variantUuid: String) async throws -> (String?, String?)
+    func loadCachedImage(for variantUuid: String) -> UIImage?
+    func deleteCachedImage(for variantUuid: String)
+    func clearCache()
+}
+```
+
+**Key Features**:
+- **Automatic Caching**: Images cached when variant added to collection/wishlist
+- **Offline Access**: Load images from local storage when offline
+- **Cache Management**: Track cache size, clear individual or all images
+- **Duplicate Detection**: Skip re-downloading existing cached images
+- **Parallel Downloads**: Async concurrent download of full image + thumbnail
+
+**Storage Structure**:
+```
+Documents/CachedImages/
+├── {variantUuid}.jpg           (Full image)
+├── {variantUuid}_thumb.jpg     (Thumbnail)
+└── ...
+```
+
+**Integration with OwnedVariant**:
+```swift
+// When adding to collection
+let (imagePath, thumbPath) = try await ImagePersistenceService.shared.cacheImages(
+    imageUrl: variant.imageUrl,
+    thumbnailUrl: variant.thumbnailUrl,
+    for: variantUuid
+)
+
+owned.localImagePath = imagePath
+owned.localThumbnailPath = thumbPath
+```
+
+**Cache Management**:
+- `cacheSize()` - Total bytes used
+- `formattedCacheSize()` - Human-readable size (e.g., "12.3 MB")
+- `clearCache()` - Remove all cached images
+- Auto-cleanup when variant removed from collection
+
+### APIService (Deprecated)
+
+### APIService (Deprecated)
+
+**Status**: ~~Most functionality moved to BrowseService~~  
+**Remaining**: Report submission only
+
+**Purpose**: Submit data issue reports to API  
+**Pattern**: Singleton with stateless methods
 
 ```swift
 class APIService {
     static let shared = APIService()
     
-    func fetchCritters() async throws -> [CritterResponse]
-    func fetchFamilies() async throws -> [FamilyResponse]
-    func submitReport(...) async throws -> String
+    func submitReport(variantUuid: String, issueType: ReportIssueType, details: String?, suggestedCorrection: String?) async throws -> String
 }
 ```
 
-**API Configuration**:
-- Base URL: `Config.apiBaseURL` (environment-based)
-- Debug: `https://calicoprod.thetechnodro.me/api/v1`
-- Production: `http://api.callicollection.com/api/v1`
-
-**Response Models**:
-```swift
-struct CritterResponse: Codable {
-    let uuid: String
-    let familyId: String
-    let name: String
-    let family: FamilyResponse?
-    let variants: [VariantResponse]?
-}
-```
+**Migration Notes**:
+- `fetchCritters()` → `BrowseService.fetchCritters()`
+- `fetchFamilies()` → `BrowseService.fetchFamilies()`
+- Report functionality remains in APIService
 
 ### NetworkConfig
 
@@ -287,29 +419,63 @@ static func performRequest(_ request: URLRequest) async throws -> (Data, URLResp
 - Exponential backoff between attempts
 - Logs warnings on retry attempts
 
-### BackupManager
+### API Configuration
+
+**Base URL**: `Config.apiBaseURL` (environment-based)
+- **Debug**: `https://calicoprod.thetechnodro.me/api/v1`
+- **Production**: `http://api.callicollection.com/api/v1`
+
+**Endpoints**:
+- `GET /critters?page={page}&per_page={perPage}&family={uuid}` - Browse critters (paginated)
+- `GET /critters/{uuid}/variants` - Get critter variants for picker
+- `GET /families` - Get all families with counts
+- `GET /families/{uuid}` - Get family detail with critters
+- `POST /variants/report` - Submit data issue report
+- `GET /sets/barcode/{barcode}` - Barcode lookup (future)
+
+### BackupManager (Updated in 2.5a)
 
 **Purpose**: Import/export user collection and photos  
 **Pattern**: Singleton with `@Published` state  
 **Format**: ZIP archive with JSON manifest
 
+**Note**: Does NOT include cached images. Images are re-downloaded from API URLs during import.
+
 **Export Structure**:
 ```
 CaliCollection_Backup_01-28-2026.zip
-├── backup.json          (Collection metadata)
+├── backup.json          (Collection metadata + image URLs)
 └── photos/
-    ├── {uuid}_{id}.jpg
+    ├── {uuid}_{id}.jpg  (User-captured photos only)
     └── ...
+```
+
+**Backup Format** (JSON):
+```swift
+struct CollectionBackup: Codable {
+    let exportDate: Date
+    let appVersion: String
+    let ownedVariants: [BackupVariant]  // Includes imageURL/thumbnailURL
+    let photos: [BackupPhoto]           // User photos, not cached images
+}
 ```
 
 **Key Methods**:
 - `exportCollection(ownedVariants:photos:appVersion:)` - Create ZIP backup
 - `importCollection(from:into:)` - Restore from backup
+- `formattedCacheSize()` - Display cache size (via ImagePersistenceService)
 
 **Import Strategy**:
 - Upsert logic: Update existing, insert new
 - Photo deduplication by UUID
+- **Image Re-caching**: Local image paths cleared; images re-downloaded on-demand
 - Detailed import result reporting
+
+**Changes in 2.5a**:
+- Backup no longer includes cached variant images (only user photos)
+- Import process clears `localImagePath`/`localThumbnailPath`
+- Images automatically re-cached when user views variants
+- Smaller backup file sizes
 
 ### ToastManager
 
@@ -422,31 +588,32 @@ AppLogger.error("❌ Error")              // All builds
 ```
 CaliCollectionV2/
 ├── Models/
-│   ├── Browse Cache/
-│   │   ├── Critter.swift
-│   │   ├── CritterVariant.swift
-│   │   └── Family.swift
 │   ├── User Collection/
-│   │   ├── OwnedVariant.swift
-│   │   └── VariantPhoto.swift
+│   │   ├── OwnedVariant.swift       (with local image paths)
+│   │   ├── VariantPhoto.swift
+│   │   └── Family.swift              (small cached dataset)
 │   └── API Responses/
-│       ├── CritterResponse.swift
+│       ├── BrowseResponses.swift     (paginated browse models)
+│       ├── SetResponse.swift         (barcode scan models)
 │       ├── FamilyResponse.swift
-│       └── VariantResponse.swift
+│       └── ReportRequest.swift
 │
 ├── Services/
-│   ├── SyncService.swift
-│   ├── APIService.swift
+│   ├── BrowseService.swift           ⭐ NEW - Online browsing
+│   ├── ImagePersistenceService.swift ⭐ NEW - Image caching
+│   ├── SyncService.swift             (simplified - families only)
+│   ├── APIService.swift              (deprecated - reports only)
 │   ├── NetworkConfig.swift
 │   ├── BackupManager.swift
 │   └── ToastManager.swift
 │
 ├── Views/
 │   ├── ContentView.swift
-│   ├── FirstSyncView.swift
-│   ├── CollectionView.swift
-│   ├── WishlistView.swift
-│   ├── SearchView.swift
+│   ├── FirstSyncView.swift           (now families only)
+│   ├── CollectionView.swift          (offline-capable)
+│   ├── WishlistView.swift            (offline-capable)
+│   ├── BrowseView.swift              ⭐ NEW - Online browse with pagination
+│   ├── VariantPickerView.swift       ⭐ NEW - Select variant when adding
 │   ├── SettingsView.swift
 │   └── DataManagementView.swift
 │
@@ -459,74 +626,148 @@ CaliCollectionV2/
     └── OwnedVariantTests.swift
 ```
 
+### Key Structural Changes in 2.5a
+
+**Removed**:
+- `Critter.swift` - No longer cached locally
+- `CritterVariant.swift` - No longer cached locally
+- `CritterResponse.swift` - Replaced by `BrowseResponses.swift`
+- `SearchView.swift` - Replaced by `BrowseView.swift`
+
+**Added**:
+- `BrowseService.swift` - Online browsing with pagination
+- `ImagePersistenceService.swift` - Local image caching
+- `BrowseResponses.swift` - Paginated API response models
+- `BrowseView.swift` - Modern paginated browse UI
+- `VariantPickerView.swift` - Choose specific variant
+
 ### Organizational Principles
 
-1. **Model-First Organization**: Models grouped by purpose
-2. **Service Layer Isolation**: Clear separation from UI
-3. **Flat View Hierarchy**: Avoid deep nesting
+1. **Service-Driven Architecture**: Services own business logic
+2. **API Response Models**: Separate from persistent models
+3. **View Simplification**: Views consume services, minimal business logic
 4. **Shared Utilities**: Common code in Utilities folder
 
 ---
 
 ## Data Flow
 
-### Sync Flow
+### Browse Flow (NEW in 2.5a)
 
 ```
-User Triggers Sync
+User Opens BrowseView
       │
       ▼
-SyncService.syncCritters()
+BrowseService.fetchCritters(page: 1)
+      │
+      ├─► NetworkConfig.performRequest()
+      │   └─► Auto-retry on failure
+      │
+      ├─► Parse BrowseCrittersAPIResponse
+      │   ├─► data: [BrowseCritter]
+      │   └─► meta: PaginationMeta (current_page, total_pages, etc.)
+      │
+      └─► Display in paginated grid
+            │
+            ├─► User scrolls to end → Load next page
+            ├─► User taps critter → Fetch variants
+            │         │
+            │         ▼
+            │   BrowseService.fetchCritterVariants(uuid)
+            │         │
+            │         └─► Show VariantPickerView
+            │               │
+            │               └─► User selects variant → Add to collection
+            │
+            └─► No local caching (always fresh from API)
+```
+
+### Sync Flow (Simplified in 2.5a)
+
+```
+User Triggers Sync (Families Only)
+      │
+      ▼
+SyncService.syncFamilies()
       │
       ├─► Check needsSync
       │   └─► Skip if recent (unless forced)
       │
-      ├─► APIService.fetchCritters()
+      ├─► BrowseService.fetchFamilies()
       │   │
       │   ├─► NetworkConfig.performRequest()
       │   │   └─► Auto-retry on failure
       │   │
-      │   └─► Parse CritterResponse[]
+      │   └─► Parse [FamilyBrowseResponse]
       │
       ├─► ModelContext Operations
-      │   ├─► Delete existing Critter/CritterVariant
-      │   ├─► Insert new models
-      │   ├─► Update OwnedVariant imageURLs
+      │   ├─► Delete existing Family models
+      │   ├─► Insert new families (~100 items)
       │   └─► Save (single batch operation)
       │
       ├─► Update lastSyncDate
       │
-      └─► ToastManager.show("✓ Synced X critters")
+      └─► ToastManager.show("✓ Synced X families")
+
+NOTE: Critters/variants NO LONGER synced.
+      Fetched on-demand via BrowseService.
 ```
 
-### Add to Collection Flow
+### Add to Collection Flow (Updated in 2.5a)
 
 ```
 User Taps "Add to Collection" on Variant
       │
       ▼
-OwnedVariant.create(variant, critter, .collection, context)
+OwnedVariant.create(from: variantResponse, status: .collection)
+      │
+      ├─► ImagePersistenceService.cacheImages()  ⭐ NEW
+      │   │
+      │   ├─► Download full image (async)
+      │   ├─► Download thumbnail (async)
+      │   ├─► Save to Documents/CachedImages/
+      │   └─► Return local file paths
       │
       ├─► Check if already exists
-      │   ├─► YES: Update status to .collection
-      │   └─► NO:  Create new OwnedVariant
+      │   ├─► YES: Update status + image paths
+      │   └─► NO:  Create new OwnedVariant with local paths
       │
       ├─► ModelContext.save()
       │
       └─► SwiftUI auto-updates via @Query
             │
-            └─► Variant appears in CollectionView
+            └─► Variant appears in CollectionView with cached images
 ```
 
-### Image Loading Flow
+**Key Change**: Images automatically cached during add process for offline access.
 
+### Image Loading Flow (Updated in 2.5a)
+
+**For OwnedVariants (Collection/Wishlist)**:
+```
+View displays OwnedVariant
+      │
+      ├─► Check hasLocalImages
+      │   │
+      │   ├─► YES: Load from local cache
+      │   │   └─► Image(uiImage: ImagePersistenceService.loadCachedImage())
+      │   │
+      │   └─► NO: Fallback to remote URL
+      │       └─► AsyncImage(url: variant.thumbnailURL)
+```
+
+**For Browse Results (Online Only)**:
 ```
 AsyncImage(url: variant.thumbnailURL)
       │
       ├─► URLSession downloads image
-      ├─► SwiftUI caches in memory
+      ├─► SwiftUI caches in memory (temporary)
       └─► Renders placeholder while loading
 ```
+
+**Key Difference**:
+- **Collection/Wishlist**: Persistent local cache for offline access
+- **Browse**: Temporary memory cache, requires internet
 
 ### Backup/Restore Flow
 
@@ -621,14 +862,20 @@ do {
 
 ## Performance Optimization
 
-### Database Performance
+### Database Performance (Simplified in 2.5a)
 
-**Batch Operations**:
+**Reduced Storage Footprint**:
+- SwiftData now stores only user data (~50-500 items) vs. entire catalog (10,000+ items)
+- Family cache: ~100 items (minimal impact)
+- Faster app launch (no large dataset queries)
+- Smaller iCloud sync payload (if enabled)
+
+**Batch Operations** (Family sync only):
 ```swift
-// Insert all critters before saving
-for response in critterResponses {
-    let critter = Critter(from: response)
-    modelContext.insert(critter)
+// Insert all families before saving
+for response in familyResponses {
+    let family = Family(from: response)
+    modelContext.insert(family)
 }
 // Single save at end
 try modelContext.save()
@@ -641,16 +888,22 @@ try modelContext.save()
 }, sort: \OwnedVariant.addedDate)
 var ownedVariants: [OwnedVariant]
 ```
-- Index on unique attributes
+- Small dataset (user's collection only)
+- Index on unique variantUuid
 - Predicate pushdown to database level
-- Lazy loading of relationships
 
 **Delete Performance**:
 ```swift
-try modelContext.delete(model: Critter.self)  // Batch delete
+try modelContext.delete(model: Family.self)  // Batch delete ~100 items
 ```
 
-### Network Performance
+### Network Performance (Enhanced in 2.5a)
+
+**Pagination** (NEW):
+- Browse critters in pages (default 30 items)
+- Reduces initial load time
+- Lower memory footprint
+- Incremental loading as user scrolls
 
 **Retry Configuration**:
 - Fail fast on non-retryable errors
@@ -664,24 +917,43 @@ try modelContext.delete(model: Critter.self)  // Batch delete
 
 **Caching Strategy**:
 - API responses: Not cached (always fresh)
-- Images: SwiftUI AsyncImage memory cache
-- Browse cache: Local SwiftData storage
+- Images (Browse): SwiftUI AsyncImage memory cache (temporary)
+- Images (Collection): Persistent file cache via ImagePersistenceService
+- Families: Local SwiftData cache (refreshed weekly)
 
-### UI Performance
+**Parallel Operations**:
+```swift
+// Download image + thumbnail concurrently
+async let imagePath = cacheImage(from: imageUrl, for: uuid)
+async let thumbPath = cacheImage(from: thumbnailUrl, for: "\(uuid)_thumb")
+return try await (imagePath, thumbPath)
+```
+
+### UI Performance (Improved in 2.5a)
 
 **Lazy Loading**:
-- Grid views use LazyVGrid/LazyHGrid
+- Browse: LazyVGrid with pagination (load as you scroll)
+- Collection: LazyVGrid with small dataset (fast rendering)
 - Only visible items rendered
 
 **Image Loading**:
 ```swift
+// Collection (offline-capable)
+if let cachedImage = ImagePersistenceService.shared.loadCachedThumbnail(for: uuid) {
+    Image(uiImage: cachedImage)  // Instant load from disk
+} else {
+    AsyncImage(url: thumbnailURL)  // Fallback to remote
+}
+
+// Browse (online only)
 AsyncImage(url: thumbnailURL) { image in
     image.resizable().aspectRatio(contentMode: .fit)
 } placeholder: {
     ProgressView()
 }
 ```
-- Asynchronous loading doesn't block UI
+- **Collection**: Instant load from cache (no network delay)
+- **Browse**: Asynchronous loading doesn't block UI
 - Thumbnail URLs reduce data transfer
 - Automatic memory management
 
@@ -689,8 +961,20 @@ AsyncImage(url: thumbnailURL) { image in
 - `@Published` only on properties that affect UI
 - Minimize unnecessary view updates
 - Use `@MainActor` to ensure UI updates on main thread
+- Pagination state prevents loading entire catalog at once
 
-### Sync Performance
+**Memory Management**:
+- Browse images: Temporary memory cache (SwiftUI managed)
+- Collection images: File cache (persistent, managed by service)
+- Old cache files cleaned up when variant removed
+
+### Sync Performance (Dramatically Improved in 2.5a)
+
+**Minimal Sync Scope**:
+- Only families synced (~100 items vs. 10,000+ critters/variants)
+- Sync time reduced from 30-60 seconds to <2 seconds
+- Lower bandwidth usage
+- Reduced server load
 
 **Conditional Sync**:
 ```swift
@@ -704,17 +988,10 @@ var needsSync: Bool {
 - Skip unnecessary API calls
 - Force sync option for manual refresh
 
-**Image URL Refresh**:
-```swift
-// During sync, update OwnedVariant URLs
-if let owned = try? modelContext.fetch(descriptor).first {
-    owned.imageURL = variantResponse.imageUrl
-    owned.thumbnailURL = variantResponse.thumbnailUrl
-}
-```
-- Keeps user collection images fresh
-- Handles URL changes on server
-- No duplicate image downloads
+**No Image URL Refresh Needed**:
+- ~~Removed: Image URL sync for OwnedVariants~~
+- Images cached locally, independent of sync
+- Simpler sync logic, fewer operations
 
 ---
 
@@ -757,27 +1034,49 @@ if let owned = try? modelContext.fetch(descriptor).first {
 3. **Error Handling**: Structured errors, never silent failures
 4. **Type Safety**: Leverage Swift's type system
 5. **Documentation**: Clear comments on complex logic
+6. **Separation of Concerns**: API models ≠ persistent models
 
-### SwiftData Usage
+### SwiftData Usage (Updated in 2.5a)
 
-1. **Unique Constraints**: Always use on identifiers
-2. **Batch Operations**: Insert all, save once
-3. **Query Predicates**: Push filtering to database
-4. **UUID References**: Not SwiftData relationships for volatile data
+1. **User Data Only**: Only persist user-owned data, not API catalogs
+2. **Unique Constraints**: Always use on identifiers
+3. **Batch Operations**: Insert all, save once
+4. **Query Predicates**: Push filtering to database
+5. **File References**: Store local paths for cached images
 
-### Networking
+**Anti-Pattern** (OLD):
+```swift
+// DON'T cache entire API catalog
+@Model class Critter { ... }  // 10,000+ items
+```
+
+**Best Practice** (NEW):
+```swift
+// DO fetch on-demand from API
+BrowseService.fetchCritters(page: 1)  // Paginated, fresh data
+```
+
+### Networking (Updated in 2.5a)
 
 1. **Retry Logic**: Handle transient failures
 2. **Timeout Configuration**: Prevent hanging
 3. **Structured Responses**: Codable DTOs
 4. **Error Mapping**: Convert network errors to domain errors
+5. **Pagination**: Use for large datasets (BrowseService)
+6. **Image Caching**: Persist locally for offline access
 
-### UI Patterns
+### UI Patterns (Updated in 2.5a)
 
-1. **Single Source of Truth**: SwiftData is source
-2. **Reactive Updates**: @Query auto-updates views
+1. **Hybrid Data Sources**: 
+   - **Collection/Wishlist**: SwiftData @Query (offline-capable)
+   - **Browse**: API service (online-only, paginated)
+2. **Reactive Updates**: @Query auto-updates collection views
 3. **Loading States**: Show progress during async operations
 4. **Error Feedback**: Toast notifications for non-critical errors
+5. **Offline Handling**: Graceful degradation when offline
+6. **Image Strategy**:
+   - Browse: AsyncImage with memory cache
+   - Collection: Cached UIImage with remote fallback
 
 ---
 
@@ -785,24 +1084,49 @@ if let owned = try? modelContext.fetch(descriptor).first {
 
 ### Scalability
 
-- **Pagination**: If critter count exceeds 10,000+
+- ✅ **Pagination**: Implemented in v2.5a (BrowseService)
+- ✅ **Offline Collection**: Implemented with image caching
 - **Background Sync**: Automatic sync on app launch
 - **Push Notifications**: Server-side update notifications
 - **CloudKit Sync**: Cross-device collection sync
+- **Image CDN**: Faster image delivery globally
 
 ### Features
 
-- **Search Improvements**: Full-text search, filters
+- **Advanced Search**: Full-text search across critters/variants
+- **Barcode Scanning**: Add items via barcode (API ready)
 - **Statistics**: Collection value, completion percentage
 - **Social Features**: Share collections, friend lists
-- **Barcode Scanning**: Add items via barcode
+- **Sets & Themes**: Browse by product sets/epochs
+- **Wishlist Alerts**: Notify when wishlist items on sale
 
-### Technical Debt
+### Technical Improvements
+
+- **Offline Browse**: Cache recent browse results for offline viewing
+- **Image Optimization**: WebP support, progressive loading
+- **Search Debouncing**: Reduce API calls during typing
+- **Prefetching**: Preload next page during pagination
+- **Better Error Recovery**: Offline queue for failed operations
+
+### Technical Debt (Updated in 2.5a)
 
 - **Unit Test Coverage**: Expand beyond OwnedVariantTests
+  - Add tests for BrowseService
+  - Add tests for ImagePersistenceService
+  - Mock network responses for deterministic testing
 - **UI Tests**: Critical user flows
-- **Error Recovery**: More robust retry strategies
-- **Offline Mode**: Better offline experience
+  - Browse → Add to Collection flow
+  - Image caching verification
+  - Offline collection viewing
+- **Migration Testing**: Ensure smooth upgrade from 2.1a → 2.5a
+  - Old users had cached critters (now removed)
+  - Verify no data loss during migration
+- **Image Cache Limits**: Currently unlimited growth
+  - Consider max cache size (e.g., 500 MB)
+  - LRU eviction strategy for old images
+- **API Error Handling**: More granular error types
+  - Better offline detection
+  - Retry with user confirmation
 
 ---
 
@@ -822,7 +1146,16 @@ if let owned = try? modelContext.fetch(descriptor).first {
 
 ## Version History
 
-- **2.1a**: Current version (January 2026)
+- **2.5a**: Major architectural refactor (January 2026)
+  - 🎯 **Online-first browsing**: Removed Critter/CritterVariant local cache
+  - 📄 **Pagination**: BrowseService with paginated API calls
+  - 💾 **Image caching**: ImagePersistenceService for offline collection access
+  - ⚡ **Faster sync**: Only families synced (~100 items vs. 10,000+)
+  - 🎨 **Variant picker**: Select specific variant when adding to collection
+  - 📦 **Smaller footprint**: Reduced app storage by ~90%
+  - 🔄 **Simplified architecture**: Eliminated dual-storage complexity
+  
+- **2.1a**: SwiftData migration (December 2025)
   - SwiftData migration complete
   - Backup/restore functionality
   - Enhanced sync with image URL updates

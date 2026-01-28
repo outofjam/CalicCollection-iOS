@@ -13,14 +13,14 @@ struct Config {
         //return "http://callicollection.test/api/v1"
 #else
         // Production URL
-        return "http://api.callicollection.com/api/v1"
+        return "https://api.callicollection.com/api/v1"
 #endif
     }
     
     // MARK: - App Information
     
     static let appName = "CaliCollection"
-    static let appVersion = "2.1a"
+    static let appVersion = "2.5a"
     
     // MARK: - Sync Settings
     
