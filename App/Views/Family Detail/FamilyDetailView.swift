@@ -5,51 +5,52 @@
 //  Created by Ismail Dawoodjee on 2026-01-24.
 //
 
-
 import SwiftUI
 import SwiftData
 
 struct FamilyDetailView: View {
+    let familyUuid: String
     let familyName: String
     
     @Environment(\.modelContext) private var modelContext
-    @Query private var allCritters: [Critter]
-    @Query private var allVariants: [CritterVariant]
     @Query private var ownedVariants: [OwnedVariant]
     
-    @State private var selectedCritter: Critter?
-    @State private var pickerTargetStatus: CritterStatus = .collection
+    @State private var familyDetail: FamilyDetailResponse?
+    @State private var isLoading = true
+    @State private var errorMessage: String?
     
-    private var familyCritters: [Critter] {
-        allCritters.filter { $0.familyName == familyName }
-    }
+    @State private var selectedCritterUuid: String?
+    @State private var pickerTargetStatus: CritterStatus = .collection
+    @State private var showVariantPicker = false
     
     private var totalVariants: Int {
-        familyCritters.reduce(0) { $0 + $1.variantsCount }
+        familyDetail?.critters.reduce(0) { $0 + $1.variantsCount } ?? 0
     }
     
     private var ownedInCollection: Int {
-        let critterUuids = Set(familyCritters.map { $0.uuid })
-        return ownedVariants.filter { 
-            critterUuids.contains($0.critterUuid) && $0.status == .collection 
+        guard let critters = familyDetail?.critters else { return 0 }
+        let critterUuids = Set(critters.map { $0.uuid })
+        return ownedVariants.filter {
+            critterUuids.contains($0.critterUuid) && $0.status == .collection
         }.count
     }
     
     private var ownedInWishlist: Int {
-        let critterUuids = Set(familyCritters.map { $0.uuid })
-        return ownedVariants.filter { 
-            critterUuids.contains($0.critterUuid) && $0.status == .wishlist 
+        guard let critters = familyDetail?.critters else { return 0 }
+        let critterUuids = Set(critters.map { $0.uuid })
+        return ownedVariants.filter {
+            critterUuids.contains($0.critterUuid) && $0.status == .wishlist
         }.count
     }
     
     // Group by member type
-    private var groupedByMemberType: [String: [Critter]] {
-        Dictionary(grouping: familyCritters) { $0.memberType }
+    private var groupedByMemberType: [String: [FamilyDetailCritter]] {
+        guard let critters = familyDetail?.critters else { return [:] }
+        return Dictionary(grouping: critters) { $0.memberType.capitalized }
     }
     
     private var sortedMemberTypes: [String] {
-        // Custom sort order: Parents, Grandparents, Kids, Babies, Other
-        let order = ["Parents", "Grandparents", "Kids", "Babies", "Other"]
+        let order = ["Father", "Mother", "Grandfather", "Grandmother", "Brother", "Sister", "Baby"]
         return groupedByMemberType.keys.sorted { first, second in
             let firstIndex = order.firstIndex(of: first) ?? order.count
             let secondIndex = order.firstIndex(of: second) ?? order.count
@@ -58,6 +59,40 @@ struct FamilyDetailView: View {
     }
     
     var body: some View {
+        Group {
+            if isLoading {
+                ProgressView("Loading family...")
+            } else if let error = errorMessage {
+                ContentUnavailableView {
+                    Label("Error", systemImage: "exclamationmark.triangle")
+                } description: {
+                    Text(error)
+                } actions: {
+                    Button("Retry") {
+                        Task { await loadFamily() }
+                    }
+                }
+            } else if let detail = familyDetail {
+                familyContent(detail)
+            }
+        }
+        .navigationTitle(familyName)
+        .navigationBarTitleDisplayMode(.large)
+        .task {
+            await loadFamily()
+        }
+        .sheet(isPresented: $showVariantPicker) {
+            if let critterUuid = selectedCritterUuid {
+                VariantPickerSheet(
+                    critterUuid: critterUuid,
+                    targetStatus: pickerTargetStatus
+                )
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private func familyContent(_ detail: FamilyDetailResponse) -> some View {
         List {
             // Stats section
             Section {
@@ -65,7 +100,7 @@ struct FamilyDetailView: View {
                     StatBadge(
                         icon: "figure.2",
                         label: "Characters",
-                        value: "\(familyCritters.count)",
+                        value: "\(detail.critters.count)",
                         color: .blue
                     )
                     
@@ -104,14 +139,10 @@ struct FamilyDetailView: View {
                 Section {
                     if let critters = groupedByMemberType[memberType] {
                         ForEach(critters.sorted(by: { $0.name < $1.name })) { critter in
-                            NavigationLink {
-                                CritterDetailView(critter: critter)
-                            } label: {
-                                CritterRow(
-                                    critter: critter,
-                                    ownedVariants: ownedVariantsFor(critter)
-                                )
-                            }
+                            CritterRowOnline(
+                                critter: critter,
+                                ownedCount: ownedCountFor(critter)
+                            )
                             .swipeActions(edge: .leading) {
                                 Button {
                                     handleCollectionAction(for: critter)
@@ -143,88 +174,114 @@ struct FamilyDetailView: View {
                 }
             }
         }
-        .navigationTitle(familyName)
-        .navigationBarTitleDisplayMode(.large)
-        .sheet(item: $selectedCritter) { critter in
-            VariantPickerSheet(
-                critter: critter,
-                targetStatus: pickerTargetStatus
-            )
+    }
+    
+    // MARK: - Data Loading
+    
+    private func loadFamily() async {
+        isLoading = true
+        errorMessage = nil
+        
+        do {
+            familyDetail = try await BrowseService.shared.fetchFamily(uuid: familyUuid)
+        } catch {
+            errorMessage = error.localizedDescription
         }
+        
+        isLoading = false
     }
     
     // MARK: - Helper Methods
     
-    private func ownedVariantsFor(_ critter: Critter) -> [OwnedVariant] {
-        ownedVariants.filter { $0.critterUuid == critter.uuid }
+    private func ownedCountFor(_ critter: FamilyDetailCritter) -> Int {
+        ownedVariants.filter { $0.critterUuid == critter.uuid }.count
     }
     
-    private func handleCollectionAction(for critter: Critter) {
+    private func handleCollectionAction(for critter: FamilyDetailCritter) {
         if critter.variantsCount == 0 {
             ToastManager.shared.show("This critter has no variants", type: .error)
             return
         }
         
-        if critter.variantsCount == 1 {
-            addSingleVariant(critter: critter, status: .collection)
-        } else {
-            pickerTargetStatus = .collection
-            selectedCritter = critter
-        }
+        pickerTargetStatus = .collection
+        selectedCritterUuid = critter.uuid
+        showVariantPicker = true
     }
     
-    private func handleWishlistAction(for critter: Critter) {
+    private func handleWishlistAction(for critter: FamilyDetailCritter) {
         if critter.variantsCount == 0 {
             ToastManager.shared.show("This critter has no variants", type: .error)
             return
         }
         
-        if critter.variantsCount == 1 {
-            addSingleVariant(critter: critter, status: .wishlist)
-        } else {
-            pickerTargetStatus = .wishlist
-            selectedCritter = critter
+        pickerTargetStatus = .wishlist
+        selectedCritterUuid = critter.uuid
+        showVariantPicker = true
+    }
+}
+
+// MARK: - Critter Row (Online Version)
+private struct CritterRowOnline: View {
+    let critter: FamilyDetailCritter
+    let ownedCount: Int
+    
+    var body: some View {
+        HStack(spacing: 12) {
+            // Thumbnail
+            if let urlString = critter.thumbnailUrl, let url = URL(string: urlString) {
+                AsyncImage(url: url) { phase in
+                    switch phase {
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                    default:
+                        placeholderView
+                    }
+                }
+                .frame(width: 50, height: 50)
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+            } else {
+                placeholderView
+                    .frame(width: 50, height: 50)
+            }
+            
+            // Info
+            VStack(alignment: .leading, spacing: 4) {
+                Text(critter.name)
+                    .font(.headline)
+                
+                HStack(spacing: 8) {
+                    Text("\(critter.variantsCount) variant\(critter.variantsCount == 1 ? "" : "s")")
+                        .font(.caption)
+                        .foregroundColor(.calicoTextSecondary)
+                    
+                    if ownedCount > 0 {
+                        Text("• \(ownedCount) owned")
+                            .font(.caption)
+                            .foregroundColor(.calicoPrimary)
+                    }
+                }
+            }
+            
+            Spacer()
+            
+            // Owned indicator
+            if ownedCount > 0 {
+                Image(systemName: "checkmark.circle.fill")
+                    .foregroundColor(.calicoPrimary)
+            }
         }
+        .contentShape(Rectangle())
     }
     
-    private func addSingleVariant(critter: Critter, status: CritterStatus) {
-        let critterVariants = allVariants.filter { $0.critterId == critter.uuid }
-        
-        guard let variant = critterVariants.first else {
-            ToastManager.shared.show("Variant not found", type: .error)
-            return
-        }
-        
-        let alreadyOwned = ownedVariants.contains {
-            $0.variantUuid == variant.uuid && $0.status == status
-        }
-        
-        if alreadyOwned {
-            try? OwnedVariant.remove(variantUuid: variant.uuid, in: modelContext)
-            
-            let generator = UINotificationFeedbackGenerator()
-            generator.notificationOccurred(.warning)
-            
-            ToastManager.shared.show(
-                "Removed \(variant.name) from \(status == .collection ? "Collection" : "Wishlist")",
-                type: .info
-            )
-        } else {
-            try? OwnedVariant.create(
-                variant: variant,
-                critter: critter,
-                status: status,
-                in: modelContext
-            )
-            
-            let generator = UINotificationFeedbackGenerator()
-            generator.notificationOccurred(.success)
-            
-            ToastManager.shared.show(
-                "✓ Added \(variant.name) to \(status == .collection ? "Collection" : "Wishlist")",
-                type: .success
-            )
-        }
+    private var placeholderView: some View {
+        RoundedRectangle(cornerRadius: 8)
+            .fill(Color.gray.opacity(0.2))
+            .overlay {
+                Image(systemName: "person.fill")
+                    .foregroundColor(.gray)
+            }
     }
 }
 
@@ -259,7 +316,6 @@ struct StatBadge: View {
 
 #Preview {
     NavigationStack {
-        FamilyDetailView(familyName: "Chocolate Rabbit")
-            .modelContainer(for: Critter.self, inMemory: true)
+        FamilyDetailView(familyUuid: "test-uuid", familyName: "Chocolate Rabbit")
     }
 }

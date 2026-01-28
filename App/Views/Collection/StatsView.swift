@@ -4,48 +4,52 @@ import SwiftData
 struct StatsView: View {
     let variants: [OwnedVariant]
     
-    @Query private var allVariants: [CritterVariant]
-    @Query private var allCritters: [Critter]
+    @Query private var cachedFamilies: [Family]
     
     // Computed stats
-    private var totalCollected: Int {
+    private var totalVariantsCollected: Int {
         variants.count
     }
     
-    private var familyBreakdown: [(family: String, collected: Int, total: Int, completion: Double)] {
+    private var totalCrittersCollected: Int {
+        Set(variants.map { $0.critterUuid }).count
+    }
+    
+    private var familyBreakdown: [(family: String, familyId: String, collected: Int, total: Int, percentage: Double)] {
         // Get unique critters collected by family
-        let collectedCrittersByFamily = Dictionary(grouping: variants) { $0.familyName ?? "Unknown" }
+        let collectedByFamily = Dictionary(grouping: variants) { $0.familyId }
             .mapValues { variants in
                 Set(variants.map { $0.critterUuid }).count
             }
         
-        // Get total critters by family
-        let totalCrittersByFamily = Dictionary(grouping: allCritters) { $0.familyName ?? "Unknown" }
-            .mapValues { $0.count }
+        // Build breakdown with totals from cached families
+        var breakdown: [(family: String, familyId: String, collected: Int, total: Int, percentage: Double)] = []
         
-        // Combine
-        return collectedCrittersByFamily.map { family, collected in
-            let total = totalCrittersByFamily[family] ?? collected
-            let completion = total > 0 ? Double(collected) / Double(total) : 0
+        for (familyId, collectedCount) in collectedByFamily {
+            // Find the family name from variants (since we group by familyId)
+            let familyName = variants.first { $0.familyId == familyId }?.familyName ?? "Unknown"
             
-            return (family, collected, total, completion)
+            // Get total critters from cached family data
+            let totalCritters = cachedFamilies.first { $0.uuid == familyId }?.crittersCount ?? collectedCount
+            
+            let percentage = totalCritters > 0 ? Double(collectedCount) / Double(totalCritters) : 0
+            
+            breakdown.append((familyName, familyId, collectedCount, totalCritters, min(percentage, 1.0)))
         }
-        .sorted { $0.collected > $1.collected }
+        
+        return breakdown.sorted { $0.percentage > $1.percentage }
     }
     
-    private var memberTypeBreakdown: [(type: String, collected: Int, total: Int, percentage: Double)] {
+    private var memberTypeBreakdown: [(type: String, collected: Int, percentage: Double)] {
         // Get unique critters collected by member type
         let collectedCrittersByType = Dictionary(grouping: variants) { $0.memberType }
             .mapValues { variants in
                 Set(variants.map { $0.critterUuid }).count
             }
         
-        // Total collected critters (for percentage of collection)
-        let totalCollected = Set(variants.map { $0.critterUuid }).count
-        
         return collectedCrittersByType.map { type, collected in
-            let percentage = totalCollected > 0 ? Double(collected) / Double(totalCollected) : 0
-            return (type, collected, totalCollected, percentage)
+            let percentage = totalCrittersCollected > 0 ? Double(collected) / Double(totalCrittersCollected) : 0
+            return (type, collected, percentage)
         }
         .sorted { $0.collected > $1.collected }
     }
@@ -58,12 +62,19 @@ struct StatsView: View {
         variants.max(by: { $0.addedDate < $1.addedDate })
     }
     
+    // Overall completion
+    private var overallCompletion: (collected: Int, total: Int, percentage: Double) {
+        let totalCrittersInOwnedFamilies = familyBreakdown.reduce(0) { $0 + $1.total }
+        let percentage = totalCrittersInOwnedFamilies > 0 ? Double(totalCrittersCollected) / Double(totalCrittersInOwnedFamilies) : 0
+        return (totalCrittersCollected, totalCrittersInOwnedFamilies, min(percentage, 1.0))
+    }
+    
     var body: some View {
         ScrollView {
             VStack(spacing: 24) {
-                // MARK: - Total Collected
+                // MARK: - Overall Stats
                 VStack(spacing: 8) {
-                    Text("\(totalCollected)")
+                    Text("\(totalCrittersCollected)")
                         .font(.system(size: 60, weight: .bold))
                         .foregroundStyle(
                             LinearGradient(
@@ -73,11 +84,59 @@ struct StatsView: View {
                             )
                         )
                     
-                    Text("Critters Collected")
+                    Text("Unique Critters")
                         .font(.title3)
+                        .foregroundColor(.calicoTextSecondary)
+                    
+                    Text("\(totalVariantsCollected) total variants")
+                        .font(.caption)
                         .foregroundColor(.calicoTextSecondary)
                 }
                 .padding(.top)
+                
+                // Overall completion for families you've started
+                if !familyBreakdown.isEmpty {
+                    let overall = overallCompletion
+                    VStack(spacing: 8) {
+                        HStack {
+                            Text("Family Completion")
+                                .font(.subheadline)
+                                .foregroundColor(.calicoTextSecondary)
+                            Spacer()
+                            Text("\(overall.collected) of \(overall.total)")
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                        }
+                        
+                        GeometryReader { geometry in
+                            ZStack(alignment: .leading) {
+                                RoundedRectangle(cornerRadius: 6)
+                                    .fill(Color.gray.opacity(0.2))
+                                    .frame(height: 12)
+                                
+                                RoundedRectangle(cornerRadius: 6)
+                                    .fill(
+                                        LinearGradient(
+                                            colors: [.blue, .pink],
+                                            startPoint: .leading,
+                                            endPoint: .trailing
+                                        )
+                                    )
+                                    .frame(width: geometry.size.width * overall.percentage, height: 12)
+                            }
+                        }
+                        .frame(height: 12)
+                        
+                        Text("\(Int(overall.percentage * 100))% complete across \(familyBreakdown.count) families")
+                            .font(.caption)
+                            .foregroundColor(.calicoTextSecondary)
+                    }
+                    .padding()
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color.blue.opacity(0.05))
+                    )
+                }
                 
                 Divider()
                 
@@ -91,41 +150,13 @@ struct StatsView: View {
                         Text("No families yet")
                             .foregroundColor(.calicoTextSecondary)
                     } else {
-                        ForEach(familyBreakdown, id: \.family) { item in
-                            VStack(alignment: .leading, spacing: 8) {
-                                HStack {
-                                    Text(item.family)
-                                        .font(.headline)
-                                    Spacer()
-                                    Text("\(item.collected)/\(item.total) critters")
-                                        .font(.subheadline)
-                                        .foregroundColor(.calicoTextSecondary)
-                                }
-                                
-                                // Progress bar
-                                GeometryReader { geometry in
-                                    ZStack(alignment: .leading) {
-                                        RoundedRectangle(cornerRadius: 4)
-                                            .fill(Color.gray.opacity(0.2))
-                                            .frame(height: 8)
-                                        
-                                        RoundedRectangle(cornerRadius: 4)
-                                            .fill(
-                                                LinearGradient(
-                                                    colors: [.blue, .pink],
-                                                    startPoint: .leading,
-                                                    endPoint: .trailing
-                                                )
-                                            )
-                                            .frame(width: geometry.size.width * item.completion, height: 8)
-                                    }
-                                }
-                                .frame(height: 8)
-                                
-                                Text("\(Int(item.completion * 100))% complete")
-                                    .font(.caption)
-                                    .foregroundColor(.calicoTextSecondary)
-                            }
+                        ForEach(familyBreakdown, id: \.familyId) { item in
+                            FamilyStatRow(
+                                family: item.family,
+                                collected: item.collected,
+                                total: item.total,
+                                percentage: item.percentage
+                            )
                         }
                     }
                 }
@@ -148,41 +179,11 @@ struct StatsView: View {
                             GridItem(.flexible(), spacing: 12)
                         ], spacing: 16) {
                             ForEach(memberTypeBreakdown, id: \.type) { item in
-                                VStack(spacing: 8) {
-                                    // Mini pie chart
-                                    ZStack {
-                                        Circle()
-                                            .stroke(Color.gray.opacity(0.2), lineWidth: 8)
-                                            .frame(width: 80, height: 80)
-                                        
-                                        Circle()
-                                            .trim(from: 0, to: item.percentage)
-                                            .stroke(
-                                                LinearGradient(
-                                                    colors: [.blue, .pink],
-                                                    startPoint: .topLeading,
-                                                    endPoint: .bottomTrailing
-                                                ),
-                                                style: StrokeStyle(lineWidth: 8, lineCap: .round)
-                                            )
-                                            .frame(width: 80, height: 80)
-                                            .rotationEffect(.degrees(-90))
-                                        
-                                        Text("\(Int(item.percentage * 100))%")
-                                            .font(.title3)
-                                            .fontWeight(.bold)
-                                    }
-                                    
-                                    VStack(spacing: 2) {
-                                        Text(item.type)
-                                            .font(.subheadline)
-                                            .fontWeight(.medium)
-                                        
-                                        Text("\(item.collected) of \(item.total)")
-                                            .font(.caption)
-                                            .foregroundColor(.calicoTextSecondary)
-                                    }
-                                }
+                                MemberTypeStatCard(
+                                    type: item.type,
+                                    collected: item.collected,
+                                    percentage: item.percentage
+                                )
                             }
                         }
                     }
@@ -198,83 +199,11 @@ struct StatsView: View {
                         .fontWeight(.bold)
                     
                     if let earliest = earliestAdded {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("Earliest Added")
-                                .font(.caption)
-                                .foregroundColor(.calicoTextSecondary)
-                            
-                            HStack(spacing: 12) {
-                                // Use thumbnail for timeline images
-                                if let urlString = earliest.thumbnailURL ?? earliest.imageURL,
-                                   let url = URL(string: urlString) {
-                                    AsyncImage(url: url) { phase in
-                                        switch phase {
-                                        case .success(let image):
-                                            image
-                                                .resizable()
-                                                .aspectRatio(contentMode: .fill)
-                                                .frame(width: 50, height: 50)
-                                                .clipShape(RoundedRectangle(cornerRadius: 8))
-                                        default:
-                                            placeholderImage
-                                        }
-                                    }
-                                } else {
-                                    placeholderImage
-                                }
-                                
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text(earliest.variantName)
-                                        .font(.headline)
-                                    Text(earliest.critterName)
-                                        .font(.subheadline)
-                                        .foregroundColor(.calicoTextSecondary)
-                                    Text(earliest.addedDate.formatted(date: .abbreviated, time: .omitted))
-                                        .font(.caption)
-                                        .foregroundColor(.calicoTextSecondary)
-                                }
-                            }
-                        }
+                        TimelineItem(title: "First Added", variant: earliest)
                     }
                     
-                    if let latest = latestAdded {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("Latest Added")
-                                .font(.caption)
-                                .foregroundColor(.calicoTextSecondary)
-                            
-                            HStack(spacing: 12) {
-                                // Use thumbnail for timeline images
-                                if let urlString = latest.thumbnailURL ?? latest.imageURL,
-                                   let url = URL(string: urlString) {
-                                    AsyncImage(url: url) { phase in
-                                        switch phase {
-                                        case .success(let image):
-                                            image
-                                                .resizable()
-                                                .aspectRatio(contentMode: .fill)
-                                                .frame(width: 50, height: 50)
-                                                .clipShape(RoundedRectangle(cornerRadius: 8))
-                                        default:
-                                            placeholderImage
-                                        }
-                                    }
-                                } else {
-                                    placeholderImage
-                                }
-                                
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text(latest.variantName)
-                                        .font(.headline)
-                                    Text(latest.critterName)
-                                        .font(.subheadline)
-                                        .foregroundColor(.calicoTextSecondary)
-                                    Text(latest.addedDate.formatted(date: .abbreviated, time: .omitted))
-                                        .font(.caption)
-                                        .foregroundColor(.calicoTextSecondary)
-                                }
-                            }
-                        }
+                    if let latest = latestAdded, latest.variantUuid != earliestAdded?.variantUuid {
+                        TimelineItem(title: "Latest Added", variant: latest)
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -282,11 +211,172 @@ struct StatsView: View {
             .padding()
         }
     }
+}
+
+// MARK: - Family Stat Row
+private struct FamilyStatRow: View {
+    let family: String
+    let collected: Int
+    let total: Int
+    let percentage: Double
     
-    private var placeholderImage: some View {
+    private var isComplete: Bool { collected >= total }
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text(family)
+                    .font(.headline)
+                
+                if isComplete {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundColor(.green)
+                        .font(.caption)
+                }
+                
+                Spacer()
+                
+                Text("\(collected) of \(total)")
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                    .foregroundColor(isComplete ? .green : .primary)
+            }
+            
+            GeometryReader { geometry in
+                ZStack(alignment: .leading) {
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(Color.gray.opacity(0.2))
+                        .frame(height: 8)
+                    
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(
+                            isComplete
+                                ? LinearGradient(colors: [.green, .green], startPoint: .leading, endPoint: .trailing)
+                                : LinearGradient(colors: [.blue, .pink], startPoint: .leading, endPoint: .trailing)
+                        )
+                        .frame(width: geometry.size.width * percentage, height: 8)
+                }
+            }
+            .frame(height: 8)
+            
+            Text("\(Int(percentage * 100))% complete")
+                .font(.caption)
+                .foregroundColor(isComplete ? .green : .calicoTextSecondary)
+        }
+    }
+}
+
+// MARK: - Member Type Stat Card
+private struct MemberTypeStatCard: View {
+    let type: String
+    let collected: Int
+    let percentage: Double
+    
+    var body: some View {
+        VStack(spacing: 8) {
+            ZStack {
+                Circle()
+                    .stroke(Color.gray.opacity(0.2), lineWidth: 8)
+                    .frame(width: 80, height: 80)
+                
+                Circle()
+                    .trim(from: 0, to: percentage)
+                    .stroke(
+                        LinearGradient(
+                            colors: [.blue, .pink],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        style: StrokeStyle(lineWidth: 8, lineCap: .round)
+                    )
+                    .frame(width: 80, height: 80)
+                    .rotationEffect(.degrees(-90))
+                
+                Text("\(Int(percentage * 100))%")
+                    .font(.title3)
+                    .fontWeight(.bold)
+            }
+            
+            VStack(spacing: 2) {
+                Text(type.capitalized)
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                
+                Text("\(collected) critters")
+                    .font(.caption)
+                    .foregroundColor(.calicoTextSecondary)
+            }
+        }
+    }
+}
+
+// MARK: - Timeline Item
+private struct TimelineItem: View {
+    let title: String
+    let variant: OwnedVariant
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(title)
+                .font(.caption)
+                .foregroundColor(.calicoTextSecondary)
+            
+            HStack(spacing: 12) {
+                VariantThumbnail(variant: variant, size: 50)
+                
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(variant.variantName)
+                        .font(.headline)
+                    Text(variant.critterName)
+                        .font(.subheadline)
+                        .foregroundColor(.calicoTextSecondary)
+                    Text(variant.addedDate.formatted(date: .abbreviated, time: .omitted))
+                        .font(.caption)
+                        .foregroundColor(.calicoTextSecondary)
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Variant Thumbnail (supports local + remote)
+private struct VariantThumbnail: View {
+    let variant: OwnedVariant
+    let size: CGFloat
+    
+    var body: some View {
+        Group {
+            // Try local cached image first
+            if let localPath = variant.localThumbnailPath,
+               let uiImage = UIImage(contentsOfFile: localPath) {
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+            }
+            // Fall back to remote URL
+            else if let urlString = variant.thumbnailURL ?? variant.imageURL,
+                    let url = URL(string: urlString) {
+                AsyncImage(url: url) { phase in
+                    switch phase {
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                    default:
+                        placeholderView
+                    }
+                }
+            } else {
+                placeholderView
+            }
+        }
+        .frame(width: size, height: size)
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+    }
+    
+    private var placeholderView: some View {
         RoundedRectangle(cornerRadius: 8)
             .fill(Color.gray.opacity(0.2))
-            .frame(width: 50, height: 50)
             .overlay {
                 Image(systemName: "photo")
                     .font(.caption)

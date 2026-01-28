@@ -9,10 +9,9 @@ final class OwnedVariantTests: XCTestCase {
     override func setUpWithError() throws {
         // Create in-memory container for testing
         let schema = Schema([
-            Critter.self,
-            CritterVariant.self,
             Family.self,
-            OwnedVariant.self
+            OwnedVariant.self,
+            VariantPhoto.self
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
         modelContainer = try ModelContainer(for: schema, configurations: [modelConfiguration])
@@ -24,17 +23,18 @@ final class OwnedVariantTests: XCTestCase {
         modelContext = nil
     }
     
-    // MARK: - Test Creation
+    // MARK: - Test Creation from VariantResponse
     
-    func testCreateOwnedVariant() throws {
+    func testCreateOwnedVariantFromVariantResponse() async throws {
         // Given
-        let critter = createTestCritter()
-        let variant = createTestVariant(critterId: critter.uuid)
+        let critter = createTestCritterInfo()
+        let variant = createTestVariantResponse(critterId: critter.uuid)
         
         // When
-        try OwnedVariant.create(
+        try await OwnedVariant.create(
             variant: variant,
             critter: critter,
+            familyId: critter.familyUuid ?? "",
             status: .collection,
             in: modelContext
         )
@@ -47,27 +47,56 @@ final class OwnedVariantTests: XCTestCase {
         XCTAssertEqual(ownedVariants.first?.variantUuid, variant.uuid)
         XCTAssertEqual(ownedVariants.first?.status, .collection)
         XCTAssertEqual(ownedVariants.first?.critterName, critter.name)
-        XCTAssertEqual(ownedVariants.first?.imageURL, variant.imageURL)
-        XCTAssertEqual(ownedVariants.first?.thumbnailURL, variant.thumbnailURL)
+        XCTAssertEqual(ownedVariants.first?.familyName, critter.familyName)
+        XCTAssertEqual(ownedVariants.first?.familyId, critter.familyUuid)
     }
     
-    func testCreateDuplicateUpdatesStatus() throws {
+    // MARK: - Test Creation from SearchResult
+    
+    func testCreateOwnedVariantFromSearchResult() async throws {
         // Given
-        let critter = createTestCritter()
-        let variant = createTestVariant(critterId: critter.uuid)
+        let searchResult = createTestSearchResult()
+        
+        // When
+        try await OwnedVariant.create(
+            from: searchResult,
+            status: .wishlist,
+            in: modelContext
+        )
+        
+        // Then
+        let descriptor = FetchDescriptor<OwnedVariant>()
+        let ownedVariants = try modelContext.fetch(descriptor)
+        
+        XCTAssertEqual(ownedVariants.count, 1)
+        XCTAssertEqual(ownedVariants.first?.variantUuid, searchResult.variantUuid)
+        XCTAssertEqual(ownedVariants.first?.status, .wishlist)
+        XCTAssertEqual(ownedVariants.first?.critterName, searchResult.critterName)
+        XCTAssertEqual(ownedVariants.first?.familyName, searchResult.familyName)
+        XCTAssertEqual(ownedVariants.first?.familyId, searchResult.familyUuid)
+    }
+    
+    // MARK: - Test Duplicate Handling
+    
+    func testCreateDuplicateUpdatesStatus() async throws {
+        // Given
+        let critter = createTestCritterInfo()
+        let variant = createTestVariantResponse(critterId: critter.uuid)
         
         // Create as collection first
-        try OwnedVariant.create(
+        try await OwnedVariant.create(
             variant: variant,
             critter: critter,
+            familyId: critter.familyUuid ?? "",
             status: .collection,
             in: modelContext
         )
         
         // When - Add same variant as wishlist
-        try OwnedVariant.create(
+        try await OwnedVariant.create(
             variant: variant,
             critter: critter,
+            familyId: critter.familyUuid ?? "",
             status: .wishlist,
             in: modelContext
         )
@@ -82,14 +111,15 @@ final class OwnedVariantTests: XCTestCase {
     
     // MARK: - Test Removal
     
-    func testRemoveOwnedVariant() throws {
+    func testRemoveOwnedVariant() async throws {
         // Given
-        let critter = createTestCritter()
-        let variant = createTestVariant(critterId: critter.uuid)
+        let critter = createTestCritterInfo()
+        let variant = createTestVariantResponse(critterId: critter.uuid)
         
-        try OwnedVariant.create(
+        try await OwnedVariant.create(
             variant: variant,
             critter: critter,
+            familyId: critter.familyUuid ?? "",
             status: .collection,
             in: modelContext
         )
@@ -116,22 +146,24 @@ final class OwnedVariantTests: XCTestCase {
     
     // MARK: - Test Status Transitions
     
-    func testCollectionToWishlistTransition() throws {
+    func testCollectionToWishlistTransition() async throws {
         // Given
-        let critter = createTestCritter()
-        let variant = createTestVariant(critterId: critter.uuid)
+        let critter = createTestCritterInfo()
+        let variant = createTestVariantResponse(critterId: critter.uuid)
         
-        try OwnedVariant.create(
+        try await OwnedVariant.create(
             variant: variant,
             critter: critter,
+            familyId: critter.familyUuid ?? "",
             status: .collection,
             in: modelContext
         )
         
         // When - Move to wishlist
-        try OwnedVariant.create(
+        try await OwnedVariant.create(
             variant: variant,
             critter: critter,
+            familyId: critter.familyUuid ?? "",
             status: .wishlist,
             in: modelContext
         )
@@ -147,22 +179,24 @@ final class OwnedVariantTests: XCTestCase {
         XCTAssertEqual(ownedVariant?.status, .wishlist)
     }
     
-    func testWishlistToCollectionTransition() throws {
+    func testWishlistToCollectionTransition() async throws {
         // Given
-        let critter = createTestCritter()
-        let variant = createTestVariant(critterId: critter.uuid)
+        let critter = createTestCritterInfo()
+        let variant = createTestVariantResponse(critterId: critter.uuid)
         
-        try OwnedVariant.create(
+        try await OwnedVariant.create(
             variant: variant,
             critter: critter,
+            familyId: critter.familyUuid ?? "",
             status: .wishlist,
             in: modelContext
         )
         
         // When - Move to collection
-        try OwnedVariant.create(
+        try await OwnedVariant.create(
             variant: variant,
             critter: critter,
+            familyId: critter.familyUuid ?? "",
             status: .collection,
             in: modelContext
         )
@@ -178,29 +212,82 @@ final class OwnedVariantTests: XCTestCase {
         XCTAssertEqual(ownedVariant?.status, .collection)
     }
     
+    // MARK: - Test Family ID Storage
+    
+    func testFamilyIdIsStoredCorrectly() async throws {
+        // Given
+        let familyUuid = UUID().uuidString
+        let critter = CritterInfo(
+            uuid: UUID().uuidString,
+            name: "Test Critter",
+            memberType: "Kids",
+            familyName: "Test Family",
+            familyUuid: familyUuid
+        )
+        let variant = createTestVariantResponse(critterId: critter.uuid)
+        
+        // When
+        try await OwnedVariant.create(
+            variant: variant,
+            critter: critter,
+            familyId: familyUuid,
+            status: .collection,
+            in: modelContext
+        )
+        
+        // Then
+        let descriptor = FetchDescriptor<OwnedVariant>()
+        let ownedVariant = try modelContext.fetch(descriptor).first
+        
+        XCTAssertEqual(ownedVariant?.familyId, familyUuid)
+        XCTAssertFalse(ownedVariant?.familyId.isEmpty ?? true, "Family ID should not be empty")
+    }
+    
     // MARK: - Helper Methods
     
-    private func createTestCritter() -> Critter {
-        return Critter(
+    private func createTestCritterInfo() -> CritterInfo {
+        return CritterInfo(
             uuid: UUID().uuidString,
-            familyId: UUID().uuidString,
             name: "Test Husky",
             memberType: "Kids",
-            role: "Sister",
-            familyName: "Husky Dog",
-            familySpecies: "Dog",
-            variantsCount: 1
+            familyName: "Husky Family",
+            familyUuid: UUID().uuidString
         )
     }
     
-    private func createTestVariant(critterId: String) -> CritterVariant {
-        return CritterVariant(
+    private func createTestVariantResponse(critterId: String) -> VariantResponse {
+        return VariantResponse(
             uuid: UUID().uuidString,
             critterId: critterId,
             name: "Test Variant",
             sku: "TEST-001",
-            imageURL: "https://example.com/image.jpg",
-            thumbnailURL: "https://example.com/thumb.jpg"
+            barcode: nil,
+            imageUrl: "https://example.com/image.jpg",
+            thumbnailUrl: "https://example.com/thumb.jpg",
+            releaseYear: 2024,
+            notes: nil,
+            setId: nil,
+            setName: nil,
+            epochId: nil,
+            createdAt: "2024-01-01T00:00:00Z",
+            updatedAt: "2024-01-01T00:00:00Z",
+            isPrimary: true
+        )
+    }
+    
+    private func createTestSearchResult() -> SearchResultResponse {
+        return SearchResultResponse(
+            variantUuid: UUID().uuidString,
+            variantName: "Search Result Variant",
+            critterUuid: UUID().uuidString,
+            critterName: "Search Critter",
+            familyUuid: UUID().uuidString,
+            familyName: "Search Family",
+            memberType: "Parents",
+            imageUrl: "https://example.com/search-image.jpg",
+            thumbnailUrl: "https://example.com/search-thumb.jpg",
+            setName: nil,
+            releaseYear: 2023
         )
     }
 }

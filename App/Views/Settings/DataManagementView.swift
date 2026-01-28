@@ -6,8 +6,6 @@ struct DataManagementView: View {
     @Environment(\.modelContext) private var modelContext
     @ObservedObject private var backupManager = BackupManager.shared
     
-    @Query private var critters: [Critter]
-    @Query private var variants: [CritterVariant]
     @Query private var families: [Family]
     @Query private var ownedVariants: [OwnedVariant]
     @Query private var photos: [VariantPhoto]
@@ -50,6 +48,10 @@ struct DataManagementView: View {
         ownedVariants.filter { $0.status == .wishlist }.count
     }
     
+    private var localImageCacheSize: String {
+        ImagePersistenceService.shared.formattedCacheSize()
+    }
+    
     // MARK: - Body
     
     var body: some View {
@@ -75,7 +77,7 @@ struct DataManagementView: View {
                 clearCache()
             }
         } message: {
-            Text("This will remove all downloaded critter data. You can sync again to restore it.")
+            Text("This will remove cached family data. You can sync again to restore it.")
         }
         .alert("Reset Everything?", isPresented: $showingResetAppAlert) {
             Button("Cancel", role: .cancel) { }
@@ -104,15 +106,9 @@ struct DataManagementView: View {
     private var storageSection: some View {
         Section {
             HStack {
-                Text("Browse Cache")
+                Text("Cached Families")
                 Spacer()
-                VStack(alignment: .trailing, spacing: 2) {
-                    Text("\(critters.count) critters")
-                        .font(.body)
-                    Text("\(variants.count) variants")
-                        .font(.caption)
-                        .foregroundColor(.calicoTextSecondary)
-                }
+                Text("\(families.count) families")
             }
             
             HStack {
@@ -181,6 +177,13 @@ struct DataManagementView: View {
     private var imageCacheSection: some View {
         Section {
             HStack {
+                Text("Collection Images")
+                Spacer()
+                Text(localImageCacheSize)
+                    .id(refreshID)
+            }
+            
+            HStack {
                 Text("Memory Cache")
                 Spacer()
                 VStack(alignment: .trailing, spacing: 2) {
@@ -208,7 +211,7 @@ struct DataManagementView: View {
         } header: {
             Text("Image Cache")
         } footer: {
-            Text("Images are cached for offline viewing.")
+            Text("Collection images are saved locally for offline viewing. Browse images are cached temporarily.")
         }
     }
     
@@ -223,7 +226,7 @@ struct DataManagementView: View {
             Button(role: .destructive) {
                 showingClearCacheAlert = true
             } label: {
-                Label("Clear Browse Cache", systemImage: "trash")
+                Label("Clear Family Cache", systemImage: "trash")
             }
             
             Button(role: .destructive) {
@@ -234,7 +237,7 @@ struct DataManagementView: View {
         } header: {
             Text("Danger Zone")
         } footer: {
-            Text("Clear image cache removes cached images. Clear browse cache removes downloaded critter data. Reset all data removes everything including your collection and wishlist.")
+            Text("Clear image cache removes all cached images. Clear family cache removes downloaded family data. Reset all data removes everything including your collection and wishlist.")
         }
     }
     
@@ -331,14 +334,18 @@ struct DataManagementView: View {
     }
     
     private func clearImageCache() {
+        // Clear URL cache
         URLCache.shared.removeAllCachedResponses()
+        
+        // Clear local collection images
+        ImagePersistenceService.shared.clearCache()
+        
         refreshID = UUID()
         ToastManager.shared.show("Image cache cleared", type: .success)
     }
     
     private func clearCache() {
-        try? modelContext.delete(model: Critter.self)
-        try? modelContext.delete(model: CritterVariant.self)
+        // Only clear families now (critters/variants are fetched on-demand)
         try? modelContext.delete(model: Family.self)
         
         UserDefaults.standard.removeObject(forKey: Config.UserDefaultsKeys.lastSyncDate)
@@ -346,11 +353,14 @@ struct DataManagementView: View {
     }
     
     private func resetAll() {
-        try? modelContext.delete(model: Critter.self)
-        try? modelContext.delete(model: CritterVariant.self)
+        // Clear all local data
         try? modelContext.delete(model: Family.self)
         try? modelContext.delete(model: OwnedVariant.self)
         try? modelContext.delete(model: VariantPhoto.self)
+        
+        // Clear image cache
+        ImagePersistenceService.shared.clearCache()
+        URLCache.shared.removeAllCachedResponses()
         
         UserDefaults.standard.removeObject(forKey: Config.UserDefaultsKeys.lastSyncDate)
         UserDefaults.standard.removeObject(forKey: Config.UserDefaultsKeys.hasCompletedFirstSync)
@@ -362,5 +372,5 @@ struct DataManagementView: View {
     NavigationStack {
         DataManagementView()
     }
-    .modelContainer(for: [OwnedVariant.self, VariantPhoto.self], inMemory: true)
+    .modelContainer(for: [OwnedVariant.self, VariantPhoto.self, Family.self], inMemory: true)
 }

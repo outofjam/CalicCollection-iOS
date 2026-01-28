@@ -2,7 +2,8 @@ import Foundation
 import SwiftData
 import Combine
 
-/// Service to manage syncing browse cache from API
+/// Service to sync families from API (small dataset, worth caching)
+/// Critters and variants are now fetched on-demand via BrowseService
 @MainActor
 class SyncService: ObservableObject {
     static let shared = SyncService()
@@ -45,9 +46,8 @@ class SyncService: ObservableObject {
     
     // MARK: - Sync Methods
     
-    /// Sync critters and variants from API to browse cache
-    /// Sync critters and variants from API to browse cache
-    func syncCritters(modelContext: ModelContext, force: Bool = false) async {
+    /// Sync families from API (small dataset, cached for offline filter dropdown)
+    func syncFamilies(modelContext: ModelContext, force: Bool = false) async {
         guard !isSyncing else { return }
         
         if !force && !needsSync {
@@ -59,71 +59,9 @@ class SyncService: ObservableObject {
         syncError = nil
         
         do {
-            AppLogger.syncStart("critter")
-            
-            // Fetch from API
-            let critterResponses = try await APIService.shared.fetchCritters()
-            AppLogger.debug("Received \(critterResponses.count) critters from API")
-            
-            // Clear existing browse cache
-            try modelContext.delete(model: Critter.self)
-            try modelContext.delete(model: CritterVariant.self)
-            
-            // Batch insert new critters and variants
-            for response in critterResponses {
-                let critter = Critter(from: response)
-                modelContext.insert(critter)
-                
-                // Insert variants if they exist
-                if let variants = response.variants {
-                    for variantResponse in variants {
-                        let variant = CritterVariant(from: variantResponse)
-                        modelContext.insert(variant)
-                        
-                        // Update any OwnedVariants with fresh image URLs
-                        let variantUuid = variantResponse.uuid
-                        let descriptor = FetchDescriptor<OwnedVariant>(
-                            predicate: #Predicate { $0.variantUuid == variantUuid }
-                        )
-                        if let owned = try? modelContext.fetch(descriptor).first {
-                            owned.imageURL = variantResponse.imageUrl
-                            owned.thumbnailURL = variantResponse.thumbnailUrl
-                        }
-                    }
-                }
-            }
-            
-            // Save context once at the end (batch operation)
-            try modelContext.save()
-            
-            // Update last sync timestamp
-            lastSyncDate = Date()
-            UserDefaults.standard.set(lastSyncDate, forKey: Config.UserDefaultsKeys.lastSyncDate)
-            
-            AppLogger.syncComplete("Synced \(critterResponses.count) critters successfully")
-            
-            // Show success toast
-            ToastManager.shared.show("✓ Synced \(critterResponses.count) critters", type: .success)
-            
-        } catch {
-            syncError = error.localizedDescription
-            AppLogger.syncError(error.localizedDescription)
-            ToastManager.shared.show("Sync failed: \(error.localizedDescription)", type: .error)
-        }
-        
-        isSyncing = false
-    }
-    
-    /// Sync families from API to browse cache
-    func syncFamilies(modelContext: ModelContext, force: Bool = false) async {
-        guard !isSyncing else { return }
-        
-        isSyncing = true
-        
-        do {
             AppLogger.syncStart("family")
             
-            let familyResponses = try await APIService.shared.fetchFamilies()
+            let familyResponses = try await BrowseService.shared.fetchFamilies()
             AppLogger.debug("Received \(familyResponses.count) families from API")
             
             // Clear existing families
@@ -136,20 +74,20 @@ class SyncService: ObservableObject {
             }
             
             try modelContext.save()
+            
+            // Update last sync timestamp
+            lastSyncDate = Date()
+            UserDefaults.standard.set(lastSyncDate, forKey: Config.UserDefaultsKeys.lastSyncDate)
+            
             AppLogger.syncComplete("Synced \(familyResponses.count) families successfully")
+            ToastManager.shared.show("✓ Synced \(familyResponses.count) families", type: .success)
             
         } catch {
             syncError = error.localizedDescription
             AppLogger.syncError(error.localizedDescription)
-            ToastManager.shared.show("Family sync failed", type: .error)
+            ToastManager.shared.show("Sync failed: \(error.localizedDescription)", type: .error)
         }
         
         isSyncing = false
-    }
-    
-    /// Sync both critters and families
-    func syncAll(modelContext: ModelContext, force: Bool = false) async {
-        await syncCritters(modelContext: modelContext, force: force)
-        await syncFamilies(modelContext: modelContext, force: force)
     }
 }

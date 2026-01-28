@@ -5,7 +5,6 @@
 //  Created by Ismail Dawoodjee on 2026-01-24.
 //
 
-
 import SwiftUI
 import SwiftData
 
@@ -16,8 +15,6 @@ struct ScannedSetPickerSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
     
-    @Query private var allCritters: [Critter]
-    @Query private var allVariants: [CritterVariant]
     @Query private var ownedVariants: [OwnedVariant]
     
     @State private var selectedVariantIds: Set<String> = []
@@ -121,6 +118,9 @@ struct ScannedSetPickerSheet: View {
     }
     
     private func toggleVariant(_ uuid: String) {
+        let generator = UISelectionFeedbackGenerator()
+        generator.selectionChanged()
+        
         if selectedVariantIds.contains(uuid) {
             selectedVariantIds.remove(uuid)
         } else {
@@ -129,6 +129,11 @@ struct ScannedSetPickerSheet: View {
     }
     
     private func saveSelection() async {
+        guard !selectedVariantIds.isEmpty else {
+            dismiss()
+            return
+        }
+        
         isLoading = true
         
         var addedCount = 0
@@ -138,19 +143,18 @@ struct ScannedSetPickerSheet: View {
                 continue
             }
             
-            // Find or sync critter and variant
-            let critter = await ensureCritterExists(from: setVariant.critter)
-            let variant = await ensureVariantExists(from: setVariant, critter: critter)
-            
             // Add to collection/wishlist if not already owned
             if !isVariantOwned(variantUuid) {
-                try? OwnedVariant.create(
-                    variant: variant,
-                    critter: critter,
-                    status: targetStatus,
-                    in: modelContext
-                )
-                addedCount += 1
+                do {
+                    try await OwnedVariant.create(
+                        from: setVariant,
+                        status: targetStatus,
+                        in: modelContext
+                    )
+                    addedCount += 1
+                } catch {
+                    AppLogger.error("Failed to add variant: \(error)")
+                }
             }
         }
         
@@ -170,52 +174,6 @@ struct ScannedSetPickerSheet: View {
         
         dismiss()
     }
-    
-    // MARK: - Sync Helpers
-    
-    private func ensureCritterExists(from setCritter: SetCritter) async -> Critter {
-        // Check if critter already exists
-        if let existing = allCritters.first(where: { $0.uuid == setCritter.uuid }) {
-            return existing
-        }
-        
-        // Create new critter from API data
-        let critter = Critter(
-            uuid: setCritter.uuid,
-            familyId: setCritter.family.uuid,
-            name: setCritter.name,
-            memberType: setCritter.memberType,
-            role: setCritter.role,
-            familyName: setCritter.family.name,
-            familySpecies: setCritter.family.species
-        )
-        
-        modelContext.insert(critter)
-        return critter
-    }
-    
-    private func ensureVariantExists(from setVariant: SetVariant, critter: Critter) async -> CritterVariant {
-        // Check if variant already exists
-        if let existing = allVariants.first(where: { $0.uuid == setVariant.uuid }) {
-            return existing
-        }
-        
-        // Create new variant from API data
-        let variant = CritterVariant(
-            uuid: setVariant.uuid,
-            critterId: critter.uuid,
-            name: setVariant.name,
-            sku: setVariant.sku,
-            barcode: setVariant.barcode,
-            imageURL: setVariant.imageURL,
-            thumbnailURL: setVariant.thumbnailURL,
-            releaseYear: setVariant.releaseYear,
-            notes: setVariant.notes
-        )
-        
-        modelContext.insert(variant)
-        return variant
-    }
 }
 
 // MARK: - Scanned Variant Row
@@ -232,25 +190,24 @@ struct ScannedVariantRow: View {
                 .font(.title3)
             
             // Variant image
-            RoundedRectangle(cornerRadius: 8)
-                .fill(Color.gray.opacity(0.2))
-                .frame(width: 60, height: 60)
-                .overlay {
-                    if let urlString = variant.thumbnailURL ?? variant.imageURL {
-                        CachedAsyncImage(url: urlString) { image in
-                            image
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                                .frame(width: 60, height: 60)
-                                .clipShape(RoundedRectangle(cornerRadius: 8))
-                        } placeholder: {
-                            ProgressView()
-                        }
-                    } else {
-                        Image(systemName: "photo")
-                            .foregroundColor(.gray)
+            if let urlString = variant.thumbnailURL ?? variant.imageURL,
+               let url = URL(string: urlString) {
+                AsyncImage(url: url) { phase in
+                    switch phase {
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 60, height: 60)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                    default:
+                        placeholderView
                     }
                 }
+                .frame(width: 60, height: 60)
+            } else {
+                placeholderView
+            }
             
             // Variant info
             VStack(alignment: .leading, spacing: 4) {
@@ -283,6 +240,16 @@ struct ScannedVariantRow: View {
             Spacer()
         }
         .padding(.vertical, 8)
+    }
+    
+    private var placeholderView: some View {
+        RoundedRectangle(cornerRadius: 8)
+            .fill(Color.gray.opacity(0.2))
+            .frame(width: 60, height: 60)
+            .overlay {
+                Image(systemName: "photo")
+                    .foregroundColor(.gray)
+            }
     }
 }
 

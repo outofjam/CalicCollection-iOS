@@ -2,24 +2,21 @@ import SwiftUI
 import SwiftData
 
 struct CritterDetailView: View {
-    let critter: Critter
+    let critterUuid: String
     
     @Environment(\.modelContext) private var modelContext
-    @Query private var allVariants: [CritterVariant]
     @Query private var ownedVariants: [OwnedVariant]
+    
+    @State private var critterData: CritterVariantsResponse?
+    @State private var isLoading = true
+    @State private var errorMessage: String?
     
     @State private var showingVariantPicker = false
     @State private var pickerTargetStatus: CritterStatus = .collection
-    @State private var selectedVariantForDetail: CritterVariant?
-    
-    private var critterVariants: [CritterVariant] {
-        allVariants
-            .filter { $0.critterId == critter.uuid }
-            .sorted { ($0.isPrimary ?? false) && !($1.isPrimary ?? false) }
-    }
+    @State private var selectedVariantForDetail: VariantResponse?
     
     private var ownedCritterVariants: [OwnedVariant] {
-        ownedVariants.filter { $0.critterUuid == critter.uuid }
+        ownedVariants.filter { $0.critterUuid == critterUuid }
     }
     
     private var hasInCollection: Bool {
@@ -48,28 +45,76 @@ struct CritterDetailView: View {
     }
     
     var body: some View {
+        Group {
+            if isLoading {
+                ProgressView("Loading critter...")
+            } else if let error = errorMessage {
+                ContentUnavailableView {
+                    Label("Error", systemImage: "exclamationmark.triangle")
+                } description: {
+                    Text(error)
+                } actions: {
+                    Button("Retry") {
+                        Task { await loadCritter() }
+                    }
+                }
+            } else if let data = critterData {
+                critterContent(data)
+            }
+        }
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text(critterData?.critter.name ?? "Critter")
+                    .font(.headline)
+            }
+        }
+        .task {
+            await loadCritter()
+        }
+        .sheet(isPresented: $showingVariantPicker) {
+            if let data = critterData {
+                VariantPickerSheet(
+                    critterUuid: critterUuid,
+                    targetStatus: pickerTargetStatus
+                )
+            }
+        }
+        .sheet(item: $selectedVariantForDetail) { variant in
+            if let critter = critterData?.critter {
+                VariantDetailSheet(variant: variant, critter: critter)
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private func critterContent(_ data: CritterVariantsResponse) -> some View {
         ScrollView {
             VStack(spacing: 0) {
-                // MARK: - Hero Section (Image + Info Overlay)
+                // MARK: - Hero Section
                 GeometryReader { geometry in
                     ZStack(alignment: .bottomLeading) {
                         // Background image - use primary variant or first variant
-                        if let primaryVariant = critterVariants.primaryOrFirst(),
-                           let imageURL = primaryVariant.imageURL {
-                            CachedAsyncImage(url: imageURL) { image in
-                                image
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fill)
-                                    .frame(width: geometry.size.width, height: 280, alignment: .top)
-                                    .clipped()
-                            } placeholder: {
-                                gradientPlaceholder
+                        if let primaryVariant = data.variants.first(where: { $0.isPrimary == true }) ?? data.variants.first,
+                           let imageURL = primaryVariant.imageUrl,
+                           let url = URL(string: imageURL) {
+                            AsyncImage(url: url) { phase in
+                                switch phase {
+                                case .success(let image):
+                                    image
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fill)
+                                        .frame(width: geometry.size.width, height: 280, alignment: .top)
+                                        .clipped()
+                                default:
+                                    gradientPlaceholder
+                                }
                             }
                         } else {
                             gradientPlaceholder
                         }
                         
-                        // Gradient overlay for text readability
+                        // Gradient overlay
                         LinearGradient(
                             colors: [.clear, .black.opacity(0.7)],
                             startPoint: .top,
@@ -79,32 +124,19 @@ struct CritterDetailView: View {
                         
                         // Critter info overlay
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(critter.name)
+                            Text(data.critter.name)
                                 .font(.system(size: 34, weight: .bold))
                                 .foregroundColor(.white)
                             
-                            if let familyName = critter.familyName {
+                            if let familyName = data.critter.familyName {
                                 Text(familyName)
                                     .font(.title3)
                                     .foregroundColor(.white.opacity(0.9))
                             }
                             
-                            if let familySpecies = critter.familySpecies {
-                                Text(familySpecies)
-                                    .font(.subheadline)
-                                    .foregroundColor(.white.opacity(0.8))
-                            }
-                            
-                            HStack(spacing: 8) {
-                                Label(critter.memberType, systemImage: "person.fill")
-                                
-                                if let role = critter.role {
-                                    Text("•")
-                                    Text(role)
-                                }
-                            }
-                            .font(.subheadline)
-                            .foregroundColor(.white.opacity(0.9))
+                            Label(data.critter.memberType.capitalized, systemImage: "person.fill")
+                                .font(.subheadline)
+                                .foregroundColor(.white.opacity(0.9))
                         }
                         .padding(20)
                     }
@@ -122,12 +154,12 @@ struct CritterDetailView: View {
                             
                             Spacer()
                             
-                            Text("\(ownedCritterVariants.count) of \(critter.variantsCount) owned")
+                            Text("\(ownedCritterVariants.count) of \(data.variants.count) owned")
                                 .font(.subheadline)
                                 .foregroundColor(.calicoTextSecondary)
                         }
                         
-                        if critterVariants.isEmpty {
+                        if data.variants.isEmpty {
                             Text("No variants available")
                                 .foregroundColor(.calicoTextSecondary)
                                 .frame(maxWidth: .infinity, alignment: .center)
@@ -137,13 +169,13 @@ struct CritterDetailView: View {
                                 GridItem(.flexible(), spacing: 12),
                                 GridItem(.flexible(), spacing: 12)
                             ], spacing: 16) {
-                                ForEach(critterVariants) { variant in
+                                ForEach(data.variants) { variant in
                                     Button {
                                         let generator = UIImpactFeedbackGenerator(style: .light)
                                         generator.impactOccurred()
                                         selectedVariantForDetail = variant
                                     } label: {
-                                        VariantCard(
+                                        VariantCardOnline(
                                             variant: variant,
                                             isOwned: ownedCritterVariants.contains { $0.variantUuid == variant.uuid }
                                         )
@@ -157,7 +189,7 @@ struct CritterDetailView: View {
                     .padding(.top, 20)
                     
                     // MARK: - Action Buttons
-                    if critter.variantsCount > 0 {
+                    if !data.variants.isEmpty {
                         VStack(spacing: 12) {
                             Button {
                                 pickerTargetStatus = .collection
@@ -165,7 +197,7 @@ struct CritterDetailView: View {
                             } label: {
                                 HStack {
                                     Image(systemName: "star.fill")
-                                    Text(hasInCollection ? "Manage Collection Variants" : "Add to Collection")
+                                    Text(hasInCollection ? "Manage Collection" : "Add to Collection")
                                 }
                                 .font(.headline)
                                 .foregroundColor(.white)
@@ -181,7 +213,7 @@ struct CritterDetailView: View {
                             } label: {
                                 HStack {
                                     Image(systemName: "heart.fill")
-                                    Text(hasInWishlist ? "Manage Wishlist Variants" : "Add to Wishlist")
+                                    Text(hasInWishlist ? "Manage Wishlist" : "Add to Wishlist")
                                 }
                                 .font(.headline)
                                 .foregroundColor(.white)
@@ -198,46 +230,48 @@ struct CritterDetailView: View {
             }
         }
         .ignoresSafeArea(edges: .top)
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .principal) {
-                Text(critter.name)
-                    .font(.headline)
-            }
+    }
+    
+    // MARK: - Data Loading
+    
+    private func loadCritter() async {
+        isLoading = true
+        errorMessage = nil
+        
+        do {
+            critterData = try await BrowseService.shared.fetchCritterVariants(critterUuid: critterUuid)
+        } catch {
+            errorMessage = error.localizedDescription
         }
-        .sheet(isPresented: $showingVariantPicker) {
-            VariantPickerSheet(
-                critter: critter,
-                targetStatus: pickerTargetStatus
-            )
-        }
-        .sheet(item: $selectedVariantForDetail) { variant in
-            VariantDetailView(variant: variant, critter: critter)
-        }
+        
+        isLoading = false
     }
 }
 
-// MARK: - Variant Card
-struct VariantCard: View {
-    let variant: CritterVariant
+// MARK: - Variant Card (Online Version)
+struct VariantCardOnline: View {
+    let variant: VariantResponse
     let isOwned: Bool
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            // Image container (use thumbnail for grid performance)
+            // Image container
             ZStack(alignment: .topTrailing) {
-                // Use thumbnail if available, fallback to full image
-                if let urlString = variant.thumbnailURL ?? variant.imageURL {
-                    CachedAsyncImage(url: urlString) { image in
-                        image
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
-                    } placeholder: {
-                        Color.gray.opacity(0.2)
-                            .overlay {
-                                ProgressView()
-                            }
+                if let urlString = variant.thumbnailUrl ?? variant.imageUrl,
+                   let url = URL(string: urlString) {
+                    AsyncImage(url: url) { phase in
+                        switch phase {
+                        case .success(let image):
+                            image
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
+                        default:
+                            Color.gray.opacity(0.2)
+                                .overlay {
+                                    ProgressView()
+                                }
+                        }
                     }
                 } else {
                     Color.gray.opacity(0.2)
@@ -263,7 +297,7 @@ struct VariantCard: View {
                     .padding(6)
                 }
                 
-                // Owned checkmark (show below primary badge if both exist)
+                // Owned checkmark
                 if isOwned {
                     Image(systemName: "checkmark.circle.fill")
                         .foregroundColor(.calicoSuccess)
@@ -273,14 +307,14 @@ struct VariantCard: View {
                                 .frame(width: 20, height: 20)
                         )
                         .padding(8)
-                        .offset(y: variant.isPrimary == true ? 28 : 0) // Offset if primary badge exists
+                        .offset(y: variant.isPrimary == true ? 28 : 0)
                 }
             }
             .aspectRatio(1, contentMode: .fit)
             .clipped()
             .clipShape(RoundedRectangle(cornerRadius: 8))
             
-            // Variant info (existing code)
+            // Variant info
             VStack(alignment: .leading, spacing: 4) {
                 Text(variant.name)
                     .font(.caption)
@@ -309,20 +343,200 @@ struct VariantCard: View {
     }
 }
 
+// MARK: - Variant Detail Sheet
+struct VariantDetailSheet: View {
+    let variant: VariantResponse
+    let critter: CritterInfo
+    
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var modelContext
+    @Query private var ownedVariants: [OwnedVariant]
+    
+    private var isOwned: Bool {
+        ownedVariants.contains { $0.variantUuid == variant.uuid }
+    }
+    
+    private var ownedStatus: CritterStatus? {
+        ownedVariants.first { $0.variantUuid == variant.uuid }?.status
+    }
+    
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(spacing: 20) {
+                    // Image
+                    if let urlString = variant.imageUrl, let url = URL(string: urlString) {
+                        AsyncImage(url: url) { phase in
+                            switch phase {
+                            case .success(let image):
+                                image
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(maxHeight: 300)
+                                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                            default:
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(Color.gray.opacity(0.2))
+                                    .frame(height: 200)
+                                    .overlay { ProgressView() }
+                            }
+                        }
+                    }
+                    
+                    // Info
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text(variant.name)
+                            .font(.title2)
+                            .fontWeight(.bold)
+                        
+                        Text(critter.name)
+                            .font(.headline)
+                            .foregroundColor(.calicoTextSecondary)
+                        
+                        if let familyName = critter.familyName {
+                            Text(familyName)
+                                .font(.subheadline)
+                                .foregroundColor(.calicoTextSecondary)
+                        }
+                        
+                        Divider()
+                        
+                        if let setName = variant.setName {
+                            DetailRow(label: "Set", value: setName)
+                        }
+                        if let epochId = variant.epochId {
+                            DetailRow(label: "Set ID", value: epochId)
+                        }
+                        if let sku = variant.sku {
+                            DetailRow(label: "SKU", value: sku)
+                        }
+                        if let year = variant.releaseYear {
+                            DetailRow(label: "Release Year", value: "\(year)")
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding()
+                    
+                    // Action Buttons
+                    VStack(spacing: 12) {
+                        Button {
+                            Task {
+                                await addToCollection()
+                            }
+                        } label: {
+                            HStack {
+                                Image(systemName: ownedStatus == .collection ? "checkmark.circle.fill" : "star")
+                                Text(ownedStatus == .collection ? "In Collection" : "Add to Collection")
+                            }
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(ownedStatus == .collection ? Color.green : Color.blue)
+                            .cornerRadius(12)
+                        }
+                        
+                        Button {
+                            Task {
+                                await addToWishlist()
+                            }
+                        } label: {
+                            HStack {
+                                Image(systemName: ownedStatus == .wishlist ? "checkmark.circle.fill" : "heart")
+                                Text(ownedStatus == .wishlist ? "In Wishlist" : "Add to Wishlist")
+                            }
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(ownedStatus == .wishlist ? Color.green : Color.pink)
+                            .cornerRadius(12)
+                        }
+                        
+                        if isOwned {
+                            Button(role: .destructive) {
+                                removeFromCollection()
+                            } label: {
+                                HStack {
+                                    Image(systemName: "trash")
+                                    Text("Remove")
+                                }
+                                .font(.headline)
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(Color.red.opacity(0.1))
+                                .cornerRadius(12)
+                            }
+                        }
+                    }
+                    .padding()
+                }
+            }
+            .navigationTitle("Variant Details")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Done") { dismiss() }
+                }
+            }
+        }
+    }
+    
+    private func addToCollection() async {
+        do {
+            try await OwnedVariant.create(
+                variant: variant,
+                critter: critter,
+                familyId: "", // We don't have familyId in CritterInfo, will need to handle this
+                status: .collection,
+                in: modelContext
+            )
+            ToastManager.shared.show("✓ Added to Collection", type: .success)
+        } catch {
+            ToastManager.shared.show("Failed to add", type: .error)
+        }
+    }
+    
+    private func addToWishlist() async {
+        do {
+            try await OwnedVariant.create(
+                variant: variant,
+                critter: critter,
+                familyId: "",
+                status: .wishlist,
+                in: modelContext
+            )
+            ToastManager.shared.show("✓ Added to Wishlist", type: .success)
+        } catch {
+            ToastManager.shared.show("Failed to add", type: .error)
+        }
+    }
+    
+    private func removeFromCollection() {
+        try? OwnedVariant.remove(variantUuid: variant.uuid, in: modelContext)
+        ToastManager.shared.show("Removed", type: .info)
+        dismiss()
+    }
+}
+
+// MARK: - Detail Row
+private struct DetailRow: View {
+    let label: String
+    let value: String
+    
+    var body: some View {
+        HStack {
+            Text(label)
+                .foregroundColor(.calicoTextSecondary)
+            Spacer()
+            Text(value)
+                .fontWeight(.medium)
+        }
+    }
+}
+
 #Preview {
     NavigationStack {
-        CritterDetailView(
-            critter: Critter(
-                uuid: "1",
-                familyId: "1",
-                name: "Linnea Husky",
-                memberType: "Babies",
-                role: "Baby Sister",
-                familyName: "Husky Dog",
-                familySpecies: "Dog",
-                variantsCount: 8
-            )
-        )
+        CritterDetailView(critterUuid: "test-uuid")
     }
-    .modelContainer(for: OwnedVariant.self, inMemory: true)
 }
