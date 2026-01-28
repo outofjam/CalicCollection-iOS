@@ -40,18 +40,12 @@ struct StatsView: View {
                 Set(variants.map { $0.critterUuid }).count
             }
         
-        // Get total critters by member type
-        let totalCrittersByType = Dictionary(grouping: allCritters) { $0.memberType }
-            .mapValues { $0.count }
+        // Total collected critters (for percentage of collection)
+        let totalCollected = Set(variants.map { $0.critterUuid }).count
         
-        // Combine
-        let allTypes = Set(collectedCrittersByType.keys).union(totalCrittersByType.keys)
-        
-        return allTypes.map { type in
-            let collected = collectedCrittersByType[type] ?? 0
-            let total = totalCrittersByType[type] ?? collected
-            let percentage = total > 0 ? Double(collected) / Double(total) : 0
-            return (type, collected, total, percentage)
+        return collectedCrittersByType.map { type, collected in
+            let percentage = totalCollected > 0 ? Double(collected) / Double(totalCollected) : 0
+            return (type, collected, totalCollected, percentage)
         }
         .sorted { $0.collected > $1.collected }
     }
@@ -184,7 +178,7 @@ struct StatsView: View {
                                             .font(.subheadline)
                                             .fontWeight(.medium)
                                         
-                                        Text("\(item.collected)/\(item.total)")
+                                        Text("\(item.collected) of \(item.total)")
                                             .font(.caption)
                                             .foregroundColor(.calicoTextSecondary)
                                     }
