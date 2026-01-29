@@ -15,6 +15,7 @@ struct VariantPickerSheet: View {
     @State private var errorMessage: String?
     @State private var selectedVariantIds: Set<String> = []
     @State private var isSaving = false
+    @State private var showConfetti = false
     
     private func isVariantOwned(_ variantUuid: String, status: CritterStatus) -> Bool {
         ownedVariants.contains { $0.variantUuid == variantUuid && $0.status == status }
@@ -51,6 +52,7 @@ struct VariantPickerSheet: View {
         }
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
+        .confetti(isShowing: $showConfetti)
         .task {
             await loadVariants()
         }
@@ -158,12 +160,11 @@ struct VariantPickerSheet: View {
         isLoading = true
         errorMessage = nil
         
-        print("🔍 Loading variants for critter: \(critterUuid)")
+        AppLogger.debug("Loading variants for critter: \(critterUuid)")
         
         do {
             critterData = try await BrowseService.shared.fetchCritterVariants(critterUuid: critterUuid)
-            print("✅ Got response: \(String(describing: critterData))")
-            print("✅ Variants count: \(critterData?.variants.count ?? 0)")
+            AppLogger.debug("Variants count: \(critterData?.variants.count ?? 0)")
             
             // Pre-select already owned variants
             if let variants = critterData?.variants {
@@ -174,7 +175,7 @@ struct VariantPickerSheet: View {
                 )
             }
         } catch {
-            print("❌ Error: \(error)")
+            AppLogger.error("Failed to load variants: \(error)")
             errorMessage = error.localizedDescription
         }
         
@@ -244,6 +245,14 @@ struct VariantPickerSheet: View {
         if addedCount > 0 {
             let generator = UINotificationFeedbackGenerator()
             generator.notificationOccurred(.success)
+            
+            // Trigger confetti if adding to collection
+            if targetStatus == .collection && AppSettings.shared.showConfetti {
+                showConfetti = true
+                // Small delay before dismissing so confetti shows
+                try? await Task.sleep(nanoseconds: 500_000_000)
+            }
+            
             ToastManager.shared.show("✓ Added \(addedCount) to \(statusName)", type: .success)
         } else if removedCount > 0 {
             let generator = UINotificationFeedbackGenerator()
