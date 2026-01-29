@@ -40,6 +40,9 @@
 		931E304E2F2BE7B600F1EA33 /* PurchaseDetailsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931E304D2F2BE7B600F1EA33 /* PurchaseDetailsSection.swift */; };
 		931E30522F2BE80A00F1EA33 /* ReportIssueSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931E30512F2BE80A00F1EA33 /* ReportIssueSheet.swift */; };
 		931E307C2F2BF6CD00F1EA33 /* ConfettiManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931E307B2F2BF6CD00F1EA33 /* ConfettiManager.swift */; };
+		931E30A62F2BF9DF00F1EA33 /* BrowseCrittersList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931E30A52F2BF9DF00F1EA33 /* BrowseCrittersList.swift */; };
+		931E30A82F2BF9E900F1EA33 /* SearchResultsList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931E30A72F2BF9E900F1EA33 /* SearchResultsList.swift */; };
+		931E30AA2F2BF9F700F1EA33 /* VariantAdditionHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931E30A92F2BF9F700F1EA33 /* VariantAdditionHelpers.swift */; };
 		937B9F3F2F2023AC00C08885 /* CalicCollectionV2App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937B9F3E2F2023AC00C08885 /* CalicCollectionV2App.swift */; };
 		937B9F412F2023AC00C08885 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937B9F402F2023AC00C08885 /* ContentView.swift */; };
 		937B9F742F20247B00C08885 /* FamilyResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937B9F732F20247800C08885 /* FamilyResponse.swift */; };
@@ -132,6 +135,9 @@
 		931E304D2F2BE7B600F1EA33 /* PurchaseDetailsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseDetailsSection.swift; sourceTree = "<group>"; };
 		931E30512F2BE80A00F1EA33 /* ReportIssueSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportIssueSheet.swift; sourceTree = "<group>"; };
 		931E307B2F2BF6CD00F1EA33 /* ConfettiManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfettiManager.swift; sourceTree = "<group>"; };
+		931E30A52F2BF9DF00F1EA33 /* BrowseCrittersList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowseCrittersList.swift; sourceTree = "<group>"; };
+		931E30A72F2BF9E900F1EA33 /* SearchResultsList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchResultsList.swift; sourceTree = "<group>"; };
+		931E30A92F2BF9F700F1EA33 /* VariantAdditionHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VariantAdditionHelpers.swift; sourceTree = "<group>"; };
 		937B9F3B2F2023AC00C08885 /* CalicCollectionV2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CalicCollectionV2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		937B9F3E2F2023AC00C08885 /* CalicCollectionV2App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalicCollectionV2App.swift; sourceTree = "<group>"; };
 		937B9F402F2023AC00C08885 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -387,6 +393,9 @@
 				93C461E72F251D8200A8F084 /* ScannedSetPickerSheet.swift */,
 				93C461CC2F22EB3100A8F084 /* VariantDetailView.swift */,
 				937B9F892F2028CF00C08885 /* VariantPicker.swift */,
+				931E30A52F2BF9DF00F1EA33 /* BrowseCrittersList.swift */,
+				931E30A72F2BF9E900F1EA33 /* SearchResultsList.swift */,
+				931E30A92F2BF9F700F1EA33 /* VariantAdditionHelpers.swift */,
 			);
 			path = Search;
 			sourceTree = "<group>";
@@ -597,6 +606,7 @@
 				937B9F742F20247B00C08885 /* FamilyResponse.swift in Sources */,
 				93C461CD2F22EB3400A8F084 /* VariantDetailView.swift in Sources */,
 				93C462922F28075000A8F084 /* ReportRequest.swift in Sources */,
+				931E30AA2F2BF9F700F1EA33 /* VariantAdditionHelpers.swift in Sources */,
 				93C461E22F2511DA00A8F084 /* FamilyDetailView.swift in Sources */,
 				93C461C32F22D4BB00A8F084 /* ToastManager.swift in Sources */,
 				93C461E82F251D8200A8F084 /* ScannedSetPickerSheet.swift in Sources */,
@@ -619,6 +629,7 @@
 				931E304E2F2BE7B600F1EA33 /* PurchaseDetailsSection.swift in Sources */,
 				93C462442F26E8C400A8F084 /* VariantPhoto+Helpers.swift in Sources */,
 				93C461EE2F259F2000A8F084 /* PurchaseDetailsSheet.swift in Sources */,
+				931E30A62F2BF9DF00F1EA33 /* BrowseCrittersList.swift in Sources */,
 				93C462402F26E5EC00A8F084 /* PhotoGallerySection.swift in Sources */,
 				93C461D42F22EE4A00A8F084 /* WishlistView.swift in Sources */,
 				937B9F412F2023AC00C08885 /* ContentView.swift in Sources */,
@@ -652,6 +663,7 @@
 				93C4623C2F26E5B000A8F084 /* VariantPhoto.swift in Sources */,
 				93C461E62F251D6600A8F084 /* BarcodeScannerView.swift in Sources */,
 				93C4623E2F26E5E200A8F084 /* PhotoPickerSheet.swift in Sources */,
+				931E30A82F2BF9E900F1EA33 /* SearchResultsList.swift in Sources */,
 				931E2F492F2AB94500F1EA33 /* BrowseView.swift in Sources */,
 				931E2F4D2F2AB95300F1EA33 /* BrowseCritterRow.swift in Sources */,
 				931E304C2F2BE7A900F1EA33 /* VariantStatusBadge.swift in Sources */,

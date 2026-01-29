@@ -10,8 +10,10 @@ import SwiftUI
 // MARK: - Browse Critter Row
 struct BrowseCritterRow: View {
     let critter: BrowseCritterResponse
-    let ownedCount: Int
+    let collectionCount: Int
+    let wishlistCount: Int
     
+    private var ownedCount: Int { collectionCount + wishlistCount }
     private var hasOwned: Bool { ownedCount > 0 }
     
     var body: some View {
@@ -58,10 +60,18 @@ struct BrowseCritterRow: View {
             
             Spacer()
             
-            // Owned indicator
-            if hasOwned {
-                Image(systemName: "checkmark.circle.fill")
-                    .foregroundColor(.successGreen)
+            // Collection/Wishlist indicators
+            HStack(spacing: 4) {
+                if collectionCount > 0 {
+                    Image(systemName: "star.fill")
+                        .foregroundColor(.secondaryBlue)
+                        .font(.system(size: 14))
+                }
+                if wishlistCount > 0 {
+                    Image(systemName: "heart.fill")
+                        .foregroundColor(.primaryPink)
+                        .font(.system(size: 14))
+                }
             }
         }
         .padding(.vertical, LottaPawsTheme.spacingXS)
@@ -75,4 +85,51 @@ struct BrowseCritterRow: View {
                     .foregroundColor(.textTertiary)
             }
     }
+}
+
+#Preview {
+    VStack {
+        BrowseCritterRow(
+            critter: BrowseCritterResponse(
+                uuid: "1",
+                name: "Stella Hopscotch",
+                familyId: "1",
+                familyName: "Chocolate Rabbit",
+                memberType: "girl",
+                thumbnailUrl: nil,
+                variantsCount: 3
+            ),
+            collectionCount: 2,
+            wishlistCount: 1
+        )
+        
+        BrowseCritterRow(
+            critter: BrowseCritterResponse(
+                uuid: "2",
+                name: "Freya Hopscotch",
+                familyId: "1",
+                familyName: "Chocolate Rabbit",
+                memberType: "mother",
+                thumbnailUrl: nil,
+                variantsCount: 2
+            ),
+            collectionCount: 0,
+            wishlistCount: 1
+        )
+        
+        BrowseCritterRow(
+            critter: BrowseCritterResponse(
+                uuid: "3",
+                name: "Coco Hopscotch",
+                familyId: "1",
+                familyName: "Chocolate Rabbit",
+                memberType: "father",
+                thumbnailUrl: nil,
+                variantsCount: 2
+            ),
+            collectionCount: 0,
+            wishlistCount: 0
+        )
+    }
+    .padding()
 }
