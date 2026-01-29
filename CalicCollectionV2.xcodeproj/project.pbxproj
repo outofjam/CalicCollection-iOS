@@ -256,9 +256,10 @@
 			isa = PBXGroup;
 			children = (
 				931E307B2F2BF6CD00F1EA33 /* ConfettiManager.swift */,
-				93C461C22F22D4B300A8F084 /* ToastManager.swift */,
-				93C462432F26E8BD00A8F084 /* VariantPhoto+Helpers.swift */,
 				937B9F8F2F202B6800C08885 /* Config.swift */,
+				93C461C22F22D4B300A8F084 /* ToastManager.swift */,
+				931E30A92F2BF9F700F1EA33 /* VariantAdditionHelpers.swift */,
+				93C462432F26E8BD00A8F084 /* VariantPhoto+Helpers.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -267,12 +268,24 @@
 			isa = PBXGroup;
 			children = (
 				93ADCD192F29272300351CE9 /* FullscreenImageViewer.swift */,
-				931E30512F2BE80A00F1EA33 /* ReportIssueSheet.swift */,
 				931E304D2F2BE7B600F1EA33 /* PurchaseDetailsSection.swift */,
-				931E304B2F2BE7A900F1EA33 /* VariantStatusBadge.swift */,
+				931E30512F2BE80A00F1EA33 /* ReportIssueSheet.swift */,
 				931E30492F2BE7A200F1EA33 /* VariantHeroImage.swift */,
+				931E304B2F2BE7A900F1EA33 /* VariantStatusBadge.swift */,
 			);
 			path = VariantDetail;
+			sourceTree = "<group>";
+		};
+		931E30D32F2BFAEA00F1EA33 /* Browse */ = {
+			isa = PBXGroup;
+			children = (
+				931E2F4C2F2AB95300F1EA33 /* BrowseCritterRow.swift */,
+				931E30A52F2BF9DF00F1EA33 /* BrowseCrittersList.swift */,
+				931E2F482F2AB94500F1EA33 /* BrowseView.swift */,
+				931E30A72F2BF9E900F1EA33 /* SearchResultsList.swift */,
+				937B9F892F2028CF00C08885 /* VariantPicker.swift */,
+			);
+			path = Browse;
 			sourceTree = "<group>";
 		};
 		937B9F322F2023AC00C08885 = {
@@ -384,18 +397,13 @@
 		937B9F6E2F20241200C08885 /* Search */ = {
 			isa = PBXGroup;
 			children = (
-				931E2F4E2F2AB95A00F1EA33 /* SearchResultRow.swift */,
-				931E2F4C2F2AB95300F1EA33 /* BrowseCritterRow.swift */,
-				931E2F4A2F2AB94C00F1EA33 /* FilterChipsView.swift */,
-				931E2F482F2AB94500F1EA33 /* BrowseView.swift */,
 				93C461E52F251D6600A8F084 /* BarcodeScannerView.swift */,
+				931E30D32F2BFAEA00F1EA33 /* Browse */,
 				937B9F8B2F2028E300C08885 /* CritterDetailView.swift */,
+				931E2F4A2F2AB94C00F1EA33 /* FilterChipsView.swift */,
 				93C461E72F251D8200A8F084 /* ScannedSetPickerSheet.swift */,
+				931E2F4E2F2AB95A00F1EA33 /* SearchResultRow.swift */,
 				93C461CC2F22EB3100A8F084 /* VariantDetailView.swift */,
-				937B9F892F2028CF00C08885 /* VariantPicker.swift */,
-				931E30A52F2BF9DF00F1EA33 /* BrowseCrittersList.swift */,
-				931E30A72F2BF9E900F1EA33 /* SearchResultsList.swift */,
-				931E30A92F2BF9F700F1EA33 /* VariantAdditionHelpers.swift */,
 			);
 			path = Search;
 			sourceTree = "<group>";
