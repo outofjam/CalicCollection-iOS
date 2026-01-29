@@ -89,6 +89,16 @@ struct SettingsView: View {
                                 .foregroundColor(.calicoTextSecondary)
                         }
                     }
+                    
+                    Toggle(isOn: $appSettings.showConfetti) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Celebration Effects")
+                                .font(.body)
+                            Text("Show confetti when adding to collection")
+                                .font(.caption)
+                                .foregroundColor(.calicoTextSecondary)
+                        }
+                    }
                 } header: {
                     Text("Preferences")
                 } footer: {
@@ -126,7 +136,8 @@ struct SettingsView: View {
                 Button("Cancel", role: .cancel) { }
                 Button("Sync Now") {
                     Task {
-                        await syncService.syncFamilies(modelContext: modelContext, force: true)                    }
+                        await syncService.syncFamilies(modelContext: modelContext, force: true)
+                    }
                 }
             } message: {
                 Text("This will refresh family data from the server.")

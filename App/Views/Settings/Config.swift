@@ -35,6 +35,7 @@ struct Config {
         static let showPurchaseDetails = "showPurchaseDetails"
         static let lastBackupDate = "lastBackupDate"
         static let deviceId = "deviceId"
+        static let showConfetti = "showConfetti"
     }
     
     // MARK: - Device Identifier

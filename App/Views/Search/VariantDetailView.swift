@@ -15,6 +15,7 @@ struct VariantDetailView: View {
     @State private var showingPurchaseDetails = false
     @State private var showingReportIssue = false
     @State private var isAdding = false
+    @State private var showConfetti = false
     
     private var ownedVariant: OwnedVariant? {
         ownedVariants.first { $0.variantUuid == variant.uuid }
@@ -253,7 +254,8 @@ struct VariantDetailView: View {
                     .ignoresSafeArea()
                 }
             }
-        }.toast()
+        }
+        .confetti(isShowing: $showConfetti).toast()
     }
     
     private var gradientPlaceholder: some View {
@@ -289,6 +291,12 @@ struct VariantDetailView: View {
             
             let generator = UINotificationFeedbackGenerator()
             generator.notificationOccurred(.success)
+            
+            // Trigger confetti if enabled
+            if AppSettings.shared.showConfetti {
+                showConfetti = true
+            }
+            
             ToastManager.shared.show("✓ Added \(variant.name) to Collection", type: .success)
         } catch {
             ToastManager.shared.show("Failed to add", type: .error)
@@ -333,6 +341,7 @@ struct VariantDetailView: View {
             
             let generator = UINotificationFeedbackGenerator()
             generator.notificationOccurred(.success)
+
             ToastManager.shared.show("✓ Moved \(variant.name) to Wishlist", type: .success)
         } catch {
             ToastManager.shared.show("Failed to move", type: .error)

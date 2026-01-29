@@ -10,6 +10,12 @@ class AppSettings: ObservableObject {
         }
     }
     
+    @Published var showConfetti: Bool {
+        didSet {
+            UserDefaults.standard.set(showConfetti, forKey: Config.UserDefaultsKeys.showConfetti)
+        }
+    }
+    
     var lastBackupDate: Date? {
         get {
             UserDefaults.standard.object(forKey: Config.UserDefaultsKeys.lastBackupDate) as? Date
@@ -30,5 +36,7 @@ class AppSettings: ObservableObject {
     
     private init() {
         self.showPurchaseDetails = UserDefaults.standard.bool(forKey: Config.UserDefaultsKeys.showPurchaseDetails)
+        // Default to true for confetti (fun by default!)
+        self.showConfetti = UserDefaults.standard.object(forKey: Config.UserDefaultsKeys.showConfetti) as? Bool ?? true
     }
 }
