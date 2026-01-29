@@ -23,6 +23,7 @@
 		931E2F4B2F2AB94C00F1EA33 /* FilterChipsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931E2F4A2F2AB94C00F1EA33 /* FilterChipsView.swift */; };
 		931E2F4D2F2AB95300F1EA33 /* BrowseCritterRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931E2F4C2F2AB95300F1EA33 /* BrowseCritterRow.swift */; };
 		931E2F4F2F2AB95A00F1EA33 /* SearchResultRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931E2F4E2F2AB95A00F1EA33 /* SearchResultRow.swift */; };
+		931E2F792F2B9D3700F1EA33 /* ConfettiView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931E2F782F2B9D3700F1EA33 /* ConfettiView.swift */; };
 		937B9F3F2F2023AC00C08885 /* CalicCollectionV2App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937B9F3E2F2023AC00C08885 /* CalicCollectionV2App.swift */; };
 		937B9F412F2023AC00C08885 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937B9F402F2023AC00C08885 /* ContentView.swift */; };
 		937B9F742F20247B00C08885 /* FamilyResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937B9F732F20247800C08885 /* FamilyResponse.swift */; };
@@ -100,6 +101,7 @@
 		931E2F4A2F2AB94C00F1EA33 /* FilterChipsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterChipsView.swift; sourceTree = "<group>"; };
 		931E2F4C2F2AB95300F1EA33 /* BrowseCritterRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowseCritterRow.swift; sourceTree = "<group>"; };
 		931E2F4E2F2AB95A00F1EA33 /* SearchResultRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchResultRow.swift; sourceTree = "<group>"; };
+		931E2F782F2B9D3700F1EA33 /* ConfettiView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfettiView.swift; sourceTree = "<group>"; };
 		937B9F3B2F2023AC00C08885 /* CalicCollectionV2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CalicCollectionV2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		937B9F3E2F2023AC00C08885 /* CalicCollectionV2App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalicCollectionV2App.swift; sourceTree = "<group>"; };
 		937B9F402F2023AC00C08885 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -364,6 +366,7 @@
 		937B9F722F20242E00C08885 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				931E2F782F2B9D3700F1EA33 /* ConfettiView.swift */,
 				93ADCD172F29271600351CE9 /* BottomActionBar.swift */,
 				93C461D72F22F02300A8F084 /* CollectionComponents.swift */,
 				93ADCD192F29272300351CE9 /* FullscreenImageViewer.swift */,
@@ -565,6 +568,7 @@
 				937B9F822F20254B00C08885 /* CritterStatus.swift in Sources */,
 				93C461D12F22EE1C00A8F084 /* OwnedVariantsView.swift in Sources */,
 				93C461EC2F259F0000A8F084 /* AppSettings.swift in Sources */,
+				931E2F792F2B9D3700F1EA33 /* ConfettiView.swift in Sources */,
 				937B9F842F20259400C08885 /* APIService.swift in Sources */,
 				93C461F62F26AEFB00A8F084 /* AboutView.swift in Sources */,
 				931E2F432F2AB08D00F1EA33 /* SyncService.swift in Sources */,

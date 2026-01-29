@@ -49,6 +49,9 @@ struct BrowseView: View {
     @State private var showingScannedSetPicker = false
     @State private var isLoadingSet = false
     
+    // Confetti
+    @State private var showConfetti = false
+    
     private var isSearchMode: Bool {
         !searchText.trimmingCharacters(in: .whitespaces).isEmpty && searchText.count >= 2
     }
@@ -121,6 +124,7 @@ struct BrowseView: View {
         .overlay {
             if isLoadingSet || isAddingSingleVariant { loadingOverlay }
         }
+        .confetti(isShowing: $showConfetti)
     }
     
     // MARK: - Browse Content
@@ -470,6 +474,11 @@ struct BrowseView: View {
             let generator = UINotificationFeedbackGenerator()
             generator.notificationOccurred(.success)
             
+            // Trigger confetti if adding to collection
+            if status == .collection && AppSettings.shared.showConfetti {
+                showConfetti = true
+            }
+            
             ToastManager.shared.show(
                 "✓ Added to \(status == .collection ? "Collection" : "Wishlist")",
                 type: .success
@@ -486,6 +495,11 @@ struct BrowseView: View {
             
             let generator = UINotificationFeedbackGenerator()
             generator.notificationOccurred(.success)
+            
+            // Trigger confetti if adding to collection
+            if status == .collection && AppSettings.shared.showConfetti {
+                showConfetti = true
+            }
             
             ToastManager.shared.show(
                 "✓ Added to \(status == .collection ? "Collection" : "Wishlist")",
