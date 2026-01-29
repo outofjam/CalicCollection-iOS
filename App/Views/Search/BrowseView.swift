@@ -165,148 +165,41 @@ struct BrowseView: View {
     
     // MARK: - Browse Content
     
-    @ViewBuilder
     private var browseContent: some View {
-        if isLoadingBrowse && browseCritters.isEmpty {
-            VStack(spacing: LottaPawsTheme.spacingMD) {
-                ProgressView()
-                    .tint(.primaryPink)
-                Text("Loading critters...")
-                    .font(.subheadline)
-                    .foregroundColor(.textSecondary)
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-        } else if let error = browseError, browseCritters.isEmpty {
-            LPEmptyState(
-                icon: "exclamationmark.triangle",
-                title: "Error",
-                message: error,
-                buttonTitle: "Retry",
-                buttonAction: {
-                    Task { await loadBrowseCritters(reset: true) }
-                }
-            )
-        } else if browseCritters.isEmpty {
-            LPEmptyState(
-                icon: "pawprint.fill",
-                title: "No Critters",
-                message: "No critters found"
-            )
-        } else {
-            List {
-                ForEach(browseCritters) { critter in
-                    NavigationLink {
-                        CritterDetailView(critterUuid: critter.uuid)
-                    } label: {
-                        BrowseCritterRow(
-                            critter: critter,
-                            ownedCount: ownedCountFor(critter.uuid)
-                        )
-                    }
-                    .swipeActions(edge: .leading) {
-                        Button {
-                            handleCollectionAction(for: critter)
-                        } label: {
-                            Label("Collection", systemImage: "star.fill")
-                        }
-                        .tint(.secondaryBlue)
-                    }
-                    .swipeActions(edge: .trailing) {
-                        Button {
-                            handleWishlistAction(for: critter)
-                        } label: {
-                            Label("Wishlist", systemImage: "heart.fill")
-                        }
-                        .tint(.primaryPink)
-                    }
-                    .onAppear {
-                        if critter.id == browseCritters.last?.id && currentPage < totalPages {
-                            Task { await loadBrowseCritters(reset: false) }
-                        }
-                    }
-                }
-                
-                if isLoadingBrowse && !browseCritters.isEmpty {
-                    HStack {
-                        Spacer()
-                        ProgressView()
-                            .tint(.primaryPink)
-                        Spacer()
-                    }
-                    .listRowBackground(Color.clear)
-                }
-            }
-            .listStyle(.insetGrouped)
-        }
+        BrowseCrittersList(
+            critters: browseCritters,
+            isLoading: isLoadingBrowse,
+            error: browseError,
+            currentPage: currentPage,
+            totalPages: totalPages,
+            onLoadMore: { Task { await loadBrowseCritters(reset: false) } },
+            onRetry: { Task { await loadBrowseCritters(reset: true) } },
+            onCollectionAction: handleCollectionAction,
+            onWishlistAction: handleWishlistAction,
+            collectionCountFor: collectionCountFor,
+            wishlistCountFor: wishlistCountFor
+        )
     }
     
     // MARK: - Search Content
     
-    @ViewBuilder
     private var searchContent: some View {
-        if isSearching && searchResults.isEmpty {
-            VStack(spacing: LottaPawsTheme.spacingMD) {
-                ProgressView()
-                    .tint(.primaryPink)
-                Text("Searching...")
-                    .font(.subheadline)
-                    .foregroundColor(.textSecondary)
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-        } else if let error = searchError, searchResults.isEmpty {
-            LPEmptyState(
-                icon: "exclamationmark.triangle",
-                title: "Search Error",
-                message: error
-            )
-        } else if searchResults.isEmpty && !searchText.isEmpty {
-            LPEmptyState(
-                icon: "magnifyingglass",
-                title: "No Results",
-                message: "No variants found for \"\(searchText)\""
-            )
-        } else {
-            List {
-                ForEach(searchResults) { result in
-                    SearchResultRow(
-                        result: result,
-                        isOwned: isOwned(result.variantUuid)
-                    )
-                    .swipeActions(edge: .leading) {
-                        Button {
-                            Task { await addSearchResult(result, status: .collection) }
-                        } label: {
-                            Label("Collection", systemImage: "star.fill")
-                        }
-                        .tint(.secondaryBlue)
-                    }
-                    .swipeActions(edge: .trailing) {
-                        Button {
-                            Task { await addSearchResult(result, status: .wishlist) }
-                        } label: {
-                            Label("Wishlist", systemImage: "heart.fill")
-                        }
-                        .tint(.primaryPink)
-                    }
-                    .onAppear {
-                        if result.id == searchResults.last?.id && searchPage < searchTotalPages {
-                            Task { await performSearch(reset: false) }
-                        }
-                    }
-                }
-                
-                if isSearching && !searchResults.isEmpty {
-                    HStack {
-                        Spacer()
-                        ProgressView()
-                            .tint(.primaryPink)
-                        Spacer()
-                    }
-                    .listRowBackground(Color.clear)
-                }
-            }
-            .listStyle(.insetGrouped)
-        }
+        SearchResultsList(
+            results: searchResults,
+            searchText: searchText,
+            isSearching: isSearching,
+            error: searchError,
+            currentPage: searchPage,
+            totalPages: searchTotalPages,
+            onLoadMore: { Task { await performSearch(reset: false) } },
+            onCollectionAction: { result in
+                Task { await handleSearchResultAction(result, status: .collection) }
+            },
+            onWishlistAction: { result in
+                Task { await handleSearchResultAction(result, status: .wishlist) }
+            },
+            isOwnedCheck: isOwned
+        )
     }
     
     // MARK: - Subviews
@@ -456,8 +349,12 @@ struct BrowseView: View {
     
     // MARK: - Actions
     
-    private func ownedCountFor(_ critterUuid: String) -> Int {
-        ownedVariants.filter { $0.critterUuid == critterUuid }.count
+    private func collectionCountFor(_ critterUuid: String) -> Int {
+        ownedVariants.filter { $0.critterUuid == critterUuid && $0.status == .collection }.count
+    }
+    
+    private func wishlistCountFor(_ critterUuid: String) -> Int {
+        ownedVariants.filter { $0.critterUuid == critterUuid && $0.status == .wishlist }.count
     }
     
     private func isOwned(_ variantUuid: String) -> Bool {
@@ -472,7 +369,7 @@ struct BrowseView: View {
         
         // Single variant - add directly without picker
         if critter.variantsCount == 1 {
-            Task { await addSingleVariant(critterUuid: critter.uuid, status: .collection) }
+            Task { await handleSingleVariantAdd(critterUuid: critter.uuid, status: .collection) }
             return
         }
         
@@ -489,7 +386,7 @@ struct BrowseView: View {
         
         // Single variant - add directly without picker
         if critter.variantsCount == 1 {
-            Task { await addSingleVariant(critterUuid: critter.uuid, status: .wishlist) }
+            Task { await handleSingleVariantAdd(critterUuid: critter.uuid, status: .wishlist) }
             return
         }
         
@@ -498,74 +395,37 @@ struct BrowseView: View {
         selectedCritterUuid = critter.uuid
     }
     
-    private func addSingleVariant(critterUuid: String, status: CritterStatus) async {
+    private func handleSingleVariantAdd(critterUuid: String, status: CritterStatus) async {
         isAddingSingleVariant = true
         defer { isAddingSingleVariant = false }
         
         do {
-            let response = try await BrowseService.shared.fetchCritterVariants(critterUuid: critterUuid)
-            
-            guard let variant = response.variants.first else {
-                ToastManager.shared.show("No variant found", type: .error)
-                return
-            }
-            
-            // Check if already owned
-            if ownedVariants.contains(where: { $0.variantUuid == variant.uuid }) {
-                ToastManager.shared.show("Already in your \(status == .collection ? "collection" : "wishlist")", type: .info)
-                return
-            }
-            
-            // Create OwnedVariant
-            let owned = OwnedVariant(
-                variantUuid: variant.uuid,
-                critterUuid: response.critter.uuid,
-                critterName: response.critter.name,
-                variantName: variant.name,
-                familyId: response.critter.familyUuid ?? "",
-                familyName: response.critter.familyName,
-                familySpecies: nil,
-                memberType: response.critter.memberType,
-                role: nil,
-                epochId: variant.epochId,
-                setName: variant.setName,
-                imageURL: variant.imageUrl,
-                thumbnailURL: variant.thumbnailUrl,
-                status: status
+            try await VariantAdditionHelpers.addSingleVariant(
+                critterUuid: critterUuid,
+                status: status,
+                modelContext: modelContext,
+                ownedVariants: ownedVariants
             )
-            
-            modelContext.insert(owned)
-            try modelContext.save()
-            
-            let generator = UINotificationFeedbackGenerator()
-            generator.notificationOccurred(.success)
-            
-            // Trigger confetti if adding to collection (shows on root view)
-            if status == .collection && AppSettings.shared.showConfetti {
-                ConfettiManager.shared.trigger()
-            }
             
             ToastManager.shared.show(
                 "✓ Added to \(status == .collection ? "Collection" : "Wishlist")",
                 type: .success
             )
+        } catch let error as VariantAdditionError {
+            ToastManager.shared.show(error.localizedDescription, type: .info)
         } catch {
             AppLogger.error("Failed to add single variant: \(error)")
             ToastManager.shared.show("Failed to add variant", type: .error)
         }
     }
     
-    private func addSearchResult(_ result: SearchResultResponse, status: CritterStatus) async {
+    private func handleSearchResultAction(_ result: SearchResultResponse, status: CritterStatus) async {
         do {
-            try await OwnedVariant.create(from: result, status: status, in: modelContext)
-            
-            let generator = UINotificationFeedbackGenerator()
-            generator.notificationOccurred(.success)
-            
-            // Trigger confetti if adding to collection (shows on root view)
-            if status == .collection && AppSettings.shared.showConfetti {
-                ConfettiManager.shared.trigger()
-            }
+            try await VariantAdditionHelpers.addSearchResult(
+                result,
+                status: status,
+                modelContext: modelContext
+            )
             
             ToastManager.shared.show(
                 "✓ Added to \(status == .collection ? "Collection" : "Wishlist")",
