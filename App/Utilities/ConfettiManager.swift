@@ -7,6 +7,7 @@
 
 
 import SwiftUI
+import Combine
 
 @MainActor
 class ConfettiManager: ObservableObject {

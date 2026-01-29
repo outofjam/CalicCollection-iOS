@@ -24,19 +24,19 @@ struct ContentView: View {
                 FirstSyncView()
             } else {
                 TabView {
-                    Tab("Collection", systemImage: "square.grid.2x2.fill") {
+                    Tab("Collection", systemImage: "square.grid.2x2") {
                         NavigationStack {
                             CollectionView()
                         }
                     }
                     
-                    Tab("Wishlist", systemImage: "heart.fill") {
+                    Tab("Wishlist", systemImage: "heart") {
                         NavigationStack {
                             WishlistView()
                         }
                     }
                     
-                    Tab("Settings", systemImage: "gearshape.fill") {
+                    Tab("Settings", systemImage: "gearshape") {
                         SettingsView()
                     }
                     

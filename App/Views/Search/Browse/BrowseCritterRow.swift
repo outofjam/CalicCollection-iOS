@@ -93,11 +93,11 @@ struct BrowseCritterRow: View {
             critter: BrowseCritterResponse(
                 uuid: "1",
                 name: "Stella Hopscotch",
-                familyId: "1",
-                familyName: "Chocolate Rabbit",
                 memberType: "girl",
-                thumbnailUrl: nil,
-                variantsCount: 3
+                familyUuid: "1",
+                familyName: "Chocolate Rabbit",
+                variantsCount: 3,
+                thumbnailUrl: nil
             ),
             collectionCount: 2,
             wishlistCount: 1
@@ -107,11 +107,11 @@ struct BrowseCritterRow: View {
             critter: BrowseCritterResponse(
                 uuid: "2",
                 name: "Freya Hopscotch",
-                familyId: "1",
-                familyName: "Chocolate Rabbit",
                 memberType: "mother",
-                thumbnailUrl: nil,
-                variantsCount: 2
+                familyUuid: "1",
+                familyName: "Chocolate Rabbit",
+                variantsCount: 2,
+                thumbnailUrl: nil
             ),
             collectionCount: 0,
             wishlistCount: 1
@@ -121,11 +121,11 @@ struct BrowseCritterRow: View {
             critter: BrowseCritterResponse(
                 uuid: "3",
                 name: "Coco Hopscotch",
-                familyId: "1",
-                familyName: "Chocolate Rabbit",
                 memberType: "father",
-                thumbnailUrl: nil,
-                variantsCount: 2
+                familyUuid: "1",
+                familyName: "Chocolate Rabbit",
+                variantsCount: 2,
+                thumbnailUrl: nil
             ),
             collectionCount: 0,
             wishlistCount: 0
