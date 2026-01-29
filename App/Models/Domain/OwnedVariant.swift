@@ -190,8 +190,7 @@ extension OwnedVariant {
             existing.thumbnailURL = searchResult.thumbnailUrl
             existing.localImagePath = imagePath
             existing.localThumbnailPath = thumbPath
-            existing.epochId = searchResult.epochId
-            existing.setName = searchResult.setName
+            // Note: epochId/setName not available in search results
             if status == .collection && existing.photoPath == nil {
                 existing.addedDate = Date()
             }
@@ -205,8 +204,8 @@ extension OwnedVariant {
                 familyId: searchResult.familyUuid ?? "",
                 familyName: searchResult.familyName,
                 memberType: searchResult.memberType ?? "unknown",
-                epochId: searchResult.epochId,
-                setName: searchResult.setName,
+                epochId: nil,  // Not available in search results
+                setName: nil,  // Not available in search results
                 imageURL: searchResult.imageUrl,
                 thumbnailURL: searchResult.thumbnailUrl,
                 localImagePath: imagePath,
@@ -246,8 +245,7 @@ extension OwnedVariant {
             existing.thumbnailURL = setVariant.thumbnailURL
             existing.localImagePath = imagePath
             existing.localThumbnailPath = thumbPath
-            existing.epochId = setVariant.epochId
-            existing.setName = setVariant.setName
+            // Note: epochId/setName would need to be passed from SetInfo
             if status == .collection && existing.photoPath == nil {
                 existing.addedDate = Date()
             }
@@ -263,8 +261,8 @@ extension OwnedVariant {
                 familySpecies: setVariant.critter.family.species,
                 memberType: setVariant.critter.memberType,
                 role: setVariant.critter.role,
-                epochId: setVariant.epochId,
-                setName: setVariant.setName,
+                epochId: nil,  // Would need SetInfo passed in
+                setName: nil,  // Would need SetInfo passed in
                 imageURL: setVariant.imageURL,
                 thumbnailURL: setVariant.thumbnailURL,
                 localImagePath: imagePath,
