@@ -1,6 +1,6 @@
 //
 //  ScannedSetPickerSheet.swift
-//  CaliCollectionV2
+//  LottaPaws
 //
 //  Created by Ismail Dawoodjee on 2026-01-24.
 //
@@ -24,28 +24,29 @@ struct ScannedSetPickerSheet: View {
         NavigationStack {
             VStack(spacing: 0) {
                 // Header
-                VStack(spacing: 8) {
+                VStack(spacing: LottaPawsTheme.spacingSM) {
                     Image(systemName: "checkmark.circle.fill")
                         .font(.system(size: 50))
-                        .foregroundColor(.calicoSuccess)
+                        .foregroundColor(.successGreen)
                     
                     Text(setResponse.set.name)
                         .font(.title2)
                         .fontWeight(.bold)
+                        .foregroundColor(.textPrimary)
                     
                     Text("Select variants to add to \(targetStatus == .collection ? "Collection" : "Wishlist")")
                         .font(.subheadline)
-                        .foregroundColor(.calicoTextSecondary)
+                        .foregroundColor(.textSecondary)
                         .multilineTextAlignment(.center)
                 }
-                .padding()
+                .padding(LottaPawsTheme.spacingLG)
                 
                 // Variants list
                 if setResponse.variants.isEmpty {
-                    ContentUnavailableView(
-                        "No Variants",
-                        systemImage: "photo.stack",
-                        description: Text("This set has no variants")
+                    LPEmptyState(
+                        icon: "photo.stack",
+                        title: "No Variants",
+                        message: "This set has no variants"
                     )
                 } else {
                     List {
@@ -65,7 +66,7 @@ struct ScannedSetPickerSheet: View {
                 }
                 
                 // Action buttons
-                VStack(spacing: 8) {
+                VStack(spacing: LottaPawsTheme.spacingSM) {
                     Button {
                         Task {
                             await saveSelection()
@@ -84,19 +85,20 @@ struct ScannedSetPickerSheet: View {
                         .fontWeight(.semibold)
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 12)
-                        .background(selectedVariantIds.isEmpty ? Color.gray : (targetStatus == .collection ? Color.blue : Color.pink))
-                        .cornerRadius(10)
+                        .padding(.vertical, LottaPawsTheme.spacingMD)
+                        .background(selectedVariantIds.isEmpty ? Color.textTertiary : (targetStatus == .collection ? Color.secondaryBlue : Color.primaryPink))
+                        .cornerRadius(LottaPawsTheme.radiusSM)
                     }
                     .disabled(isLoading)
                     
                     Button("Cancel") {
                         dismiss()
                     }
-                    .foregroundColor(.calicoTextSecondary)
+                    .foregroundColor(.textSecondary)
                 }
-                .padding()
+                .padding(LottaPawsTheme.spacingLG)
             }
+            .background(Color.backgroundPrimary)
             .navigationBarTitleDisplayMode(.inline)
         }
         .presentationDetents([.medium, .large])
@@ -183,10 +185,10 @@ struct ScannedVariantRow: View {
     let isOwned: Bool
     
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: LottaPawsTheme.spacingMD) {
             // Checkbox
             Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                .foregroundColor(isSelected ? .blue : .gray)
+                .foregroundColor(isSelected ? .primaryPink : .textTertiary)
                 .font(.title3)
             
             // Variant image
@@ -199,7 +201,7 @@ struct ScannedVariantRow: View {
                             .resizable()
                             .aspectRatio(contentMode: .fill)
                             .frame(width: 60, height: 60)
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                            .clipShape(RoundedRectangle(cornerRadius: LottaPawsTheme.radiusSM))
                     default:
                         placeholderView
                     }
@@ -210,18 +212,19 @@ struct ScannedVariantRow: View {
             }
             
             // Variant info
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: LottaPawsTheme.spacingXS) {
                 HStack {
                     Text(variant.critter.name)
                         .font(.headline)
+                        .foregroundColor(.textPrimary)
                     
                     if isOwned {
                         Text("✓ Owned")
                             .font(.caption2)
-                            .padding(.horizontal, 6)
+                            .padding(.horizontal, LottaPawsTheme.spacingSM)
                             .padding(.vertical, 2)
-                            .background(Color.green.opacity(0.2))
-                            .foregroundColor(.calicoSuccess)
+                            .background(Color.successGreen.opacity(0.15))
+                            .foregroundColor(.successGreen)
                             .cornerRadius(4)
                     }
                 }
@@ -229,26 +232,26 @@ struct ScannedVariantRow: View {
                 if let role = variant.critter.role {
                     Text(role)
                         .font(.caption)
-                        .foregroundColor(.calicoTextSecondary)
+                        .foregroundColor(.textSecondary)
                 }
                 
                 Text(variant.critter.family.name)
                     .font(.caption2)
-                    .foregroundColor(.calicoTextSecondary)
+                    .foregroundColor(.textTertiary)
             }
             
             Spacer()
         }
-        .padding(.vertical, 8)
+        .padding(.vertical, LottaPawsTheme.spacingSM)
     }
     
     private var placeholderView: some View {
-        RoundedRectangle(cornerRadius: 8)
-            .fill(Color.gray.opacity(0.2))
+        RoundedRectangle(cornerRadius: LottaPawsTheme.radiusSM)
+            .fill(Color.backgroundTertiary)
             .frame(width: 60, height: 60)
             .overlay {
                 Image(systemName: "photo")
-                    .foregroundColor(.gray)
+                    .foregroundColor(.textTertiary)
             }
     }
 }

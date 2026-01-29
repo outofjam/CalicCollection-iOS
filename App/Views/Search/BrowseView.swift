@@ -1,10 +1,9 @@
 //
 //  BrowseView.swift
-//  CalicCollectionV2
+//  LottaPaws
 //
 //  Created by Ismail Dawoodjee on 2026-01-28.
 //
-
 
 import SwiftUI
 import SwiftData
@@ -58,15 +57,7 @@ struct BrowseView: View {
     
     var body: some View {
         ZStack {
-            VStack(spacing: 0) {
-                if !isSearchMode {
-                    FilterChipsView(
-                        selectedFamilyUuid: $selectedFamilyUuid,
-                        selectedFamilyName: $selectedFamilyName,
-                        families: cachedFamilies
-                    )
-                }
-                
+            Group {
                 if isSearchMode {
                     searchContent
                 } else {
@@ -85,6 +76,11 @@ struct BrowseView: View {
         }
         .navigationTitle("Browse")
         .searchable(text: $searchText, prompt: "Search critters & variants...")
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                familyFilterMenu
+            }
+        }
         .onChange(of: searchText) { _, newValue in
             handleSearchTextChange(newValue)
         }
@@ -127,28 +123,78 @@ struct BrowseView: View {
         .confetti(isShowing: $showConfetti)
     }
     
+    // MARK: - Family Filter Menu
+    
+    private var familyFilterMenu: some View {
+        Menu {
+            Button {
+                selectedFamilyUuid = nil
+                selectedFamilyName = nil
+            } label: {
+                HStack {
+                    Text("All Families")
+                    if selectedFamilyUuid == nil {
+                        Image(systemName: "checkmark")
+                    }
+                }
+            }
+            
+            Divider()
+            
+            ForEach(cachedFamilies.sorted(by: { $0.name < $1.name })) { family in
+                Button {
+                    selectedFamilyUuid = family.uuid
+                    selectedFamilyName = family.name
+                } label: {
+                    HStack {
+                        Text(family.name)
+                        if selectedFamilyUuid == family.uuid {
+                            Image(systemName: "checkmark")
+                        }
+                    }
+                }
+            }
+        } label: {
+            HStack(spacing: 4) {
+                Image(systemName: selectedFamilyUuid != nil ? "line.3.horizontal.decrease.circle.fill" : "line.3.horizontal.decrease.circle")
+                if let name = selectedFamilyName {
+                    Text(name)
+                        .font(.subheadline)
+                        .lineLimit(1)
+                }
+            }
+            .foregroundColor(.primaryPink)
+        }
+    }
+    
     // MARK: - Browse Content
     
     @ViewBuilder
     private var browseContent: some View {
         if isLoadingBrowse && browseCritters.isEmpty {
-            ProgressView("Loading critters...")
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            VStack(spacing: LottaPawsTheme.spacingMD) {
+                ProgressView()
+                    .tint(.primaryPink)
+                Text("Loading critters...")
+                    .font(.subheadline)
+                    .foregroundColor(.textSecondary)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else if let error = browseError, browseCritters.isEmpty {
-            ContentUnavailableView {
-                Label("Error", systemImage: "exclamationmark.triangle")
-            } description: {
-                Text(error)
-            } actions: {
-                Button("Retry") {
+            LPEmptyState(
+                icon: "exclamationmark.triangle",
+                title: "Error",
+                message: error,
+                buttonTitle: "Retry",
+                buttonAction: {
                     Task { await loadBrowseCritters(reset: true) }
                 }
-            }
+            )
         } else if browseCritters.isEmpty {
-            ContentUnavailableView(
-                "No Critters",
-                systemImage: "pawprint.fill",
-                description: Text("No critters found")
+            LPEmptyState(
+                icon: "pawprint.fill",
+                title: "No Critters",
+                message: "No critters found"
             )
         } else {
             List {
@@ -167,7 +213,7 @@ struct BrowseView: View {
                         } label: {
                             Label("Collection", systemImage: "star.fill")
                         }
-                        .tint(.calicoPrimary)
+                        .tint(.secondaryBlue)
                     }
                     .swipeActions(edge: .trailing) {
                         Button {
@@ -175,7 +221,7 @@ struct BrowseView: View {
                         } label: {
                             Label("Wishlist", systemImage: "heart.fill")
                         }
-                        .tint(.calicoSecondary)
+                        .tint(.primaryPink)
                     }
                     .onAppear {
                         if critter.id == browseCritters.last?.id && currentPage < totalPages {
@@ -188,6 +234,7 @@ struct BrowseView: View {
                     HStack {
                         Spacer()
                         ProgressView()
+                            .tint(.primaryPink)
                         Spacer()
                     }
                     .listRowBackground(Color.clear)
@@ -205,19 +252,25 @@ struct BrowseView: View {
     @ViewBuilder
     private var searchContent: some View {
         if isSearching && searchResults.isEmpty {
-            ProgressView("Searching...")
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-        } else if let error = searchError, searchResults.isEmpty {
-            ContentUnavailableView {
-                Label("Search Error", systemImage: "exclamationmark.triangle")
-            } description: {
-                Text(error)
+            VStack(spacing: LottaPawsTheme.spacingMD) {
+                ProgressView()
+                    .tint(.primaryPink)
+                Text("Searching...")
+                    .font(.subheadline)
+                    .foregroundColor(.textSecondary)
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else if let error = searchError, searchResults.isEmpty {
+            LPEmptyState(
+                icon: "exclamationmark.triangle",
+                title: "Search Error",
+                message: error
+            )
         } else if searchResults.isEmpty && !searchText.isEmpty {
-            ContentUnavailableView(
-                "No Results",
-                systemImage: "magnifyingglass",
-                description: Text("No variants found for \"\(searchText)\"")
+            LPEmptyState(
+                icon: "magnifyingglass",
+                title: "No Results",
+                message: "No variants found for \"\(searchText)\""
             )
         } else {
             List {
@@ -232,7 +285,7 @@ struct BrowseView: View {
                         } label: {
                             Label("Collection", systemImage: "star.fill")
                         }
-                        .tint(.calicoPrimary)
+                        .tint(.secondaryBlue)
                     }
                     .swipeActions(edge: .trailing) {
                         Button {
@@ -240,7 +293,7 @@ struct BrowseView: View {
                         } label: {
                             Label("Wishlist", systemImage: "heart.fill")
                         }
-                        .tint(.calicoSecondary)
+                        .tint(.primaryPink)
                     }
                     .onAppear {
                         if result.id == searchResults.last?.id && searchPage < searchTotalPages {
@@ -253,6 +306,7 @@ struct BrowseView: View {
                     HStack {
                         Spacer()
                         ProgressView()
+                            .tint(.primaryPink)
                         Spacer()
                     }
                     .listRowBackground(Color.clear)
@@ -272,16 +326,21 @@ struct BrowseView: View {
         } label: {
             ZStack {
                 Circle()
-                    .fill(Color.blue)
+                    .fill(Color.primaryPink)
                     .frame(width: 60, height: 60)
-                    .shadow(radius: 4)
+                    .shadow(
+                        color: LottaPawsTheme.shadowMedium.color,
+                        radius: LottaPawsTheme.shadowMedium.radius,
+                        x: LottaPawsTheme.shadowMedium.x,
+                        y: LottaPawsTheme.shadowMedium.y
+                    )
                 
                 Image(systemName: "barcode.viewfinder")
                     .font(.system(size: 24))
                     .foregroundColor(.white)
             }
         }
-        .padding()
+        .padding(LottaPawsTheme.spacingLG)
     }
     
     private var loadingOverlay: some View {
@@ -289,15 +348,23 @@ struct BrowseView: View {
             Color.black.opacity(0.3)
                 .ignoresSafeArea()
             
-            VStack(spacing: 12) {
+            VStack(spacing: LottaPawsTheme.spacingMD) {
                 ProgressView()
+                    .tint(.primaryPink)
                     .scaleEffect(1.5)
                 Text(isAddingSingleVariant ? "Adding..." : "Loading set...")
                     .font(.subheadline)
+                    .foregroundColor(.textSecondary)
             }
-            .padding(20)
-            .background(Color(uiColor: .systemBackground))
-            .cornerRadius(12)
+            .padding(LottaPawsTheme.spacingXL)
+            .background(Color.backgroundPrimary)
+            .cornerRadius(LottaPawsTheme.radiusMD)
+            .shadow(
+                color: LottaPawsTheme.shadowMedium.color,
+                radius: LottaPawsTheme.shadowMedium.radius,
+                x: LottaPawsTheme.shadowMedium.x,
+                y: LottaPawsTheme.shadowMedium.y
+            )
         }
     }
     

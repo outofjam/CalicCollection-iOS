@@ -24,6 +24,16 @@
 		931E2F4D2F2AB95300F1EA33 /* BrowseCritterRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931E2F4C2F2AB95300F1EA33 /* BrowseCritterRow.swift */; };
 		931E2F4F2F2AB95A00F1EA33 /* SearchResultRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931E2F4E2F2AB95A00F1EA33 /* SearchResultRow.swift */; };
 		931E2F792F2B9D3700F1EA33 /* ConfettiView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931E2F782F2B9D3700F1EA33 /* ConfettiView.swift */; };
+		931E2FC02F2BB4DB00F1EA33 /* LottaPawsCards.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931E2FB92F2BB4DB00F1EA33 /* LottaPawsCards.swift */; };
+		931E2FC12F2BB4DB00F1EA33 /* LottaPawsBadges.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931E2FB72F2BB4DB00F1EA33 /* LottaPawsBadges.swift */; };
+		931E2FC22F2BB4DB00F1EA33 /* LottaPawsColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931E2FBA2F2BB4DB00F1EA33 /* LottaPawsColors.swift */; };
+		931E2FC32F2BB4DB00F1EA33 /* LottaPawsLoading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931E2FBD2F2BB4DB00F1EA33 /* LottaPawsLoading.swift */; };
+		931E2FC42F2BB4DB00F1EA33 /* LottaPawsButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931E2FB82F2BB4DB00F1EA33 /* LottaPawsButtons.swift */; };
+		931E2FC52F2BB4DB00F1EA33 /* LottaPawsText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931E2FBE2F2BB4DB00F1EA33 /* LottaPawsText.swift */; };
+		931E2FC62F2BB4DB00F1EA33 /* LottaPawsImages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931E2FBB2F2BB4DB00F1EA33 /* LottaPawsImages.swift */; };
+		931E2FC72F2BB4DB00F1EA33 /* LottaPawsTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931E2FBF2F2BB4DB00F1EA33 /* LottaPawsTheme.swift */; };
+		931E2FC82F2BB4DB00F1EA33 /* LottaPawsInputs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931E2FBC2F2BB4DB00F1EA33 /* LottaPawsInputs.swift */; };
+		931E2FCA2F2BC08C00F1EA33 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 931E2FC92F2BC08C00F1EA33 /* README.md */; };
 		937B9F3F2F2023AC00C08885 /* CalicCollectionV2App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937B9F3E2F2023AC00C08885 /* CalicCollectionV2App.swift */; };
 		937B9F412F2023AC00C08885 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937B9F402F2023AC00C08885 /* ContentView.swift */; };
 		937B9F742F20247B00C08885 /* FamilyResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937B9F732F20247800C08885 /* FamilyResponse.swift */; };
@@ -57,7 +67,6 @@
 		93C461F02F26696700A8F084 /* ImageCacheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C461EF2F26696700A8F084 /* ImageCacheManager.swift */; };
 		93C461F22F26699B00A8F084 /* BackupManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C461F12F26699200A8F084 /* BackupManager.swift */; };
 		93C461F62F26AEFB00A8F084 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C461F52F26AEFB00A8F084 /* AboutView.swift */; };
-		93C462222F26DD9D00A8F084 /* Colours.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C462212F26DD9B00A8F084 /* Colours.swift */; };
 		93C4623C2F26E5B000A8F084 /* VariantPhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C4623B2F26E5B000A8F084 /* VariantPhoto.swift */; };
 		93C4623E2F26E5E200A8F084 /* PhotoPickerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C4623D2F26E5E200A8F084 /* PhotoPickerSheet.swift */; };
 		93C462402F26E5EC00A8F084 /* PhotoGallerySection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C4623F2F26E5EC00A8F084 /* PhotoGallerySection.swift */; };
@@ -102,6 +111,16 @@
 		931E2F4C2F2AB95300F1EA33 /* BrowseCritterRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowseCritterRow.swift; sourceTree = "<group>"; };
 		931E2F4E2F2AB95A00F1EA33 /* SearchResultRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchResultRow.swift; sourceTree = "<group>"; };
 		931E2F782F2B9D3700F1EA33 /* ConfettiView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfettiView.swift; sourceTree = "<group>"; };
+		931E2FB72F2BB4DB00F1EA33 /* LottaPawsBadges.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LottaPawsBadges.swift; sourceTree = "<group>"; };
+		931E2FB82F2BB4DB00F1EA33 /* LottaPawsButtons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LottaPawsButtons.swift; sourceTree = "<group>"; };
+		931E2FB92F2BB4DB00F1EA33 /* LottaPawsCards.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LottaPawsCards.swift; sourceTree = "<group>"; };
+		931E2FBA2F2BB4DB00F1EA33 /* LottaPawsColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LottaPawsColors.swift; sourceTree = "<group>"; };
+		931E2FBB2F2BB4DB00F1EA33 /* LottaPawsImages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LottaPawsImages.swift; sourceTree = "<group>"; };
+		931E2FBC2F2BB4DB00F1EA33 /* LottaPawsInputs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LottaPawsInputs.swift; sourceTree = "<group>"; };
+		931E2FBD2F2BB4DB00F1EA33 /* LottaPawsLoading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LottaPawsLoading.swift; sourceTree = "<group>"; };
+		931E2FBE2F2BB4DB00F1EA33 /* LottaPawsText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LottaPawsText.swift; sourceTree = "<group>"; };
+		931E2FBF2F2BB4DB00F1EA33 /* LottaPawsTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LottaPawsTheme.swift; sourceTree = "<group>"; };
+		931E2FC92F2BC08C00F1EA33 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		937B9F3B2F2023AC00C08885 /* CalicCollectionV2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CalicCollectionV2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		937B9F3E2F2023AC00C08885 /* CalicCollectionV2App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalicCollectionV2App.swift; sourceTree = "<group>"; };
 		937B9F402F2023AC00C08885 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -139,7 +158,6 @@
 		93C461EF2F26696700A8F084 /* ImageCacheManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCacheManager.swift; sourceTree = "<group>"; };
 		93C461F12F26699200A8F084 /* BackupManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupManager.swift; sourceTree = "<group>"; };
 		93C461F52F26AEFB00A8F084 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
-		93C462212F26DD9B00A8F084 /* Colours.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colours.swift; sourceTree = "<group>"; };
 		93C4623B2F26E5B000A8F084 /* VariantPhoto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VariantPhoto.swift; sourceTree = "<group>"; };
 		93C4623D2F26E5E200A8F084 /* PhotoPickerSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoPickerSheet.swift; sourceTree = "<group>"; };
 		93C4623F2F26E5EC00A8F084 /* PhotoGallerySection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoGallerySection.swift; sourceTree = "<group>"; };
@@ -201,6 +219,33 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		931E2FB62F2BB4C500F1EA33 /* Theme */ = {
+			isa = PBXGroup;
+			children = (
+				931E2FB72F2BB4DB00F1EA33 /* LottaPawsBadges.swift */,
+				931E2FB82F2BB4DB00F1EA33 /* LottaPawsButtons.swift */,
+				931E2FB92F2BB4DB00F1EA33 /* LottaPawsCards.swift */,
+				931E2FBA2F2BB4DB00F1EA33 /* LottaPawsColors.swift */,
+				931E2FBB2F2BB4DB00F1EA33 /* LottaPawsImages.swift */,
+				931E2FBC2F2BB4DB00F1EA33 /* LottaPawsInputs.swift */,
+				931E2FBD2F2BB4DB00F1EA33 /* LottaPawsLoading.swift */,
+				931E2FBE2F2BB4DB00F1EA33 /* LottaPawsText.swift */,
+				931E2FBF2F2BB4DB00F1EA33 /* LottaPawsTheme.swift */,
+				931E2FC92F2BC08C00F1EA33 /* README.md */,
+			);
+			path = Theme;
+			sourceTree = "<group>";
+		};
+		931E2FCB2F2BC45500F1EA33 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				93C461C22F22D4B300A8F084 /* ToastManager.swift */,
+				93C462432F26E8BD00A8F084 /* VariantPhoto+Helpers.swift */,
+				937B9F8F2F202B6800C08885 /* Config.swift */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
 		937B9F322F2023AC00C08885 = {
 			isa = PBXGroup;
 			children = (
@@ -227,8 +272,9 @@
 		937B9F672F2023D800C08885 /* App */ = {
 			isa = PBXGroup;
 			children = (
+				931E2FCB2F2BC45500F1EA33 /* Utilities */,
+				931E2FB62F2BB4C500F1EA33 /* Theme */,
 				937B9F3E2F2023AC00C08885 /* CalicCollectionV2App.swift */,
-				937B9F6B2F2023F200C08885 /* Helpers */,
 				937B9F682F2023DC00C08885 /* Models */,
 				937B9F692F2023E400C08885 /* Services */,
 				937B9F6A2F2023EB00C08885 /* Views */,
@@ -261,6 +307,7 @@
 				93ADCD452F292DFC00351CE9 /* NetworkConfig.swift */,
 				931E2F412F2AB08D00F1EA33 /* SearchService.swift */,
 				931E2F422F2AB08D00F1EA33 /* SyncService.swift */,
+				93C461EB2F259F0000A8F084 /* AppSettings.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -278,16 +325,6 @@
 				937B9F702F20241D00C08885 /* Wishlist */,
 			);
 			path = Views;
-			sourceTree = "<group>";
-		};
-		937B9F6B2F2023F200C08885 /* Helpers */ = {
-			isa = PBXGroup;
-			children = (
-				93C462212F26DD9B00A8F084 /* Colours.swift */,
-				93C461C22F22D4B300A8F084 /* ToastManager.swift */,
-				93C462432F26E8BD00A8F084 /* VariantPhoto+Helpers.swift */,
-			);
-			path = Helpers;
 			sourceTree = "<group>";
 		};
 		937B9F6C2F2023FC00C08885 /* API */ = {
@@ -356,8 +393,6 @@
 			children = (
 				931E2EF02F2945E200F1EA33 /* DataManagementView.swift */,
 				93C461F52F26AEFB00A8F084 /* AboutView.swift */,
-				93C461EB2F259F0000A8F084 /* AppSettings.swift */,
-				937B9F8F2F202B6800C08885 /* Config.swift */,
 				93C461CA2F22D65600A8F084 /* SettingsView.swift */,
 			);
 			path = Settings;
@@ -509,6 +544,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				931E2FCA2F2BC08C00F1EA33 /* README.md in Resources */,
 				931E2F1F2F2A52B600F1EA33 /* ARCHITECTURE.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -543,7 +579,6 @@
 				931E2F2F2F2AAFD900F1EA33 /* BrowseResponses.swift in Sources */,
 				931E2F3A2F2AB04F00F1EA33 /* OwnedVariant.swift in Sources */,
 				931E2F4B2F2AB94C00F1EA33 /* FilterChipsView.swift in Sources */,
-				93C462222F26DD9D00A8F084 /* Colours.swift in Sources */,
 				93C462422F26E5F800A8F084 /* PhotoDetailView.swift in Sources */,
 				93C461D82F22F02600A8F084 /* CollectionComponents.swift in Sources */,
 				937B9F762F20248C00C08885 /* VariantResponse.swift in Sources */,
@@ -572,6 +607,15 @@
 				937B9F842F20259400C08885 /* APIService.swift in Sources */,
 				93C461F62F26AEFB00A8F084 /* AboutView.swift in Sources */,
 				931E2F432F2AB08D00F1EA33 /* SyncService.swift in Sources */,
+				931E2FC02F2BB4DB00F1EA33 /* LottaPawsCards.swift in Sources */,
+				931E2FC12F2BB4DB00F1EA33 /* LottaPawsBadges.swift in Sources */,
+				931E2FC22F2BB4DB00F1EA33 /* LottaPawsColors.swift in Sources */,
+				931E2FC32F2BB4DB00F1EA33 /* LottaPawsLoading.swift in Sources */,
+				931E2FC42F2BB4DB00F1EA33 /* LottaPawsButtons.swift in Sources */,
+				931E2FC52F2BB4DB00F1EA33 /* LottaPawsText.swift in Sources */,
+				931E2FC62F2BB4DB00F1EA33 /* LottaPawsImages.swift in Sources */,
+				931E2FC72F2BB4DB00F1EA33 /* LottaPawsTheme.swift in Sources */,
+				931E2FC82F2BB4DB00F1EA33 /* LottaPawsInputs.swift in Sources */,
 				931E2F442F2AB08D00F1EA33 /* BrowseService.swift in Sources */,
 				931E2F452F2AB08D00F1EA33 /* APIError.swift in Sources */,
 				931E2F462F2AB08D00F1EA33 /* SearchService.swift in Sources */,

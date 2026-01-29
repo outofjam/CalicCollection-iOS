@@ -1,10 +1,9 @@
 //
 //  PhotoGallerySection.swift
-//  CaliCollectionV2
+//  LottaPaws
 //
 //  Created by Ismail Dawoodjee on 2026-01-25.
 //
-
 
 import SwiftUI
 import SwiftData
@@ -25,19 +24,19 @@ struct PhotoGallerySection: View {
     }
     
     private let photoSize: CGFloat = 80
-    private let spacing: CGFloat = 12
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: LottaPawsTheme.spacingMD) {
             HStack {
                 Label("My Photos", systemImage: "photo.on.rectangle.angled")
                     .font(.headline)
+                    .foregroundColor(.textPrimary)
                 
                 Spacer()
                 
                 Text("\(photos.count)/12")
                     .font(.caption)
-                    .foregroundColor(.calicoTextSecondary)
+                    .foregroundColor(.textTertiary)
             }
             
             if photos.isEmpty {
@@ -45,24 +44,28 @@ struct PhotoGallerySection: View {
                 Button {
                     showingPhotoPicker = true
                 } label: {
-                    VStack(spacing: 8) {
+                    VStack(spacing: LottaPawsTheme.spacingSM) {
                         Image(systemName: "camera.fill")
                             .font(.title2)
-                            .foregroundColor(.calicoTextSecondary)
+                            .foregroundColor(.textTertiary)
                         
                         Text("Add photos of your critter")
                             .font(.subheadline)
-                            .foregroundColor(.calicoTextSecondary)
+                            .foregroundColor(.textSecondary)
                     }
                     .frame(maxWidth: .infinity)
                     .frame(height: 120)
-                    .background(Color(uiColor: .secondarySystemGroupedBackground))
-                    .cornerRadius(12)
+                    .background(Color.backgroundSecondary)
+                    .cornerRadius(LottaPawsTheme.radiusMD)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: LottaPawsTheme.radiusMD)
+                            .stroke(Color.borderColor, lineWidth: 1)
+                    )
                 }
             } else {
                 // Photo grid
                 ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: spacing) {
+                    HStack(spacing: LottaPawsTheme.spacingMD) {
                         ForEach(photos) { photo in
                             PhotoThumbnail(photo: photo)
                                 .onTapGesture {
@@ -78,15 +81,15 @@ struct PhotoGallerySection: View {
                                 VStack {
                                     Image(systemName: "plus")
                                         .font(.title2)
-                                        .foregroundColor(.calicoTextSecondary)
+                                        .foregroundColor(.primaryPink)
                                 }
                                 .frame(width: photoSize, height: photoSize)
-                                .background(Color(uiColor: .secondarySystemGroupedBackground))
-                                .cornerRadius(8)
+                                .background(Color.backgroundSecondary)
+                                .cornerRadius(LottaPawsTheme.radiusSM)
                                 .overlay(
-                                    RoundedRectangle(cornerRadius: 8)
-                                        .stroke(Color.calicoTextSecondary.opacity(0.3), lineWidth: 1)
-                                        .strokeBorder(style: StrokeStyle(lineWidth: 1, dash: [5]))
+                                    RoundedRectangle(cornerRadius: LottaPawsTheme.radiusSM)
+                                        .strokeBorder(style: StrokeStyle(lineWidth: 1.5, dash: [6]))
+                                        .foregroundColor(.primaryPink.opacity(0.5))
                                 )
                             }
                         }
@@ -94,7 +97,7 @@ struct PhotoGallerySection: View {
                 }
             }
         }
-        .padding(.vertical, 8)
+        .padding(.vertical, LottaPawsTheme.spacingSM)
         .sheet(isPresented: $showingPhotoPicker) {
             PhotoPickerSheet(variantUuid: variantUuid) { images in
                 savePhotos(images)
@@ -142,15 +145,15 @@ struct PhotoThumbnail: View {
                     .aspectRatio(contentMode: .fill)
                     .frame(width: 80, height: 80)
                     .clipped()
-                    .cornerRadius(8)
+                    .cornerRadius(LottaPawsTheme.radiusSM)
             } else {
                 Rectangle()
-                    .fill(Color.gray.opacity(0.3))
+                    .fill(Color.backgroundTertiary)
                     .frame(width: 80, height: 80)
-                    .cornerRadius(8)
+                    .cornerRadius(LottaPawsTheme.radiusSM)
                     .overlay {
                         Image(systemName: "photo")
-                            .foregroundColor(.gray)
+                            .foregroundColor(.textTertiary)
                     }
             }
         }

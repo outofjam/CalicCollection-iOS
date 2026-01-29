@@ -1,6 +1,6 @@
 //
 //  ContentView.swift
-//  CaliCollectionV2
+//  LottaPaws
 //
 //  Created by Ismail Dawoodjee on 2026-01-20.
 //
@@ -12,18 +12,28 @@ struct ContentView: View {
     @State private var searchText = ""
     @AppStorage(Config.UserDefaultsKeys.hasCompletedFirstSync) private var hasCompletedFirstSync = false
     
+    init() {
+        // Configure app-wide appearance on first init
+        configureLottaPawsAppearance()
+        configureLottaPawsRefreshControl()
+    }
+    
     var body: some View {
         ZStack {
             if !hasCompletedFirstSync {
                 FirstSyncView()
             } else {
                 TabView {
-                    Tab("Collection", systemImage: "star.fill") {
-                        CollectionView()
+                    Tab("Collection", systemImage: "square.grid.2x2.fill") {
+                        NavigationStack {
+                            CollectionView()
+                        }
                     }
                     
                     Tab("Wishlist", systemImage: "heart.fill") {
-                        WishlistView()
+                        NavigationStack {
+                            WishlistView()
+                        }
                     }
                     
                     Tab("Settings", systemImage: "gearshape.fill") {
@@ -36,12 +46,13 @@ struct ContentView: View {
                         }
                     }
                 }
+                .tint(.primaryPink)
             }
         }
         .toast()
+        .lottaPawsStyle()
     }
 }
-
 
 #Preview {
     ContentView()

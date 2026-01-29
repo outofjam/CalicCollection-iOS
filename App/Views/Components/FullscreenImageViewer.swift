@@ -1,10 +1,9 @@
 //
 //  FullscreenImageViewer.swift
-//  CalicCollectionV2
+//  LottaPaws
 //
 //  Created by Ismail Dawoodjee on 2026-01-27.
 //
-
 
 import SwiftUI
 
@@ -38,7 +37,7 @@ struct FullscreenImageViewer: View {
                                     .onEnded { _ in
                                         lastScale = scale
                                         if scale < 1 {
-                                            withAnimation {
+                                            withAnimation(LottaPawsTheme.animationSpring) {
                                                 scale = 1
                                                 lastScale = 1
                                                 offset = .zero
@@ -63,7 +62,7 @@ struct FullscreenImageViewer: View {
                             )
                     case .empty:
                         ProgressView()
-                            .tint(.white)
+                            .tint(.primaryPink)
                     case .failure:
                         Image(systemName: "photo")
                             .font(.system(size: 60))
@@ -86,14 +85,14 @@ struct FullscreenImageViewer: View {
                             .foregroundColor(.white)
                             .shadow(radius: 2)
                     }
-                    .padding()
+                    .padding(LottaPawsTheme.spacingLG)
                 }
                 Spacer()
             }
         }
         .statusBar(hidden: true)
         .onTapGesture(count: 2) {
-            withAnimation {
+            withAnimation(LottaPawsTheme.animationSpring) {
                 if scale == 1 {
                     scale = 2
                     lastScale = 2

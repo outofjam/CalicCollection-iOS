@@ -1,3 +1,8 @@
+//
+//  FirstSyncView.swift
+//  LottaPaws
+//
+
 import SwiftUI
 import SwiftData
 
@@ -9,7 +14,7 @@ struct FirstSyncView: View {
     @State private var syncComplete = false
     
     var body: some View {
-        VStack(spacing: 32) {
+        VStack(spacing: LottaPawsTheme.spacingXXL) {
             Spacer()
             
             // App Icon / Logo
@@ -17,75 +22,73 @@ struct FirstSyncView: View {
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .frame(width: 120, height: 120)
-                .clipShape(RoundedRectangle(cornerRadius: 24))
+                .clipShape(RoundedRectangle(cornerRadius: LottaPawsTheme.radiusXL))
+                .shadow(
+                    color: LottaPawsTheme.shadowMedium.color,
+                    radius: LottaPawsTheme.shadowMedium.radius,
+                    x: 0,
+                    y: 8
+                )
             
             // Welcome Text
-            VStack(spacing: 8) {
+            VStack(spacing: LottaPawsTheme.spacingSM) {
                 Text("Welcome to")
                     .font(.title2)
-                    .foregroundColor(.calicoTextSecondary)
+                    .foregroundColor(.textSecondary)
                 
-                Text("CaliCollection")
+                Text("LottaPaws")
                     .font(.largeTitle)
                     .fontWeight(.bold)
+                    .foregroundColor(.textPrimary)
             }
             
             // Sync Status
-            VStack(spacing: 16) {
+            VStack(spacing: LottaPawsTheme.spacingLG) {
                 if syncService.isSyncing {
-                    ProgressView(value: syncProgress)
-                        .progressViewStyle(.linear)
-                        .frame(width: 200)
-                    
-                    Text("Setting up...")
-                        .font(.subheadline)
-                        .foregroundColor(.calicoTextSecondary)
+                    VStack(spacing: LottaPawsTheme.spacingMD) {
+                        LPProgressBar(progress: syncProgress, color: .primaryPink)
+                            .frame(width: 200)
+                        
+                        Text("Setting up...")
+                            .font(.subheadline)
+                            .foregroundColor(.textSecondary)
+                    }
                 } else if let error = syncService.syncError {
-                    VStack(spacing: 12) {
+                    VStack(spacing: LottaPawsTheme.spacingMD) {
                         Image(systemName: "exclamationmark.triangle.fill")
                             .font(.system(size: 40))
-                            .foregroundColor(.calicoError)
+                            .foregroundColor(.errorRed)
                         
                         Text("Setup Failed")
                             .font(.headline)
+                            .foregroundColor(.textPrimary)
                         
                         Text(error)
                             .font(.caption)
-                            .foregroundColor(.calicoTextSecondary)
+                            .foregroundColor(.textSecondary)
                             .multilineTextAlignment(.center)
+                            .padding(.horizontal, LottaPawsTheme.spacingXL)
                         
-                        Button {
+                        Button("Try Again") {
                             startSync()
-                        } label: {
-                            Text("Try Again")
-                                .font(.headline)
-                                .foregroundColor(.white)
-                                .padding()
-                                .background(Color.blue)
-                                .cornerRadius(12)
                         }
+                        .buttonStyle(.primary)
                     }
                 } else if syncComplete {
-                    VStack(spacing: 12) {
+                    VStack(spacing: LottaPawsTheme.spacingMD) {
                         Image(systemName: "checkmark.circle.fill")
                             .font(.system(size: 40))
-                            .foregroundColor(.calicoSuccess)
+                            .foregroundColor(.successGreen)
                         
                         Text("All set!")
                             .font(.headline)
+                            .foregroundColor(.textPrimary)
                     }
                 } else {
-                    Button {
+                    Button("Get Started") {
                         startSync()
-                    } label: {
-                        Text("Get Started")
-                            .font(.headline)
-                            .foregroundColor(.white)
-                            .padding(.horizontal, 40)
-                            .padding(.vertical, 16)
-                            .background(Color.blue)
-                            .cornerRadius(12)
                     }
+                    .buttonStyle(.primary)
                 }
             }
             
@@ -94,9 +97,14 @@ struct FirstSyncView: View {
             // App Version
             Text("Version \(Config.appVersion)")
                 .font(.caption2)
-                .foregroundColor(.calicoTextSecondary)
+                .foregroundColor(.textTertiary)
         }
-        .padding()
+        .padding(LottaPawsTheme.spacingLG)
+        .background(
+            LinearGradient.lottaGradient
+                .opacity(0.15)
+                .ignoresSafeArea()
+        )
     }
     
     private func startSync() {

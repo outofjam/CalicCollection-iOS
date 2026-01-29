@@ -1,3 +1,8 @@
+//
+//  ToastManager.swift
+//  LottaPaws
+//
+
 import SwiftUI
 import Combine
 
@@ -22,7 +27,7 @@ class ToastManager: ObservableObject {
         Task { @MainActor in
             try? await Task.sleep(for: .milliseconds(100))
             
-            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+            withAnimation(LottaPawsTheme.animationSpring) {
                 self.toast = Toast(message: message, type: type)
             }
             
@@ -32,7 +37,7 @@ class ToastManager: ObservableObject {
                 
                 guard !Task.isCancelled else { return }
                 
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                withAnimation(LottaPawsTheme.animationSpring) {
                     self.toast = nil
                 }
             }
@@ -63,9 +68,9 @@ enum ToastType {
     
     var color: Color {
         switch self {
-        case .success: return .green
-        case .error: return .red
-        case .info: return .blue
+        case .success: return .successGreen
+        case .error: return .errorRed
+        case .info: return .infoBlue
         }
     }
 }
@@ -81,8 +86,8 @@ struct ToastModifier: ViewModifier {
             if let toast = toastManager.toast {
                 VStack {
                     ToastView(toast: toast)
-                        .padding(.horizontal)
-                        .padding(.top, 8)
+                        .padding(.horizontal, LottaPawsTheme.spacingLG)
+                        .padding(.top, LottaPawsTheme.spacingSM)
                         .transition(.move(edge: .top).combined(with: .opacity))
                     
                     Spacer()
@@ -98,7 +103,7 @@ struct ToastView: View {
     let toast: Toast
     
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: LottaPawsTheme.spacingMD) {
             Image(systemName: toast.type.icon)
                 .foregroundColor(toast.type.color)
                 .font(.title3)
@@ -106,14 +111,24 @@ struct ToastView: View {
             Text(toast.message)
                 .font(.subheadline)
                 .fontWeight(.medium)
+                .foregroundColor(.textPrimary)
             
             Spacer()
         }
-        .padding()
+        .padding(LottaPawsTheme.spacingMD)
         .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(.ultraThinMaterial)
-                .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 4)
+            RoundedRectangle(cornerRadius: LottaPawsTheme.radiusMD)
+                .fill(Color.backgroundPrimary)
+                .shadow(
+                    color: LottaPawsTheme.shadowMedium.color,
+                    radius: LottaPawsTheme.shadowMedium.radius,
+                    x: LottaPawsTheme.shadowMedium.x,
+                    y: LottaPawsTheme.shadowMedium.y
+                )
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: LottaPawsTheme.radiusMD)
+                .stroke(toast.type.color.opacity(0.3), lineWidth: 1)
         )
     }
 }

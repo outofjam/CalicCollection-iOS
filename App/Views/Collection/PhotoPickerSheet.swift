@@ -1,10 +1,9 @@
 //
 //  PhotoPickerSheet.swift
-//  CaliCollectionV2
+//  LottaPaws
 //
 //  Created by Ismail Dawoodjee on 2026-01-25.
 //
-
 
 import SwiftUI
 import PhotosUI
@@ -26,6 +25,7 @@ struct PhotoPickerSheet: View {
                         showingCamera = true
                     } label: {
                         Label("Take Photo", systemImage: "camera.fill")
+                            .foregroundColor(.primaryPink)
                     }
                     
                     PhotosPicker(
@@ -34,11 +34,13 @@ struct PhotoPickerSheet: View {
                         matching: .images
                     ) {
                         Label("Choose from Library", systemImage: "photo.on.rectangle")
+                            .foregroundColor(.primaryPink)
                     }
                 } header: {
                     Text("Add Photos")
                 } footer: {
                     Text("You can add up to 12 photos per variant")
+                        .foregroundColor(.textTertiary)
                 }
             }
             .navigationTitle("Add Photos")
@@ -48,6 +50,7 @@ struct PhotoPickerSheet: View {
                     Button("Cancel") {
                         dismiss()
                     }
+                    .foregroundColor(.primaryPink)
                 }
             }
             .onChange(of: selectedItems) { oldValue, newValue in
@@ -63,6 +66,7 @@ struct PhotoPickerSheet: View {
                 }
             }
         }
+        .tint(.primaryPink)
     }
     
     private func loadSelectedPhotos() async {

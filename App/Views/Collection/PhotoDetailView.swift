@@ -1,3 +1,8 @@
+//
+//  PhotoDetailView.swift
+//  LottaPaws
+//
+
 import SwiftUI
 import SwiftData
 
@@ -55,11 +60,12 @@ struct PhotoDetailView: View {
                     
                     Text("\(currentIndex + 1) of \(allPhotos.count)")
                         .font(.subheadline)
+                        .fontWeight(.medium)
                         .foregroundColor(.white)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
+                        .padding(.horizontal, LottaPawsTheme.spacingMD)
+                        .padding(.vertical, LottaPawsTheme.spacingSM)
                         .background(.ultraThinMaterial)
-                        .cornerRadius(20)
+                        .cornerRadius(LottaPawsTheme.radiusFull)
                     
                     Spacer()
                     
@@ -82,7 +88,7 @@ struct PhotoDetailView: View {
                             .shadow(radius: 2)
                     }
                 }
-                .padding()
+                .padding(LottaPawsTheme.spacingLG)
                 
                 Spacer()
             }
@@ -114,7 +120,7 @@ struct PhotoDetailView: View {
                             .onEnded { _ in
                                 lastScale = scale
                                 if scale < 1 {
-                                    withAnimation {
+                                    withAnimation(LottaPawsTheme.animationSpring) {
                                         scale = 1
                                         lastScale = 1
                                         offset = .zero
@@ -138,7 +144,7 @@ struct PhotoDetailView: View {
                             }
                     )
                     .onTapGesture(count: 2) {
-                        withAnimation {
+                        withAnimation(LottaPawsTheme.animationSpring) {
                             if scale == 1 {
                                 scale = 2
                                 lastScale = 2

@@ -1,10 +1,9 @@
 //
 //  InfoRow.swift
-//  CalicCollectionV2
+//  LottaPaws
 //
 //  Created by Ismail Dawoodjee on 2026-01-27.
 //
-
 
 import SwiftUI
 
@@ -16,10 +15,11 @@ struct InfoRow: View {
         HStack {
             Text(label)
                 .font(.caption)
-                .foregroundColor(.calicoTextSecondary)
+                .foregroundColor(.textSecondary)
             Spacer()
             Text(value)
                 .font(.body)
+                .foregroundColor(.textPrimary)
         }
     }
 }

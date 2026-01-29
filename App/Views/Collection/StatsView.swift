@@ -1,3 +1,8 @@
+//
+//  StatsView.swift
+//  LottaPaws
+//
+
 import SwiftUI
 import SwiftData
 
@@ -71,84 +76,63 @@ struct StatsView: View {
     
     var body: some View {
         ScrollView {
-            VStack(spacing: 24) {
+            VStack(spacing: LottaPawsTheme.spacingXL) {
                 // MARK: - Overall Stats
-                VStack(spacing: 8) {
+                VStack(spacing: LottaPawsTheme.spacingSM) {
                     Text("\(totalCrittersCollected)")
                         .font(.system(size: 60, weight: .bold))
-                        .foregroundStyle(
-                            LinearGradient(
-                                colors: [.blue, .pink],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
+                        .foregroundStyle(LinearGradient.lottaGradient)
                     
                     Text("Unique Critters")
                         .font(.title3)
-                        .foregroundColor(.calicoTextSecondary)
+                        .foregroundColor(.textSecondary)
                     
                     Text("\(totalVariantsCollected) total variants")
                         .font(.caption)
-                        .foregroundColor(.calicoTextSecondary)
+                        .foregroundColor(.textTertiary)
                 }
-                .padding(.top)
+                .padding(.top, LottaPawsTheme.spacingLG)
                 
                 // Overall completion for families you've started
                 if !familyBreakdown.isEmpty {
                     let overall = overallCompletion
-                    VStack(spacing: 8) {
+                    VStack(spacing: LottaPawsTheme.spacingSM) {
                         HStack {
                             Text("Family Completion")
                                 .font(.subheadline)
-                                .foregroundColor(.calicoTextSecondary)
+                                .foregroundColor(.textSecondary)
                             Spacer()
                             Text("\(overall.collected) of \(overall.total)")
                                 .font(.subheadline)
                                 .fontWeight(.medium)
+                                .foregroundColor(.textPrimary)
                         }
                         
-                        GeometryReader { geometry in
-                            ZStack(alignment: .leading) {
-                                RoundedRectangle(cornerRadius: 6)
-                                    .fill(Color.gray.opacity(0.2))
-                                    .frame(height: 12)
-                                
-                                RoundedRectangle(cornerRadius: 6)
-                                    .fill(
-                                        LinearGradient(
-                                            colors: [.blue, .pink],
-                                            startPoint: .leading,
-                                            endPoint: .trailing
-                                        )
-                                    )
-                                    .frame(width: geometry.size.width * overall.percentage, height: 12)
-                            }
-                        }
-                        .frame(height: 12)
+                        LPProgressBar(progress: overall.percentage, color: .primaryPink, height: 12)
                         
                         Text("\(Int(overall.percentage * 100))% complete across \(familyBreakdown.count) families")
                             .font(.caption)
-                            .foregroundColor(.calicoTextSecondary)
+                            .foregroundColor(.textTertiary)
                     }
-                    .padding()
+                    .padding(LottaPawsTheme.spacingLG)
                     .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(Color.blue.opacity(0.05))
+                        RoundedRectangle(cornerRadius: LottaPawsTheme.radiusMD)
+                            .fill(Color.primaryPinkLight.opacity(0.3))
                     )
                 }
                 
-                Divider()
+                LPDivider()
                 
                 // MARK: - Family Breakdown
-                VStack(alignment: .leading, spacing: 16) {
+                VStack(alignment: .leading, spacing: LottaPawsTheme.spacingLG) {
                     Text("By Family")
                         .font(.title2)
                         .fontWeight(.bold)
+                        .foregroundColor(.textPrimary)
                     
                     if familyBreakdown.isEmpty {
                         Text("No families yet")
-                            .foregroundColor(.calicoTextSecondary)
+                            .foregroundColor(.textSecondary)
                     } else {
                         ForEach(familyBreakdown, id: \.familyId) { item in
                             FamilyStatRow(
@@ -162,22 +146,23 @@ struct StatsView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 
-                Divider()
+                LPDivider()
                 
                 // MARK: - Member Type Breakdown
-                VStack(alignment: .leading, spacing: 16) {
+                VStack(alignment: .leading, spacing: LottaPawsTheme.spacingLG) {
                     Text("By Member Type")
                         .font(.title2)
                         .fontWeight(.bold)
+                        .foregroundColor(.textPrimary)
                     
                     if memberTypeBreakdown.isEmpty {
                         Text("No member types yet")
-                            .foregroundColor(.calicoTextSecondary)
+                            .foregroundColor(.textSecondary)
                     } else {
                         LazyVGrid(columns: [
-                            GridItem(.flexible(), spacing: 12),
-                            GridItem(.flexible(), spacing: 12)
-                        ], spacing: 16) {
+                            GridItem(.flexible(), spacing: LottaPawsTheme.spacingMD),
+                            GridItem(.flexible(), spacing: LottaPawsTheme.spacingMD)
+                        ], spacing: LottaPawsTheme.spacingLG) {
                             ForEach(memberTypeBreakdown, id: \.type) { item in
                                 MemberTypeStatCard(
                                     type: item.type,
@@ -190,13 +175,14 @@ struct StatsView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 
-                Divider()
+                LPDivider()
                 
                 // MARK: - Timeline
-                VStack(alignment: .leading, spacing: 16) {
+                VStack(alignment: .leading, spacing: LottaPawsTheme.spacingLG) {
                     Text("Timeline")
                         .font(.title2)
                         .fontWeight(.bold)
+                        .foregroundColor(.textPrimary)
                     
                     if let earliest = earliestAdded {
                         TimelineItem(title: "First Added", variant: earliest)
@@ -208,8 +194,9 @@ struct StatsView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .padding()
+            .padding(LottaPawsTheme.spacingLG)
         }
+        .background(Color.backgroundPrimary)
     }
 }
 
@@ -223,14 +210,15 @@ private struct FamilyStatRow: View {
     private var isComplete: Bool { collected >= total }
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: LottaPawsTheme.spacingSM) {
             HStack {
                 Text(family)
                     .font(.headline)
+                    .foregroundColor(.textPrimary)
                 
                 if isComplete {
                     Image(systemName: "checkmark.circle.fill")
-                        .foregroundColor(.green)
+                        .foregroundColor(.successGreen)
                         .font(.caption)
                 }
                 
@@ -239,29 +227,18 @@ private struct FamilyStatRow: View {
                 Text("\(collected) of \(total)")
                     .font(.subheadline)
                     .fontWeight(.medium)
-                    .foregroundColor(isComplete ? .green : .primary)
+                    .foregroundColor(isComplete ? .successGreen : .textPrimary)
             }
             
-            GeometryReader { geometry in
-                ZStack(alignment: .leading) {
-                    RoundedRectangle(cornerRadius: 4)
-                        .fill(Color.gray.opacity(0.2))
-                        .frame(height: 8)
-                    
-                    RoundedRectangle(cornerRadius: 4)
-                        .fill(
-                            isComplete
-                                ? LinearGradient(colors: [.green, .green], startPoint: .leading, endPoint: .trailing)
-                                : LinearGradient(colors: [.blue, .pink], startPoint: .leading, endPoint: .trailing)
-                        )
-                        .frame(width: geometry.size.width * percentage, height: 8)
-                }
-            }
-            .frame(height: 8)
+            LPProgressBar(
+                progress: percentage,
+                color: isComplete ? .successGreen : .primaryPink,
+                height: 8
+            )
             
             Text("\(Int(percentage * 100))% complete")
                 .font(.caption)
-                .foregroundColor(isComplete ? .green : .calicoTextSecondary)
+                .foregroundColor(isComplete ? .successGreen : .textTertiary)
         }
     }
 }
@@ -272,41 +249,36 @@ private struct MemberTypeStatCard: View {
     let collected: Int
     let percentage: Double
     
+    private var memberColor: Color {
+        MemberTypeConfig.forType(type).color
+    }
+    
     var body: some View {
-        VStack(spacing: 8) {
-            ZStack {
-                Circle()
-                    .stroke(Color.gray.opacity(0.2), lineWidth: 8)
-                    .frame(width: 80, height: 80)
-                
-                Circle()
-                    .trim(from: 0, to: percentage)
-                    .stroke(
-                        LinearGradient(
-                            colors: [.blue, .pink],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ),
-                        style: StrokeStyle(lineWidth: 8, lineCap: .round)
-                    )
-                    .frame(width: 80, height: 80)
-                    .rotationEffect(.degrees(-90))
-                
-                Text("\(Int(percentage * 100))%")
-                    .font(.title3)
-                    .fontWeight(.bold)
-            }
+        VStack(spacing: LottaPawsTheme.spacingSM) {
+            LPCircularProgress(
+                progress: percentage,
+                size: 80,
+                lineWidth: 8,
+                color: memberColor,
+                showLabel: true
+            )
             
             VStack(spacing: 2) {
                 Text(type.capitalized)
                     .font(.subheadline)
                     .fontWeight(.medium)
+                    .foregroundColor(.textPrimary)
                 
                 Text("\(collected) critters")
                     .font(.caption)
-                    .foregroundColor(.calicoTextSecondary)
+                    .foregroundColor(.textSecondary)
             }
         }
+        .padding(LottaPawsTheme.spacingMD)
+        .background(
+            RoundedRectangle(cornerRadius: LottaPawsTheme.radiusMD)
+                .fill(Color.backgroundSecondary)
+        )
     }
 }
 
@@ -316,26 +288,32 @@ private struct TimelineItem: View {
     let variant: OwnedVariant
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: LottaPawsTheme.spacingXS) {
             Text(title)
                 .font(.caption)
-                .foregroundColor(.calicoTextSecondary)
+                .foregroundColor(.textTertiary)
             
-            HStack(spacing: 12) {
+            HStack(spacing: LottaPawsTheme.spacingMD) {
                 VariantThumbnail(variant: variant, size: 50)
                 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(variant.variantName)
                         .font(.headline)
+                        .foregroundColor(.textPrimary)
                     Text(variant.critterName)
                         .font(.subheadline)
-                        .foregroundColor(.calicoTextSecondary)
+                        .foregroundColor(.textSecondary)
                     Text(variant.addedDate.formatted(date: .abbreviated, time: .omitted))
                         .font(.caption)
-                        .foregroundColor(.calicoTextSecondary)
+                        .foregroundColor(.textTertiary)
                 }
             }
         }
+        .padding(LottaPawsTheme.spacingMD)
+        .background(
+            RoundedRectangle(cornerRadius: LottaPawsTheme.radiusMD)
+                .fill(Color.backgroundSecondary)
+        )
     }
 }
 
@@ -371,16 +349,16 @@ private struct VariantThumbnail: View {
             }
         }
         .frame(width: size, height: size)
-        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .clipShape(RoundedRectangle(cornerRadius: LottaPawsTheme.radiusSM))
     }
     
     private var placeholderView: some View {
-        RoundedRectangle(cornerRadius: 8)
-            .fill(Color.gray.opacity(0.2))
+        RoundedRectangle(cornerRadius: LottaPawsTheme.radiusSM)
+            .fill(Color.backgroundTertiary)
             .overlay {
                 Image(systemName: "photo")
                     .font(.caption)
-                    .foregroundColor(.gray)
+                    .foregroundColor(.textTertiary)
             }
     }
 }

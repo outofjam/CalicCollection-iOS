@@ -1,3 +1,8 @@
+//
+//  CollectionView.swift
+//  LottaPaws
+//
+
 import SwiftUI
 import SwiftData
 
