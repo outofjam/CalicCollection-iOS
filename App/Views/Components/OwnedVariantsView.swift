@@ -1,3 +1,8 @@
+//
+//  OwnedVariantsView.swift
+//  LottaPaws
+//
+
 import SwiftUI
 import SwiftData
 
@@ -47,63 +52,65 @@ struct OwnedVariantsView: View {
     }
     
     var body: some View {
-        NavigationStack {
-            ZStack {
-                if filteredVariants.isEmpty {
-                    ContentUnavailableView(
-                        title,
-                        systemImage: emptyIcon,
-                        description: Text(emptyDescription)
-                    )
-                } else {
-                    Group {
-                        switch viewMode {
-                        case .list:
-                            CollectionListView(
-                                groupedVariants: groupedVariants,
-                                sortedGroupNames: sortedFamilyNames,
-                                selectedVariant: $selectedVariant
-                            )
-                        case .gallery:
-                            CollectionGalleryView(
-                                groupedVariants: groupedVariants,
-                                sortedGroupNames: sortedFamilyNames,
-                                selectedVariant: $selectedVariant
-                            )
-                        case .stats:
-                            StatsView(variants: filteredVariants)
-                        }
+        ZStack {
+            Color.backgroundPrimary.ignoresSafeArea()
+            
+            if filteredVariants.isEmpty {
+                LPEmptyState(
+                    icon: emptyIcon,
+                    title: "No \(title) Yet",
+                    message: emptyDescription
+                )
+            } else {
+                Group {
+                    switch viewMode {
+                    case .list:
+                        CollectionListView(
+                            groupedVariants: groupedVariants,
+                            sortedGroupNames: sortedFamilyNames,
+                            selectedVariant: $selectedVariant
+                        )
+                    case .gallery:
+                        CollectionGalleryView(
+                            groupedVariants: groupedVariants,
+                            sortedGroupNames: sortedFamilyNames,
+                            selectedVariant: $selectedVariant
+                        )
+                    case .stats:
+                        StatsView(variants: filteredVariants)
                     }
                 }
             }
-            .navigationTitle(title)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        withAnimation {
-                            if status == .collection {
-                                // Collection has 3 modes: list → gallery → stats → list
-                                switch viewMode {
-                                case .list:
-                                    viewMode = .gallery
-                                case .gallery:
-                                    viewMode = .stats
-                                case .stats:
-                                    viewMode = .list
-                                }
-                            } else {
-                                // Wishlist has 2 modes: list → gallery → list
-                                viewMode = viewMode == .list ? .gallery : .list
+        }
+        .navigationTitle(title)
+        .navigationBarTitleDisplayMode(.large)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    withAnimation(LottaPawsTheme.animationSpring) {
+                        if status == .collection {
+                            // Collection has 3 modes: list → gallery → stats → list
+                            switch viewMode {
+                            case .list:
+                                viewMode = .gallery
+                            case .gallery:
+                                viewMode = .stats
+                            case .stats:
+                                viewMode = .list
                             }
+                        } else {
+                            // Wishlist has 2 modes: list → gallery → list
+                            viewMode = viewMode == .list ? .gallery : .list
                         }
-                    } label: {
-                        Image(systemName: iconForMode)
                     }
+                } label: {
+                    Image(systemName: iconForMode)
+                        .foregroundColor(.primaryPink)
                 }
             }
-            .sheet(item: $selectedVariant) { variant in
-                OwnedVariantDetailView(ownedVariant: variant)
-            }
+        }
+        .sheet(item: $selectedVariant) { variant in
+            OwnedVariantDetailView(ownedVariant: variant)
         }
     }
 }
@@ -185,18 +192,18 @@ struct OwnedVariantDetailView: View {
                                             Image(systemName: "arrow.up.left.and.arrow.down.right")
                                                 .font(.system(size: 14, weight: .semibold))
                                                 .foregroundColor(.white)
-                                                .padding(8)
+                                                .padding(LottaPawsTheme.spacingSM)
                                                 .background(Color.black.opacity(0.5))
                                                 .clipShape(Circle())
                                         }
-                                        .padding(12)
+                                        .padding(LottaPawsTheme.spacingMD)
                                     }
                                 }
                                 .frame(height: 300)
                             }
                             
                             // Info overlay
-                            VStack(alignment: .leading, spacing: 4) {
+                            VStack(alignment: .leading, spacing: LottaPawsTheme.spacingXS) {
                                 Text(ownedVariant.critterName)
                                     .font(.system(size: 28, weight: .bold))
                                     .foregroundColor(.white)
@@ -211,41 +218,42 @@ struct OwnedVariantDetailView: View {
                                         .foregroundColor(.white.opacity(0.8))
                                 }
                             }
-                            .padding(20)
+                            .padding(LottaPawsTheme.spacingXL)
                         }
                     }
                     .frame(height: 300)
                     
                     // MARK: - Content
-                    VStack(spacing: 24) {
+                    VStack(spacing: LottaPawsTheme.spacingXL) {
                                             
                         // Photo Gallery (collection items only)
                         if ownedVariant.status == .collection {
                             PhotoGallerySection(variantUuid: ownedVariant.variantUuid)
-                                .padding(.vertical, 8)
+                                .padding(.vertical, LottaPawsTheme.spacingSM)
                         }
                         
                         // Status Badge
                         HStack {
                             Image(systemName: ownedVariant.status == .collection ? "star.fill" : "heart.fill")
-                                .foregroundColor(ownedVariant.status == .collection ? .blue : .pink)
+                                .foregroundColor(ownedVariant.status == .collection ? .secondaryBlue : .primaryPink)
                             Text(ownedVariant.status == .collection ? "In Collection" : "On Wishlist")
                                 .fontWeight(.medium)
+                                .foregroundColor(.textPrimary)
                             
                             Spacer()
                             
                             Text("Added \(ownedVariant.addedDate.formatted(date: .abbreviated, time: .omitted))")
                                 .font(.caption)
-                                .foregroundColor(.calicoTextSecondary)
+                                .foregroundColor(.textTertiary)
                         }
-                        .padding()
+                        .padding(LottaPawsTheme.spacingLG)
                         .background(
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(ownedVariant.status == .collection ? Color.blue.opacity(0.1) : Color.pink.opacity(0.1))
+                            RoundedRectangle(cornerRadius: LottaPawsTheme.radiusMD)
+                                .fill(ownedVariant.status == .collection ? Color.secondaryBlueLight.opacity(0.5) : Color.primaryPinkLight.opacity(0.5))
                         )
                         
                         // Info Section
-                        VStack(alignment: .leading, spacing: 12) {
+                        VStack(alignment: .leading, spacing: LottaPawsTheme.spacingMD) {
                             if let familyName = ownedVariant.familyName {
                                 InfoRow(label: "Family", value: familyName)
                             }
@@ -270,15 +278,17 @@ struct OwnedVariantDetailView: View {
                         // Extra padding for bottom action bar
                         Color.clear.frame(height: 80)
                     }
-                    .padding(.horizontal)
-                    .padding(.top, 20)
+                    .padding(.horizontal, LottaPawsTheme.spacingLG)
+                    .padding(.top, LottaPawsTheme.spacingXL)
                 }
             }
+            .background(Color.backgroundPrimary)
             .ignoresSafeArea(edges: .top)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("Done") { dismiss() }
+                        .foregroundColor(.primaryPink)
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
@@ -289,6 +299,7 @@ struct OwnedVariantDetailView: View {
                         }
                     } label: {
                         Image(systemName: "ellipsis.circle")
+                            .foregroundColor(.primaryPink)
                     }
                 }
             }
@@ -313,9 +324,9 @@ struct OwnedVariantDetailView: View {
                             VStack {
                                 Image(systemName: "photo.slash")
                                     .font(.largeTitle)
-                                    .foregroundColor(.gray)
+                                    .foregroundColor(.textTertiary)
                                 Text("Image not available")
-                                    .foregroundColor(.gray)
+                                    .foregroundColor(.textTertiary)
                             }
                         }
                         .onTapGesture { showingFullscreenImage = false }
@@ -332,13 +343,7 @@ struct OwnedVariantDetailView: View {
     
     private var gradientPlaceholder: some View {
         Rectangle()
-            .fill(
-                LinearGradient(
-                    colors: [Color.blue.opacity(0.3), Color.pink.opacity(0.3)],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-            )
+            .fill(LinearGradient.lottaGradient.opacity(0.5))
             .frame(height: 300)
             .overlay {
                 Image(systemName: "photo")
@@ -384,7 +389,7 @@ struct OwnedVariantActionBar: View {
     let onMoveToCollection: () -> Void
     
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: LottaPawsTheme.spacingMD) {
             if ownedVariant.status == .collection {
                 // Move to Wishlist button
                 Button {
@@ -395,11 +400,11 @@ struct OwnedVariantActionBar: View {
                         Text("Move to Wishlist")
                     }
                     .font(.subheadline.weight(.medium))
-                    .foregroundColor(.pink)
+                    .foregroundColor(.primaryPink)
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 12)
-                    .background(Color.pink.opacity(0.1))
-                    .cornerRadius(10)
+                    .padding(.vertical, LottaPawsTheme.spacingMD)
+                    .background(Color.primaryPinkLight.opacity(0.5))
+                    .cornerRadius(LottaPawsTheme.radiusSM)
                 }
             } else {
                 // Move to Collection button
@@ -411,11 +416,11 @@ struct OwnedVariantActionBar: View {
                         Text("Move to Collection")
                     }
                     .font(.subheadline.weight(.medium))
-                    .foregroundColor(.blue)
+                    .foregroundColor(.secondaryBlue)
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 12)
-                    .background(Color.blue.opacity(0.1))
-                    .cornerRadius(10)
+                    .padding(.vertical, LottaPawsTheme.spacingMD)
+                    .background(Color.secondaryBlueLight.opacity(0.5))
+                    .cornerRadius(LottaPawsTheme.radiusSM)
                 }
             }
             
@@ -425,14 +430,14 @@ struct OwnedVariantActionBar: View {
             } label: {
                 Image(systemName: "trash")
                     .font(.subheadline.weight(.medium))
-                    .foregroundColor(.red)
-                    .padding(.vertical, 12)
-                    .padding(.horizontal, 16)
-                    .background(Color.red.opacity(0.1))
-                    .cornerRadius(10)
+                    .foregroundColor(.errorRed)
+                    .padding(.vertical, LottaPawsTheme.spacingMD)
+                    .padding(.horizontal, LottaPawsTheme.spacingLG)
+                    .background(Color.errorRed.opacity(0.15))
+                    .cornerRadius(LottaPawsTheme.radiusSM)
             }
         }
-        .padding()
+        .padding(LottaPawsTheme.spacingLG)
         .background(.ultraThinMaterial)
     }
 }
@@ -459,13 +464,13 @@ struct FullscreenLocalImageViewer: View {
                                 scale = value
                             }
                             .onEnded { _ in
-                                withAnimation {
+                                withAnimation(LottaPawsTheme.animationSpring) {
                                     scale = max(1.0, min(scale, 3.0))
                                 }
                             }
                     )
                     .onTapGesture(count: 2) {
-                        withAnimation {
+                        withAnimation(LottaPawsTheme.animationSpring) {
                             scale = scale > 1.0 ? 1.0 : 2.0
                         }
                     }
@@ -481,7 +486,7 @@ struct FullscreenLocalImageViewer: View {
                             .font(.title)
                             .foregroundColor(.white.opacity(0.8))
                     }
-                    .padding()
+                    .padding(LottaPawsTheme.spacingLG)
                 }
                 Spacer()
             }

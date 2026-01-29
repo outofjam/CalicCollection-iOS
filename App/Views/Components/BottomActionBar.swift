@@ -1,10 +1,9 @@
 //
 //  BottomActionBar.swift
-//  CalicCollectionV2
+//  LottaPaws
 //
 //  Created by Ismail Dawoodjee on 2026-01-27.
 //
-
 
 import SwiftUI
 
@@ -21,9 +20,9 @@ struct BottomActionBar: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            Divider()
+            LPDivider()
             
-            HStack(spacing: 12) {
+            HStack(spacing: LottaPawsTheme.spacingMD) {
                 // Primary action button
                 if !isInCollection {
                     Button {
@@ -37,8 +36,8 @@ struct BottomActionBar: View {
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 14)
-                        .background(Color.calicoPrimary)
-                        .cornerRadius(12)
+                        .background(Color.primaryPink)
+                        .cornerRadius(LottaPawsTheme.radiusMD)
                     }
                 } else {
                     Button {
@@ -49,14 +48,14 @@ struct BottomActionBar: View {
                             Text("Move to Wishlist")
                         }
                         .font(.headline)
-                        .foregroundColor(.pink)
+                        .foregroundColor(.primaryPink)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 14)
-                        .background(Color.pink.opacity(0.1))
-                        .cornerRadius(12)
+                        .background(Color.primaryPinkLight.opacity(0.5))
+                        .cornerRadius(LottaPawsTheme.radiusMD)
                         .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color.pink, lineWidth: 1.5)
+                            RoundedRectangle(cornerRadius: LottaPawsTheme.radiusMD)
+                                .stroke(Color.primaryPink, lineWidth: 1.5)
                         )
                     }
                 }
@@ -80,10 +79,10 @@ struct BottomActionBar: View {
                     } label: {
                         Image(systemName: "ellipsis.circle.fill")
                             .font(.title2)
-                            .foregroundColor(.calicoTextSecondary)
+                            .foregroundColor(.textSecondary)
                             .frame(width: 50, height: 50)
-                            .background(Color(uiColor: .secondarySystemGroupedBackground))
-                            .cornerRadius(12)
+                            .background(Color.backgroundSecondary)
+                            .cornerRadius(LottaPawsTheme.radiusMD)
                     }
                 } else if !isInCollection {
                     Button {
@@ -91,19 +90,19 @@ struct BottomActionBar: View {
                     } label: {
                         Image(systemName: "heart")
                             .font(.title2)
-                            .foregroundColor(.pink)
+                            .foregroundColor(.primaryPink)
                             .frame(width: 50, height: 50)
-                            .background(Color.pink.opacity(0.1))
-                            .cornerRadius(12)
+                            .background(Color.primaryPinkLight.opacity(0.5))
+                            .cornerRadius(LottaPawsTheme.radiusMD)
                             .overlay(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .stroke(Color.pink, lineWidth: 1.5)
+                                RoundedRectangle(cornerRadius: LottaPawsTheme.radiusMD)
+                                    .stroke(Color.primaryPink, lineWidth: 1.5)
                             )
                     }
                 }
             }
-            .padding(.horizontal)
-            .padding(.vertical, 12)
+            .padding(.horizontal, LottaPawsTheme.spacingLG)
+            .padding(.vertical, LottaPawsTheme.spacingMD)
         }
         .background(.regularMaterial)
         .alert("Remove \(variantName)?", isPresented: $showingRemoveAlert) {

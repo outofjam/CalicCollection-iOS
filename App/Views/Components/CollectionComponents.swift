@@ -1,3 +1,8 @@
+//
+//  CollectionListView.swift
+//  LottaPaws
+//
+
 import SwiftUI
 import SwiftData
 
@@ -19,30 +24,30 @@ struct CollectionListView: View {
                             HStack {
                                 Text(familyName)
                                     .font(.headline)
-                                    .foregroundColor(.primary)
+                                    .foregroundColor(.textPrimary)
                                 Spacer()
                                 if let variants = groupedVariants[familyName] {
                                     Text("\(variants.count) variant\(variants.count == 1 ? "" : "s")")
                                         .font(.caption)
-                                        .foregroundColor(.calicoTextSecondary)
+                                        .foregroundColor(.textTertiary)
                                 }
                             }
-                            .padding(.vertical, 4)
+                            .padding(.vertical, LottaPawsTheme.spacingXS)
                         }
                     } else {
                         // Fallback if no UUID (shouldn't happen)
                         HStack {
                             Text(familyName)
                                 .font(.headline)
-                                .foregroundColor(.primary)
+                                .foregroundColor(.textPrimary)
                             Spacer()
                             if let variants = groupedVariants[familyName] {
                                 Text("\(variants.count) variant\(variants.count == 1 ? "" : "s")")
                                     .font(.caption)
-                                    .foregroundColor(.calicoTextSecondary)
+                                    .foregroundColor(.textTertiary)
                             }
                         }
-                        .padding(.vertical, 4)
+                        .padding(.vertical, LottaPawsTheme.spacingXS)
                     }
                     
                     // Variants
@@ -78,7 +83,7 @@ struct CollectionListRow: View {
     }
     
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: LottaPawsTheme.spacingMD) {
             // Show user photo if available, then local cached image, then remote
             if let photo = firstPhoto, let uiImage = UIImage(data: photo.imageData) {
                 ZStack(alignment: .topTrailing) {
@@ -92,10 +97,10 @@ struct CollectionListRow: View {
                         .font(.system(size: 8))
                         .foregroundColor(.white)
                         .padding(3)
-                        .background(Circle().fill(Color.calicoPrimary))
+                        .background(Circle().fill(Color.primaryPink))
                         .offset(x: -2, y: 2)
                 }
-                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .clipShape(RoundedRectangle(cornerRadius: LottaPawsTheme.radiusSM))
             } else if let localPath = variant.localThumbnailPath,
                       let uiImage = UIImage(contentsOfFile: localPath) {
                 // Local cached thumbnail
@@ -103,7 +108,7 @@ struct CollectionListRow: View {
                     .resizable()
                     .aspectRatio(contentMode: .fill)
                     .frame(width: 60, height: 60)
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .clipShape(RoundedRectangle(cornerRadius: LottaPawsTheme.radiusSM))
             } else if let urlString = variant.thumbnailURL ?? variant.imageURL,
                       let url = URL(string: urlString) {
                 // Remote URL fallback
@@ -114,7 +119,7 @@ struct CollectionListRow: View {
                             .resizable()
                             .aspectRatio(contentMode: .fill)
                             .frame(width: 60, height: 60)
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                            .clipShape(RoundedRectangle(cornerRadius: LottaPawsTheme.radiusSM))
                     default:
                         placeholderImage
                     }
@@ -124,16 +129,17 @@ struct CollectionListRow: View {
             }
             
             // Variant info
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: LottaPawsTheme.spacingXS) {
                 Text(variant.critterName)
                     .font(.headline)
+                    .foregroundColor(.textPrimary)
                 
                 Text(variant.variantName)
                     .font(.subheadline)
-                    .foregroundColor(.calicoTextSecondary)
+                    .foregroundColor(.textSecondary)
                 
                 // Single line with date and photo count
-                HStack(spacing: 4) {
+                HStack(spacing: LottaPawsTheme.spacingXS) {
                     Text("Added \(variant.addedDate.formatted(date: .abbreviated, time: .omitted))")
                     
                     if firstPhoto != nil {
@@ -142,33 +148,33 @@ struct CollectionListRow: View {
                         Image(systemName: "photo")
                             .font(.system(size: 10))
                         Text("\(photoCount)")
-                            .foregroundColor(.calicoPrimary)
+                            .foregroundColor(.primaryPink)
                     }
                 }
                 .font(.caption)
-                .foregroundColor(.calicoTextSecondary)
+                .foregroundColor(.textTertiary)
             }
             
             Spacer()
             
             Image(systemName: "chevron.right")
                 .font(.caption)
-                .foregroundColor(.calicoTextSecondary)
+                .foregroundColor(.textTertiary)
         }
         .listRowSeparator(.visible)
         .alignmentGuide(.listRowSeparatorLeading) { _ in
-            60 + 12   // image width + HStack spacing
+            60 + LottaPawsTheme.spacingMD   // image width + HStack spacing
         }
-        .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+        .listRowInsets(EdgeInsets(top: LottaPawsTheme.spacingSM, leading: LottaPawsTheme.spacingLG, bottom: LottaPawsTheme.spacingSM, trailing: LottaPawsTheme.spacingLG))
     }
     
     private var placeholderImage: some View {
-        RoundedRectangle(cornerRadius: 8)
-            .fill(Color.gray.opacity(0.2))
+        RoundedRectangle(cornerRadius: LottaPawsTheme.radiusSM)
+            .fill(Color.backgroundTertiary)
             .frame(width: 60, height: 60)
             .overlay {
                 Image(systemName: "photo")
-                    .foregroundColor(.gray)
+                    .foregroundColor(.textTertiary)
             }
     }
 }
@@ -186,10 +192,10 @@ struct CollectionGalleryView: View {
                     Section {
                         if let variants = groupedVariants[familyName] {
                             LazyVGrid(columns: [
-                                GridItem(.flexible(), spacing: 8),
-                                GridItem(.flexible(), spacing: 8),
-                                GridItem(.flexible(), spacing: 8)
-                            ], spacing: 8) {
+                                GridItem(.flexible(), spacing: LottaPawsTheme.spacingSM),
+                                GridItem(.flexible(), spacing: LottaPawsTheme.spacingSM),
+                                GridItem(.flexible(), spacing: LottaPawsTheme.spacingSM)
+                            ], spacing: LottaPawsTheme.spacingSM) {
                                 ForEach(variants, id: \.variantUuid) { variant in
                                     Button {
                                         selectedVariant = variant
@@ -199,8 +205,8 @@ struct CollectionGalleryView: View {
                                     .buttonStyle(.plain)
                                 }
                             }
-                            .padding(.horizontal, 8)
-                            .padding(.bottom, 16)
+                            .padding(.horizontal, LottaPawsTheme.spacingSM)
+                            .padding(.bottom, LottaPawsTheme.spacingLG)
                         }
                     } header: {
                         if let familyUuid = groupedVariants[familyName]?.first?.familyId {
@@ -216,24 +222,30 @@ struct CollectionGalleryView: View {
                 }
             }
         }
+        .background(Color.backgroundPrimary)
     }
     
     private func familyHeader(familyName: String) -> some View {
         HStack {
             Text(familyName)
                 .font(.headline)
-                .foregroundColor(.primary)
+                .foregroundColor(.textPrimary)
             Spacer()
             if let variants = groupedVariants[familyName] {
                 Text("\(variants.count)")
                     .font(.caption)
-                    .foregroundColor(.calicoTextSecondary)
+                    .fontWeight(.medium)
+                    .foregroundColor(.textTertiary)
+                    .padding(.horizontal, LottaPawsTheme.spacingSM)
+                    .padding(.vertical, LottaPawsTheme.spacingXS)
+                    .background(Color.backgroundTertiary)
+                    .clipShape(Capsule())
             }
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
+        .padding(.horizontal, LottaPawsTheme.spacingLG)
+        .padding(.vertical, LottaPawsTheme.spacingMD)
         .frame(maxWidth: .infinity)
-        .background(Color(uiColor: .systemBackground))
+        .background(Color.backgroundPrimary)
     }
 }
 
@@ -267,7 +279,7 @@ struct GalleryImageCard: View {
                             .font(.system(size: 10))
                             .foregroundColor(.white)
                             .padding(4)
-                            .background(Circle().fill(Color.calicoPrimary))
+                            .background(Circle().fill(Color.primaryPink))
                             .offset(x: -4, y: 4)
                     }
                 } else if let localPath = variant.localThumbnailPath,
@@ -314,19 +326,19 @@ struct GalleryImageCard: View {
                         .foregroundColor(.white.opacity(0.8))
                         .lineLimit(1)
                 }
-                .padding(6)
+                .padding(LottaPawsTheme.spacingSM)
             }
-            .clipShape(RoundedRectangle(cornerRadius: 8))
+            .clipShape(RoundedRectangle(cornerRadius: LottaPawsTheme.radiusSM))
         }
         .aspectRatio(1, contentMode: .fit)
     }
     
     private func placeholderImage(width: CGFloat, height: CGFloat) -> some View {
-        Color.gray.opacity(0.2)
+        Color.backgroundTertiary
             .frame(width: width, height: height)
             .overlay {
                 Image(systemName: "photo")
-                    .foregroundColor(.gray)
+                    .foregroundColor(.textTertiary)
             }
     }
 }

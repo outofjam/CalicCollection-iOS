@@ -24,6 +24,14 @@ struct CalicCollectionV2App: App {
             ContentView()
                 .modelContainer(sharedModelContainer)
                 .environmentObject(SyncService.shared)
+                .lottaPawsStyle()
         }
     }
+    
+    init() {
+        configureLottaPawsAppearance()
+    }
+
 }
+
+

@@ -1,3 +1,8 @@
+//
+//  SettingsView.swift
+//  LottaPaws
+//
+
 import SwiftUI
 import SwiftData
 
@@ -17,23 +22,24 @@ struct SettingsView: View {
                 // MARK: - Sync Section
                 Section {
                     HStack {
-                        VStack(alignment: .leading, spacing: 4) {
+                        VStack(alignment: .leading, spacing: LottaPawsTheme.spacingXS) {
                             Text("Last Synced")
                                 .font(.subheadline)
-                                .foregroundColor(.calicoTextSecondary)
+                                .foregroundColor(.textSecondary)
                             
                             if let lastSync = syncService.lastSyncDate {
                                 Text(syncService.timeSinceLastSync)
                                     .font(.body)
+                                    .foregroundColor(.textPrimary)
                                     .id(refreshID)
                                 
                                 Text(lastSync.formatted(date: .abbreviated, time: .shortened))
                                     .font(.caption)
-                                    .foregroundColor(.calicoTextSecondary)
+                                    .foregroundColor(.textTertiary)
                             } else {
                                 Text("Never")
                                     .font(.body)
-                                    .foregroundColor(.calicoTextSecondary)
+                                    .foregroundColor(.textSecondary)
                             }
                         }
                         
@@ -41,6 +47,7 @@ struct SettingsView: View {
                         
                         if syncService.isSyncing {
                             ProgressView()
+                                .tint(.primaryPink)
                         }
                     }
                     
@@ -51,22 +58,24 @@ struct SettingsView: View {
                             Image(systemName: "arrow.clockwise")
                             Text("Force Sync Now")
                         }
+                        .foregroundColor(.primaryPink)
                     }
                     .disabled(syncService.isSyncing)
                     
                     if let error = syncService.syncError {
-                        HStack(alignment: .top, spacing: 8) {
+                        HStack(alignment: .top, spacing: LottaPawsTheme.spacingSM) {
                             Image(systemName: "exclamationmark.triangle.fill")
-                                .foregroundColor(.calicoError)
+                                .foregroundColor(.errorRed)
                             
-                            VStack(alignment: .leading, spacing: 4) {
+                            VStack(alignment: .leading, spacing: LottaPawsTheme.spacingXS) {
                                 Text("Sync Error")
                                     .font(.subheadline)
                                     .fontWeight(.medium)
+                                    .foregroundColor(.textPrimary)
                                 
                                 Text(error)
                                     .font(.caption)
-                                    .foregroundColor(.calicoTextSecondary)
+                                    .foregroundColor(.textSecondary)
                             }
                         }
                     }
@@ -81,24 +90,28 @@ struct SettingsView: View {
                 // MARK: - Preferences Section
                 Section {
                     Toggle(isOn: $appSettings.showPurchaseDetails) {
-                        VStack(alignment: .leading, spacing: 4) {
+                        VStack(alignment: .leading, spacing: LottaPawsTheme.spacingXS) {
                             Text("Show Purchase Details")
                                 .font(.body)
+                                .foregroundColor(.textPrimary)
                             Text("Track price, date, location, and condition")
                                 .font(.caption)
-                                .foregroundColor(.calicoTextSecondary)
+                                .foregroundColor(.textSecondary)
                         }
                     }
+                    .tint(.primaryPink)
                     
                     Toggle(isOn: $appSettings.showConfetti) {
-                        VStack(alignment: .leading, spacing: 4) {
+                        VStack(alignment: .leading, spacing: LottaPawsTheme.spacingXS) {
                             Text("Celebration Effects")
                                 .font(.body)
+                                .foregroundColor(.textPrimary)
                             Text("Show confetti when adding to collection")
                                 .font(.caption)
-                                .foregroundColor(.calicoTextSecondary)
+                                .foregroundColor(.textSecondary)
                         }
                     }
+                    .tint(.primaryPink)
                 } header: {
                     Text("Preferences")
                 } footer: {
@@ -111,6 +124,7 @@ struct SettingsView: View {
                         AboutView()
                     } label: {
                         Label("About", systemImage: "info.circle")
+                            .foregroundColor(.textPrimary)
                     }
                 }
                 
@@ -120,6 +134,7 @@ struct SettingsView: View {
                         DataManagementView()
                     } label: {
                         Label("Data Management", systemImage: "externaldrive")
+                            .foregroundColor(.textPrimary)
                     }
                 } header: {
                     Text("Data")
@@ -143,6 +158,7 @@ struct SettingsView: View {
                 Text("This will refresh family data from the server.")
             }
         }
+        .tint(.primaryPink)
     }
     
     private func loadStats() async {
@@ -166,7 +182,7 @@ struct SettingsIcon: View {
     var body: some View {
         Image(systemName: systemName)
             .frame(width: 22, alignment: .center)
-            .foregroundStyle(.secondary)
+            .foregroundColor(.textSecondary)
     }
 }
 

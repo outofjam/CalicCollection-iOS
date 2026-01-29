@@ -1,3 +1,8 @@
+//
+//  CritterDetailView.swift
+//  LottaPaws
+//
+
 import SwiftUI
 import SwiftData
 
@@ -29,13 +34,7 @@ struct CritterDetailView: View {
     
     private var gradientPlaceholder: some View {
         RoundedRectangle(cornerRadius: 0)
-            .fill(
-                LinearGradient(
-                    colors: [Color.blue.opacity(0.3), Color.pink.opacity(0.3)],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-            )
+            .fill(LinearGradient.lottaGradient.opacity(0.5))
             .frame(height: 280)
             .overlay {
                 Image(systemName: "pawprint.fill")
@@ -47,17 +46,23 @@ struct CritterDetailView: View {
     var body: some View {
         Group {
             if isLoading {
-                ProgressView("Loading critter...")
+                VStack(spacing: LottaPawsTheme.spacingMD) {
+                    ProgressView()
+                        .tint(.primaryPink)
+                    Text("Loading critter...")
+                        .font(.subheadline)
+                        .foregroundColor(.textSecondary)
+                }
             } else if let error = errorMessage {
-                ContentUnavailableView {
-                    Label("Error", systemImage: "exclamationmark.triangle")
-                } description: {
-                    Text(error)
-                } actions: {
-                    Button("Retry") {
+                LPEmptyState(
+                    icon: "exclamationmark.triangle",
+                    title: "Error",
+                    message: error,
+                    buttonTitle: "Retry",
+                    buttonAction: {
                         Task { await loadCritter() }
                     }
-                }
+                )
             } else if let data = critterData {
                 critterContent(data)
             }
@@ -67,6 +72,7 @@ struct CritterDetailView: View {
             ToolbarItem(placement: .principal) {
                 Text(critterData?.critter.name ?? "Critter")
                     .font(.headline)
+                    .foregroundColor(.textPrimary)
             }
         }
         .task {
@@ -123,7 +129,7 @@ struct CritterDetailView: View {
                         .frame(height: 280)
                         
                         // Critter info overlay
-                        VStack(alignment: .leading, spacing: 4) {
+                        VStack(alignment: .leading, spacing: LottaPawsTheme.spacingXS) {
                             Text(data.critter.name)
                                 .font(.system(size: 34, weight: .bold))
                                 .foregroundColor(.white)
@@ -138,37 +144,38 @@ struct CritterDetailView: View {
                                 .font(.subheadline)
                                 .foregroundColor(.white.opacity(0.9))
                         }
-                        .padding(20)
+                        .padding(LottaPawsTheme.spacingXL)
                     }
                 }
                 .frame(height: 280)
                 
                 // MARK: - Content Section
-                VStack(spacing: 24) {
+                VStack(spacing: LottaPawsTheme.spacingXL) {
                     // Variants Section
-                    VStack(alignment: .leading, spacing: 12) {
+                    VStack(alignment: .leading, spacing: LottaPawsTheme.spacingMD) {
                         HStack {
                             Text("Variants")
                                 .font(.title3)
                                 .fontWeight(.bold)
+                                .foregroundColor(.textPrimary)
                             
                             Spacer()
                             
                             Text("\(ownedCritterVariants.count) of \(data.variants.count) owned")
                                 .font(.subheadline)
-                                .foregroundColor(.calicoTextSecondary)
+                                .foregroundColor(.textSecondary)
                         }
                         
                         if data.variants.isEmpty {
                             Text("No variants available")
-                                .foregroundColor(.calicoTextSecondary)
+                                .foregroundColor(.textSecondary)
                                 .frame(maxWidth: .infinity, alignment: .center)
-                                .padding()
+                                .padding(LottaPawsTheme.spacingLG)
                         } else {
                             LazyVGrid(columns: [
-                                GridItem(.flexible(), spacing: 12),
-                                GridItem(.flexible(), spacing: 12)
-                            ], spacing: 16) {
+                                GridItem(.flexible(), spacing: LottaPawsTheme.spacingMD),
+                                GridItem(.flexible(), spacing: LottaPawsTheme.spacingMD)
+                            ], spacing: LottaPawsTheme.spacingLG) {
                                 ForEach(data.variants) { variant in
                                     Button {
                                         let generator = UIImpactFeedbackGenerator(style: .light)
@@ -185,12 +192,12 @@ struct CritterDetailView: View {
                             }
                         }
                     }
-                    .padding(.horizontal)
-                    .padding(.top, 20)
+                    .padding(.horizontal, LottaPawsTheme.spacingLG)
+                    .padding(.top, LottaPawsTheme.spacingXL)
                     
                     // MARK: - Action Buttons
                     if !data.variants.isEmpty {
-                        VStack(spacing: 12) {
+                        VStack(spacing: LottaPawsTheme.spacingMD) {
                             Button {
                                 pickerTargetStatus = .collection
                                 showingVariantPicker = true
@@ -202,9 +209,9 @@ struct CritterDetailView: View {
                                 .font(.headline)
                                 .foregroundColor(.white)
                                 .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(Color.blue)
-                                .cornerRadius(12)
+                                .padding(LottaPawsTheme.spacingLG)
+                                .background(Color.secondaryBlue)
+                                .cornerRadius(LottaPawsTheme.radiusMD)
                             }
                             
                             Button {
@@ -218,17 +225,18 @@ struct CritterDetailView: View {
                                 .font(.headline)
                                 .foregroundColor(.white)
                                 .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(Color.pink)
-                                .cornerRadius(12)
+                                .padding(LottaPawsTheme.spacingLG)
+                                .background(Color.primaryPink)
+                                .cornerRadius(LottaPawsTheme.radiusMD)
                             }
                         }
-                        .padding(.horizontal)
-                        .padding(.bottom, 20)
+                        .padding(.horizontal, LottaPawsTheme.spacingLG)
+                        .padding(.bottom, LottaPawsTheme.spacingXL)
                     }
                 }
             }
         }
+        .background(Color.backgroundPrimary)
         .ignoresSafeArea(edges: .top)
     }
     
@@ -254,7 +262,7 @@ struct VariantCardOnline: View {
     let isOwned: Bool
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: LottaPawsTheme.spacingSM) {
             // Image container
             ZStack(alignment: .topTrailing) {
                 if let urlString = variant.thumbnailUrl ?? variant.imageUrl,
@@ -267,17 +275,18 @@ struct VariantCardOnline: View {
                                 .aspectRatio(contentMode: .fill)
                                 .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
                         default:
-                            Color.gray.opacity(0.2)
+                            Color.backgroundTertiary
                                 .overlay {
                                     ProgressView()
+                                        .tint(.primaryPink)
                                 }
                         }
                     }
                 } else {
-                    Color.gray.opacity(0.2)
+                    Color.backgroundTertiary
                         .overlay {
                             Image(systemName: "photo")
-                                .foregroundColor(.gray)
+                                .foregroundColor(.textTertiary)
                         }
                 }
                 
@@ -290,53 +299,54 @@ struct VariantCardOnline: View {
                             .font(.system(size: 9, weight: .semibold))
                     }
                     .foregroundColor(.white)
-                    .padding(.horizontal, 6)
+                    .padding(.horizontal, LottaPawsTheme.spacingSM)
                     .padding(.vertical, 3)
-                    .background(Color.orange)
+                    .background(Color.warningYellow)
                     .cornerRadius(4)
-                    .padding(6)
+                    .padding(LottaPawsTheme.spacingSM)
                 }
                 
                 // Owned checkmark
                 if isOwned {
                     Image(systemName: "checkmark.circle.fill")
-                        .foregroundColor(.calicoSuccess)
+                        .foregroundColor(.successGreen)
                         .background(
                             Circle()
                                 .fill(Color.white)
                                 .frame(width: 20, height: 20)
                         )
-                        .padding(8)
+                        .padding(LottaPawsTheme.spacingSM)
                         .offset(y: variant.isPrimary == true ? 28 : 0)
                 }
             }
             .aspectRatio(1, contentMode: .fit)
             .clipped()
-            .clipShape(RoundedRectangle(cornerRadius: 8))
+            .clipShape(RoundedRectangle(cornerRadius: LottaPawsTheme.radiusSM))
             
             // Variant info
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: LottaPawsTheme.spacingXS) {
                 Text(variant.name)
                     .font(.caption)
                     .fontWeight(.medium)
+                    .foregroundColor(.textPrimary)
                     .lineLimit(2)
                 
                 if let epochId = variant.epochId, let setName = variant.setName {
                     Text("Set \(epochId)")
                         .font(.caption2)
-                        .foregroundColor(.calicoTextSecondary)
+                        .foregroundColor(.textTertiary)
                     Text(setName)
                         .font(.caption2)
-                        .foregroundColor(.calicoTextSecondary)
+                        .foregroundColor(.textTertiary)
                         .lineLimit(1)
                 } else if let epochId = variant.epochId {
                     Text("Set \(epochId)")
                         .font(.caption2)
-                        .foregroundColor(.calicoTextSecondary)
+                        .foregroundColor(.textTertiary)
                 } else if let sku = variant.sku {
                     Text("SKU: \(sku)")
                         .font(.caption2)
-                        .foregroundColor(.calicoTextSecondary)
+                        .foregroundColor(.textTertiary)
                 }
             }
         }
@@ -366,7 +376,7 @@ struct VariantDetailSheet: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: 20) {
+                VStack(spacing: LottaPawsTheme.spacingXL) {
                     // Image
                     if let urlString = variant.imageUrl, let url = URL(string: urlString) {
                         AsyncImage(url: url) { phase in
@@ -376,33 +386,37 @@ struct VariantDetailSheet: View {
                                     .resizable()
                                     .aspectRatio(contentMode: .fit)
                                     .frame(maxHeight: 300)
-                                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                                    .clipShape(RoundedRectangle(cornerRadius: LottaPawsTheme.radiusMD))
                             default:
-                                RoundedRectangle(cornerRadius: 12)
-                                    .fill(Color.gray.opacity(0.2))
+                                RoundedRectangle(cornerRadius: LottaPawsTheme.radiusMD)
+                                    .fill(Color.backgroundTertiary)
                                     .frame(height: 200)
-                                    .overlay { ProgressView() }
+                                    .overlay {
+                                        ProgressView()
+                                            .tint(.primaryPink)
+                                    }
                             }
                         }
                     }
                     
                     // Info
-                    VStack(alignment: .leading, spacing: 12) {
+                    VStack(alignment: .leading, spacing: LottaPawsTheme.spacingMD) {
                         Text(variant.name)
                             .font(.title2)
                             .fontWeight(.bold)
+                            .foregroundColor(.textPrimary)
                         
                         Text(critter.name)
                             .font(.headline)
-                            .foregroundColor(.calicoTextSecondary)
+                            .foregroundColor(.textSecondary)
                         
                         if let familyName = critter.familyName {
                             Text(familyName)
                                 .font(.subheadline)
-                                .foregroundColor(.calicoTextSecondary)
+                                .foregroundColor(.textTertiary)
                         }
                         
-                        Divider()
+                        LPDivider()
                         
                         if let setName = variant.setName {
                             DetailRow(label: "Set", value: setName)
@@ -418,10 +432,10 @@ struct VariantDetailSheet: View {
                         }
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding()
+                    .padding(LottaPawsTheme.spacingLG)
                     
                     // Action Buttons
-                    VStack(spacing: 12) {
+                    VStack(spacing: LottaPawsTheme.spacingMD) {
                         Button {
                             Task { await addToCollection() }
                         } label: {
@@ -432,9 +446,9 @@ struct VariantDetailSheet: View {
                             .font(.headline)
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(ownedStatus == .collection ? Color.green : Color.blue)
-                            .cornerRadius(12)
+                            .padding(LottaPawsTheme.spacingLG)
+                            .background(ownedStatus == .collection ? Color.successGreen : Color.secondaryBlue)
+                            .cornerRadius(LottaPawsTheme.radiusMD)
                         }
                         .disabled(isAdding)
                         
@@ -448,9 +462,9 @@ struct VariantDetailSheet: View {
                             .font(.headline)
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(ownedStatus == .wishlist ? Color.green : Color.pink)
-                            .cornerRadius(12)
+                            .padding(LottaPawsTheme.spacingLG)
+                            .background(ownedStatus == .wishlist ? Color.successGreen : Color.primaryPink)
+                            .cornerRadius(LottaPawsTheme.radiusMD)
                         }
                         .disabled(isAdding)
                         
@@ -463,21 +477,24 @@ struct VariantDetailSheet: View {
                                     Text("Remove")
                                 }
                                 .font(.headline)
+                                .foregroundColor(.errorRed)
                                 .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(Color.red.opacity(0.1))
-                                .cornerRadius(12)
+                                .padding(LottaPawsTheme.spacingLG)
+                                .background(Color.errorRed.opacity(0.12))
+                                .cornerRadius(LottaPawsTheme.radiusMD)
                             }
                         }
                     }
-                    .padding()
+                    .padding(LottaPawsTheme.spacingLG)
                 }
             }
+            .background(Color.backgroundPrimary)
             .navigationTitle("Variant Details")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Done") { dismiss() }
+                        .foregroundColor(.primaryPink)
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
@@ -488,6 +505,7 @@ struct VariantDetailSheet: View {
                         }
                     } label: {
                         Image(systemName: "ellipsis.circle")
+                            .foregroundColor(.primaryPink)
                     }
                 }
             }
@@ -500,7 +518,7 @@ struct VariantDetailSheet: View {
                         Color.black.opacity(0.3)
                         ProgressView()
                             .scaleEffect(1.5)
-                            .tint(.white)
+                            .tint(.primaryPink)
                     }
                     .ignoresSafeArea()
                 }
@@ -557,10 +575,11 @@ private struct DetailRow: View {
     var body: some View {
         HStack {
             Text(label)
-                .foregroundColor(.calicoTextSecondary)
+                .foregroundColor(.textSecondary)
             Spacer()
             Text(value)
                 .fontWeight(.medium)
+                .foregroundColor(.textPrimary)
         }
     }
 }

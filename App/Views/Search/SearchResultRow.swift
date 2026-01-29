@@ -1,10 +1,9 @@
 //
 //  SearchResultRow.swift
-//  CalicCollectionV2
+//  LottaPaws
 //
 //  Created by Ismail Dawoodjee on 2026-01-28.
 //
-
 
 import SwiftUI
 
@@ -14,7 +13,7 @@ struct SearchResultRow: View {
     let isOwned: Bool
     
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: LottaPawsTheme.spacingMD) {
             // Thumbnail
             if let urlString = result.thumbnailUrl, let url = URL(string: urlString) {
                 AsyncImage(url: url) { phase in
@@ -28,27 +27,28 @@ struct SearchResultRow: View {
                     }
                 }
                 .frame(width: 60, height: 60)
-                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .clipShape(RoundedRectangle(cornerRadius: LottaPawsTheme.radiusSM))
             } else {
                 placeholderView
                     .frame(width: 60, height: 60)
             }
             
             // Info
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: LottaPawsTheme.spacingXS) {
                 Text(result.variantName)
                     .font(.headline)
+                    .foregroundColor(.textPrimary)
                 
                 if let critterName = result.critterName {
                     Text(critterName)
                         .font(.subheadline)
-                        .foregroundColor(.calicoTextSecondary)
+                        .foregroundColor(.textSecondary)
                 }
                 
                 if let familyName = result.familyName {
                     Text(familyName)
                         .font(.caption)
-                        .foregroundColor(.calicoTextSecondary)
+                        .foregroundColor(.textTertiary)
                 }
             }
             
@@ -57,18 +57,18 @@ struct SearchResultRow: View {
             // Owned indicator
             if isOwned {
                 Image(systemName: "checkmark.circle.fill")
-                    .foregroundColor(.calicoPrimary)
+                    .foregroundColor(.successGreen)
             }
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, LottaPawsTheme.spacingXS)
     }
     
     private var placeholderView: some View {
-        RoundedRectangle(cornerRadius: 8)
-            .fill(Color.gray.opacity(0.2))
+        RoundedRectangle(cornerRadius: LottaPawsTheme.radiusSM)
+            .fill(Color.backgroundTertiary)
             .overlay {
                 Image(systemName: "photo")
-                    .foregroundColor(.gray)
+                    .foregroundColor(.textTertiary)
             }
     }
 }

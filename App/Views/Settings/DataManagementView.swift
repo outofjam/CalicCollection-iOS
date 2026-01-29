@@ -1,3 +1,8 @@
+//
+//  DataManagementView.swift
+//  LottaPaws
+//
+
 import SwiftUI
 import SwiftData
 import UniformTypeIdentifiers
@@ -107,26 +112,34 @@ struct DataManagementView: View {
         Section {
             HStack {
                 Text("Cached Families")
+                    .foregroundColor(.textPrimary)
                 Spacer()
                 Text("\(families.count) families")
+                    .foregroundColor(.textSecondary)
             }
             
             HStack {
                 Text("Your Collection")
+                    .foregroundColor(.textPrimary)
                 Spacer()
                 Text("\(collectionCount) variants")
+                    .foregroundColor(.textSecondary)
             }
             
             HStack {
                 Text("Your Wishlist")
+                    .foregroundColor(.textPrimary)
                 Spacer()
                 Text("\(wishlistCount) variants")
+                    .foregroundColor(.textSecondary)
             }
             
             HStack {
                 Text("Your Photos")
+                    .foregroundColor(.textPrimary)
                 Spacer()
                 Text("\(photos.count) photos")
+                    .foregroundColor(.textSecondary)
             }
         } header: {
             Text("Storage")
@@ -141,7 +154,7 @@ struct DataManagementView: View {
             
             LabeledContent("Last Backup") {
                 Text(BackupManager.shared.lastBackupFormatted)
-                    .foregroundStyle(.secondary)
+                    .foregroundColor(.textSecondary)
             }
         }
     }
@@ -151,10 +164,11 @@ struct DataManagementView: View {
             Button {
                 presentShareSheet()
             } label: {
-                HStack(spacing: 12) {
+                HStack(spacing: LottaPawsTheme.spacingMD) {
                     Image(systemName: "arrow.down.doc")
-                        .foregroundStyle(.blue)
+                        .foregroundColor(.secondaryBlue)
                     Text("Export Backup")
+                        .foregroundColor(.textPrimary)
                 }
             }
             .buttonStyle(.plain)
@@ -162,10 +176,11 @@ struct DataManagementView: View {
             Button {
                 showingImportPicker = true
             } label: {
-                HStack(spacing: 12) {
+                HStack(spacing: LottaPawsTheme.spacingMD) {
                     Image(systemName: "arrow.up.doc")
-                        .foregroundStyle(.green)
+                        .foregroundColor(.successGreen)
                     Text("Import Backup")
+                        .foregroundColor(.textPrimary)
                 }
             }
             .buttonStyle(.plain)
@@ -178,34 +193,40 @@ struct DataManagementView: View {
         Section {
             HStack {
                 Text("Collection Images")
+                    .foregroundColor(.textPrimary)
                 Spacer()
                 Text(localImageCacheSize)
+                    .foregroundColor(.textSecondary)
                     .id(refreshID)
             }
             
             HStack {
                 Text("Memory Cache")
+                    .foregroundColor(.textPrimary)
                 Spacer()
                 VStack(alignment: .trailing, spacing: 2) {
                     Text(memoryCacheSize)
                         .font(.body)
+                        .foregroundColor(.textSecondary)
                         .id(refreshID)
                     Text("of \(memoryCacheCapacity)")
                         .font(.caption)
-                        .foregroundColor(.calicoTextSecondary)
+                        .foregroundColor(.textTertiary)
                 }
             }
             
             HStack {
                 Text("Disk Cache")
+                    .foregroundColor(.textPrimary)
                 Spacer()
                 VStack(alignment: .trailing, spacing: 2) {
                     Text(diskCacheSize)
                         .font(.body)
+                        .foregroundColor(.textSecondary)
                         .id(refreshID)
                     Text("of \(diskCacheCapacity)")
                         .font(.caption)
-                        .foregroundColor(.calicoTextSecondary)
+                        .foregroundColor(.textTertiary)
                 }
             }
         } header: {
@@ -221,18 +242,21 @@ struct DataManagementView: View {
                 showingClearImageCacheAlert = true
             } label: {
                 Label("Clear Image Cache", systemImage: "photo")
+                    .foregroundColor(.errorRed)
             }
             
             Button(role: .destructive) {
                 showingClearCacheAlert = true
             } label: {
                 Label("Clear Family Cache", systemImage: "trash")
+                    .foregroundColor(.errorRed)
             }
             
             Button(role: .destructive) {
                 showingResetAppAlert = true
             } label: {
                 Label("Reset All Data", systemImage: "exclamationmark.triangle")
+                    .foregroundColor(.errorRed)
             }
         } header: {
             Text("Danger Zone")
@@ -244,30 +268,31 @@ struct DataManagementView: View {
     // MARK: - Subviews
     
     private var backupReminderBanner: some View {
-        HStack(alignment: .top, spacing: 12) {
+        HStack(alignment: .top, spacing: LottaPawsTheme.spacingMD) {
             Image(systemName: "exclamationmark.triangle.fill")
-                .foregroundStyle(.orange)
+                .foregroundColor(.warningYellow)
             
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: LottaPawsTheme.spacingXS) {
                 Text("Backup Recommended")
                     .font(.subheadline)
                     .fontWeight(.semibold)
+                    .foregroundColor(.textPrimary)
                 
                 if let lastBackup = AppSettings.shared.lastBackupDate {
                     Text("Last backup: \(lastBackup.formatted(date: .abbreviated, time: .omitted))")
                         .font(.caption)
-                        .foregroundColor(.calicoTextSecondary)
+                        .foregroundColor(.textSecondary)
                 } else {
                     Text("You haven't backed up your collection yet")
                         .font(.caption)
-                        .foregroundColor(.calicoTextSecondary)
+                        .foregroundColor(.textSecondary)
                 }
             }
         }
-        .padding(12)
+        .padding(LottaPawsTheme.spacingMD)
         .foregroundStyle(.secondary)
-        .background(.orange.opacity(0.08))
-        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .background(Color.warningYellow.opacity(0.12))
+        .clipShape(RoundedRectangle(cornerRadius: LottaPawsTheme.radiusSM))
     }
     
     // MARK: - Actions

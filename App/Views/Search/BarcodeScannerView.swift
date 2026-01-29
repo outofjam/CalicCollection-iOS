@@ -1,3 +1,8 @@
+//
+//  BarcodeScannerView.swift
+//  LottaPaws
+//
+
 import SwiftUI
 import VisionKit
 
@@ -30,27 +35,28 @@ struct BarcodeScannerView: View {
                 .opacity(cameraReady ? 1 : 0)
             } else {
                 // Fallback for unsupported devices
-                VStack(spacing: 20) {
+                VStack(spacing: LottaPawsTheme.spacingXL) {
                     Image(systemName: "camera.fill")
                         .font(.system(size: 60))
-                        .foregroundColor(.gray)
+                        .foregroundColor(.textTertiary)
                     
                     Text("Scanner Not Available")
                         .font(.title2)
                         .fontWeight(.bold)
+                        .foregroundColor(.white)
                     
                     Text("This device doesn't support barcode scanning")
                         .font(.subheadline)
-                        .foregroundColor(.calicoTextSecondary)
+                        .foregroundColor(.textSecondary)
                         .multilineTextAlignment(.center)
-                        .padding(.horizontal)
+                        .padding(.horizontal, LottaPawsTheme.spacingLG)
                 }
             }
             
             // Loading indicator while camera initializes
             if !cameraReady && DataScannerViewController.isSupported && DataScannerViewController.isAvailable {
                 ProgressView()
-                    .tint(.white)
+                    .tint(.primaryPink)
                     .scaleEffect(1.5)
             }
             
@@ -66,7 +72,7 @@ struct BarcodeScannerView: View {
                             .foregroundColor(.white)
                             .shadow(radius: 2)
                     }
-                    .padding()
+                    .padding(LottaPawsTheme.spacingLG)
                     
                     Spacer()
                 }
@@ -74,7 +80,7 @@ struct BarcodeScannerView: View {
                 Spacer()
                 
                 // Instructions
-                VStack(spacing: 12) {
+                VStack(spacing: LottaPawsTheme.spacingMD) {
                     Image(systemName: "barcode.viewfinder")
                         .font(.system(size: 50))
                         .foregroundColor(.white)

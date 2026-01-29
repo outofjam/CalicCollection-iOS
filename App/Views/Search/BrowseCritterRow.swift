@@ -1,10 +1,9 @@
 //
 //  BrowseCritterRow.swift
-//  CalicCollectionV2
+//  LottaPaws
 //
 //  Created by Ismail Dawoodjee on 2026-01-28.
 //
-
 
 import SwiftUI
 
@@ -16,7 +15,7 @@ struct BrowseCritterRow: View {
     private var hasOwned: Bool { ownedCount > 0 }
     
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: LottaPawsTheme.spacingMD) {
             // Thumbnail
             if let urlString = critter.thumbnailUrl, let url = URL(string: urlString) {
                 AsyncImage(url: url) { phase in
@@ -30,30 +29,31 @@ struct BrowseCritterRow: View {
                     }
                 }
                 .frame(width: 60, height: 60)
-                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .clipShape(RoundedRectangle(cornerRadius: LottaPawsTheme.radiusSM))
             } else {
                 placeholderView
                     .frame(width: 60, height: 60)
             }
             
             // Info
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: LottaPawsTheme.spacingXS) {
                 Text(critter.name)
                     .font(.headline)
+                    .foregroundColor(.textPrimary)
                 
                 if let familyName = critter.familyName {
                     Text(familyName)
                         .font(.subheadline)
-                        .foregroundColor(.calicoTextSecondary)
+                        .foregroundColor(.primaryPink)
                 }
                 
-                HStack(spacing: 4) {
+                HStack(spacing: LottaPawsTheme.spacingXS) {
                     Image(systemName: "photo.stack")
                         .font(.system(size: 10))
                     Text("\(ownedCount)/\(critter.variantsCount) variants")
                         .font(.caption2)
                 }
-                .foregroundColor(hasOwned ? .blue : .secondary)
+                .foregroundColor(hasOwned ? .successGreen : .textSecondary)
             }
             
             Spacer()
@@ -61,18 +61,18 @@ struct BrowseCritterRow: View {
             // Owned indicator
             if hasOwned {
                 Image(systemName: "checkmark.circle.fill")
-                    .foregroundColor(.calicoPrimary)
+                    .foregroundColor(.successGreen)
             }
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, LottaPawsTheme.spacingXS)
     }
     
     private var placeholderView: some View {
-        RoundedRectangle(cornerRadius: 8)
-            .fill(Color.gray.opacity(0.2))
+        RoundedRectangle(cornerRadius: LottaPawsTheme.radiusSM)
+            .fill(Color.backgroundTertiary)
             .overlay {
                 Image(systemName: "pawprint.fill")
-                    .foregroundColor(.gray)
+                    .foregroundColor(.textTertiary)
             }
     }
 }

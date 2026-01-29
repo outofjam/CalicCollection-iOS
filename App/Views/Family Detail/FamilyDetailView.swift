@@ -1,6 +1,6 @@
 //
 //  FamilyDetailView.swift
-//  CaliCollectionV2
+//  LottaPaws
 //
 //  Created by Ismail Dawoodjee on 2026-01-24.
 //
@@ -61,17 +61,23 @@ struct FamilyDetailView: View {
     var body: some View {
         Group {
             if isLoading {
-                ProgressView("Loading family...")
+                VStack(spacing: LottaPawsTheme.spacingMD) {
+                    ProgressView()
+                        .tint(.primaryPink)
+                    Text("Loading family...")
+                        .font(.subheadline)
+                        .foregroundColor(.textSecondary)
+                }
             } else if let error = errorMessage {
-                ContentUnavailableView {
-                    Label("Error", systemImage: "exclamationmark.triangle")
-                } description: {
-                    Text(error)
-                } actions: {
-                    Button("Retry") {
+                LPEmptyState(
+                    icon: "exclamationmark.triangle",
+                    title: "Error",
+                    message: error,
+                    buttonTitle: "Retry",
+                    buttonAction: {
                         Task { await loadFamily() }
                     }
-                }
+                )
             } else if let detail = familyDetail {
                 familyContent(detail)
             }
@@ -101,7 +107,7 @@ struct FamilyDetailView: View {
                         icon: "figure.2",
                         label: "Characters",
                         value: "\(detail.critters.count)",
-                        color: .blue
+                        color: .secondaryBlue
                     )
                     
                     Spacer()
@@ -110,7 +116,7 @@ struct FamilyDetailView: View {
                         icon: "photo.stack",
                         label: "Total Variants",
                         value: "\(totalVariants)",
-                        color: .purple
+                        color: .primaryPink
                     )
                 }
                 
@@ -119,7 +125,7 @@ struct FamilyDetailView: View {
                         icon: "star.fill",
                         label: "In Collection",
                         value: "\(ownedInCollection)",
-                        color: .blue
+                        color: .secondaryBlue
                     )
                     
                     Spacer()
@@ -128,7 +134,7 @@ struct FamilyDetailView: View {
                         icon: "heart.fill",
                         label: "In Wishlist",
                         value: "\(ownedInWishlist)",
-                        color: .pink
+                        color: .primaryPink
                     )
                 }
             }
@@ -149,7 +155,7 @@ struct FamilyDetailView: View {
                                 } label: {
                                     Label("Collection", systemImage: "star.fill")
                                 }
-                                .tint(.calicoPrimary)
+                                .tint(.secondaryBlue)
                             }
                             .swipeActions(edge: .trailing) {
                                 Button {
@@ -157,18 +163,24 @@ struct FamilyDetailView: View {
                                 } label: {
                                     Label("Wishlist", systemImage: "heart.fill")
                                 }
-                                .tint(.calicoSecondary)
+                                .tint(.primaryPink)
                             }
                         }
                     }
                 } header: {
                     HStack {
                         Text(memberType)
+                            .foregroundColor(.textPrimary)
                         Spacer()
                         if let critters = groupedByMemberType[memberType] {
                             Text("\(critters.count)")
                                 .font(.caption)
-                                .foregroundColor(.calicoTextSecondary)
+                                .fontWeight(.medium)
+                                .foregroundColor(.textTertiary)
+                                .padding(.horizontal, LottaPawsTheme.spacingSM)
+                                .padding(.vertical, LottaPawsTheme.spacingXS)
+                                .background(Color.backgroundTertiary)
+                                .clipShape(Capsule())
                         }
                     }
                 }
@@ -226,7 +238,7 @@ private struct CritterRowOnline: View {
     let ownedCount: Int
     
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: LottaPawsTheme.spacingMD) {
             // Thumbnail
             if let urlString = critter.thumbnailUrl, let url = URL(string: urlString) {
                 AsyncImage(url: url) { phase in
@@ -240,26 +252,27 @@ private struct CritterRowOnline: View {
                     }
                 }
                 .frame(width: 50, height: 50)
-                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .clipShape(RoundedRectangle(cornerRadius: LottaPawsTheme.radiusSM))
             } else {
                 placeholderView
                     .frame(width: 50, height: 50)
             }
             
             // Info
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: LottaPawsTheme.spacingXS) {
                 Text(critter.name)
                     .font(.headline)
+                    .foregroundColor(.textPrimary)
                 
-                HStack(spacing: 8) {
+                HStack(spacing: LottaPawsTheme.spacingSM) {
                     Text("\(critter.variantsCount) variant\(critter.variantsCount == 1 ? "" : "s")")
                         .font(.caption)
-                        .foregroundColor(.calicoTextSecondary)
+                        .foregroundColor(.textSecondary)
                     
                     if ownedCount > 0 {
                         Text("• \(ownedCount) owned")
                             .font(.caption)
-                            .foregroundColor(.calicoPrimary)
+                            .foregroundColor(.successGreen)
                     }
                 }
             }
@@ -269,18 +282,18 @@ private struct CritterRowOnline: View {
             // Owned indicator
             if ownedCount > 0 {
                 Image(systemName: "checkmark.circle.fill")
-                    .foregroundColor(.calicoPrimary)
+                    .foregroundColor(.successGreen)
             }
         }
         .contentShape(Rectangle())
     }
     
     private var placeholderView: some View {
-        RoundedRectangle(cornerRadius: 8)
-            .fill(Color.gray.opacity(0.2))
+        RoundedRectangle(cornerRadius: LottaPawsTheme.radiusSM)
+            .fill(Color.backgroundTertiary)
             .overlay {
                 Image(systemName: "person.fill")
-                    .foregroundColor(.gray)
+                    .foregroundColor(.textTertiary)
             }
     }
 }
@@ -293,13 +306,14 @@ struct StatBadge: View {
     let color: Color
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack(spacing: 4) {
+        VStack(alignment: .leading, spacing: LottaPawsTheme.spacingXS) {
+            HStack(spacing: LottaPawsTheme.spacingXS) {
                 Image(systemName: icon)
                     .font(.caption)
+                    .foregroundColor(color)
                 Text(label)
                     .font(.caption)
-                    .foregroundColor(.calicoTextSecondary)
+                    .foregroundColor(.textSecondary)
             }
             
             Text(value)
@@ -308,9 +322,9 @@ struct StatBadge: View {
                 .foregroundColor(color)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding()
-        .background(color.opacity(0.1))
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .padding(LottaPawsTheme.spacingLG)
+        .background(color.opacity(0.12))
+        .clipShape(RoundedRectangle(cornerRadius: LottaPawsTheme.radiusMD))
     }
 }
 

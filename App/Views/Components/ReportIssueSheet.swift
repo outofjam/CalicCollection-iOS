@@ -1,3 +1,8 @@
+//
+//  ReportIssueSheet.swift
+//  LottaPaws
+//
+
 import SwiftUI
 
 struct ReportIssueSheet: View {
@@ -17,6 +22,7 @@ struct ReportIssueSheet: View {
                 Section {
                     Text(variantName)
                         .font(.headline)
+                        .foregroundColor(.textPrimary)
                 } header: {
                     Text("Reporting Issue For")
                 }
@@ -29,6 +35,7 @@ struct ReportIssueSheet: View {
                         }
                     }
                     .pickerStyle(.menu)
+                    .tint(.primaryPink)
                 } header: {
                     Text("What's Wrong?")
                 }
@@ -36,12 +43,14 @@ struct ReportIssueSheet: View {
                 Section {
                     TextField("Describe the issue...", text: $details, axis: .vertical)
                         .lineLimit(3...6)
+                        .foregroundColor(.textPrimary)
                 } header: {
                     Text("Details (Optional)")
                 }
                 
                 Section {
                     TextField("What should it be?", text: $suggestedCorrection)
+                        .foregroundColor(.textPrimary)
                 } header: {
                     Text("Suggested Correction (Optional)")
                 }
@@ -53,6 +62,7 @@ struct ReportIssueSheet: View {
                     Button("Cancel") {
                         dismiss()
                     }
+                    .foregroundColor(.primaryPink)
                 }
                 
                 ToolbarItem(placement: .confirmationAction) {
@@ -62,7 +72,8 @@ struct ReportIssueSheet: View {
                         }
                     }
                     .disabled(isSubmitting)
-                    .tint(.calicoPrimary)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.primaryPink)
                 }
             }
             .disabled(isSubmitting)
@@ -72,14 +83,27 @@ struct ReportIssueSheet: View {
                         Color.black.opacity(0.3)
                             .ignoresSafeArea()
                         
-                        ProgressView("Submitting...")
-                            .padding()
-                            .background(Color(uiColor: .systemBackground))
-                            .cornerRadius(12)
+                        VStack(spacing: LottaPawsTheme.spacingMD) {
+                            ProgressView()
+                                .tint(.primaryPink)
+                            Text("Submitting...")
+                                .font(.subheadline)
+                                .foregroundColor(.textSecondary)
+                        }
+                        .padding(LottaPawsTheme.spacingXL)
+                        .background(Color.backgroundPrimary)
+                        .cornerRadius(LottaPawsTheme.radiusMD)
+                        .shadow(
+                            color: LottaPawsTheme.shadowMedium.color,
+                            radius: LottaPawsTheme.shadowMedium.radius,
+                            x: LottaPawsTheme.shadowMedium.x,
+                            y: LottaPawsTheme.shadowMedium.y
+                        )
                     }
                 }
             }
         }
+        .tint(.primaryPink)
         .toast()
     }
     

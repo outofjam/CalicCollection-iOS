@@ -1,10 +1,9 @@
 //
 //  PurchaseDetailsSheet.swift
-//  CaliCollectionV2
+//  LottaPaws
 //
 //  Created by Ismail Dawoodjee on 2026-01-24.
 //
-
 
 import SwiftUI
 import SwiftData
@@ -29,6 +28,7 @@ struct PurchaseDetailsSheet: View {
                 Section {
                     HStack {
                         Text("Price Paid")
+                            .foregroundColor(.textPrimary)
                         Spacer()
                         TextField("0.00", text: $pricePaid)
                             .keyboardType(.decimalPad)
@@ -37,6 +37,7 @@ struct PurchaseDetailsSheet: View {
                     }
                     
                     DatePicker("Purchase Date", selection: $purchaseDate, displayedComponents: .date)
+                        .tint(.primaryPink)
                     
                     TextField("Store or Location", text: $purchaseLocation)
                 } header: {
@@ -50,6 +51,7 @@ struct PurchaseDetailsSheet: View {
                         }
                     }
                     .pickerStyle(.menu)
+                    .tint(.primaryPink)
                 } header: {
                     Text("Condition")
                 }
@@ -57,10 +59,12 @@ struct PurchaseDetailsSheet: View {
                 Section {
                     TextEditor(text: $notes)
                         .frame(minHeight: 100)
+                        .foregroundColor(.textPrimary)
                 } header: {
                     Text("Notes")
                 } footer: {
                     Text("Any additional details about this figure")
+                        .foregroundColor(.textTertiary)
                 }
             }
             .navigationTitle("Purchase Details")
@@ -70,15 +74,19 @@ struct PurchaseDetailsSheet: View {
                     Button("Cancel") {
                         dismiss()
                     }
+                    .foregroundColor(.primaryPink)
                 }
                 
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
                         savePurchaseDetails()
                     }
+                    .fontWeight(.semibold)
+                    .foregroundColor(.primaryPink)
                 }
             }
         }
+        .tint(.primaryPink)
         .onAppear {
             loadExistingData()
         }

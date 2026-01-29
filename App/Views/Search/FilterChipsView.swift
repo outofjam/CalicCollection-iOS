@@ -1,10 +1,9 @@
 //
 //  FilterChipsView.swift
-//  CalicCollectionV2
+//  LottaPaws
 //
 //  Created by Ismail Dawoodjee on 2026-01-28.
 //
-
 
 import SwiftUI
 
@@ -16,7 +15,7 @@ struct FilterChipsView: View {
     
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
+            HStack(spacing: LottaPawsTheme.spacingSM) {
                 // Family filter
                 Menu {
                     Button("All Families") {
@@ -35,12 +34,12 @@ struct FilterChipsView: View {
                                 Text(family.name)
                                 Spacer()
                                 Text("\(family.crittersCount)")
-                                    .foregroundColor(.secondary)
+                                    .foregroundColor(.textSecondary)
                             }
                         }
                     }
                 } label: {
-                    HStack(spacing: 4) {
+                    HStack(spacing: LottaPawsTheme.spacingXS) {
                         Image(systemName: "line.3.horizontal.decrease.circle")
                             .font(.caption)
                         Text(selectedFamilyName ?? "All Families")
@@ -48,11 +47,16 @@ struct FilterChipsView: View {
                         Image(systemName: "chevron.down")
                             .font(.caption2)
                     }
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(selectedFamilyUuid != nil ? Color.blue : Color.gray.opacity(0.2))
-                    .foregroundColor(selectedFamilyUuid != nil ? .white : .primary)
+                    .padding(.horizontal, LottaPawsTheme.spacingMD)
+                    .padding(.vertical, LottaPawsTheme.spacingSM)
+                    .background(selectedFamilyUuid != nil ? Color.primaryPink : Color.backgroundSecondary)
+                    .foregroundColor(selectedFamilyUuid != nil ? .white : .textPrimary)
                     .clipShape(Capsule())
+                    .overlay(
+                        selectedFamilyUuid == nil ?
+                        Capsule().stroke(Color.borderColor, lineWidth: 1) :
+                        nil
+                    )
                 }
                 
                 // Clear filter
@@ -61,23 +65,23 @@ struct FilterChipsView: View {
                         selectedFamilyUuid = nil
                         selectedFamilyName = nil
                     } label: {
-                        HStack(spacing: 4) {
+                        HStack(spacing: LottaPawsTheme.spacingXS) {
                             Image(systemName: "xmark.circle.fill")
                                 .font(.caption)
                             Text("Clear")
                                 .font(.subheadline)
                         }
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background(Color.red.opacity(0.1))
-                        .foregroundColor(.calicoError)
+                        .padding(.horizontal, LottaPawsTheme.spacingMD)
+                        .padding(.vertical, LottaPawsTheme.spacingSM)
+                        .background(Color.errorRed.opacity(0.12))
+                        .foregroundColor(.errorRed)
                         .clipShape(Capsule())
                     }
                 }
             }
-            .padding(.horizontal)
-            .padding(.vertical, 8)
+            .padding(.horizontal, LottaPawsTheme.spacingLG)
+            .padding(.vertical, LottaPawsTheme.spacingSM)
         }
-        .background(Color(uiColor: .systemGroupedBackground))
+        .background(Color.backgroundSecondary)
     }
 }

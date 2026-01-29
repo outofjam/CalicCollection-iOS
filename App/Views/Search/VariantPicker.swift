@@ -1,3 +1,8 @@
+//
+//  VariantPickerSheet.swift
+//  LottaPaws
+//
+
 import SwiftUI
 import SwiftData
 
@@ -32,22 +37,29 @@ struct VariantPickerSheet: View {
         NavigationStack {
             Group {
                 if isLoading {
-                    ProgressView("Loading variants...")
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    VStack(spacing: LottaPawsTheme.spacingMD) {
+                        ProgressView()
+                            .tint(.primaryPink)
+                        Text("Loading variants...")
+                            .font(.subheadline)
+                            .foregroundColor(.textSecondary)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else if let error = errorMessage {
-                    ContentUnavailableView {
-                        Label("Error", systemImage: "exclamationmark.triangle")
-                    } description: {
-                        Text(error)
-                    } actions: {
-                        Button("Retry") {
+                    LPEmptyState(
+                        icon: "exclamationmark.triangle",
+                        title: "Error",
+                        message: error,
+                        buttonTitle: "Retry",
+                        buttonAction: {
                             Task { await loadVariants() }
                         }
-                    }
+                    )
                 } else if let data = critterData {
                     pickerContent(data)
                 }
             }
+            .background(Color.backgroundPrimary)
             .navigationBarTitleDisplayMode(.inline)
         }
         .presentationDetents([.medium, .large])
@@ -60,15 +72,23 @@ struct VariantPickerSheet: View {
             if isSaving {
                 ZStack {
                     Color.black.opacity(0.3)
-                    VStack(spacing: 12) {
+                    VStack(spacing: LottaPawsTheme.spacingMD) {
                         ProgressView()
+                            .tint(.primaryPink)
                             .scaleEffect(1.5)
                         Text("Saving...")
                             .font(.subheadline)
+                            .foregroundColor(.textSecondary)
                     }
-                    .padding(20)
-                    .background(Color(uiColor: .systemBackground))
-                    .cornerRadius(12)
+                    .padding(LottaPawsTheme.spacingXL)
+                    .background(Color.backgroundPrimary)
+                    .cornerRadius(LottaPawsTheme.radiusMD)
+                    .shadow(
+                        color: LottaPawsTheme.shadowMedium.color,
+                        radius: LottaPawsTheme.shadowMedium.radius,
+                        x: LottaPawsTheme.shadowMedium.x,
+                        y: LottaPawsTheme.shadowMedium.y
+                    )
                 }
                 .ignoresSafeArea()
             }
@@ -79,30 +99,31 @@ struct VariantPickerSheet: View {
     private func pickerContent(_ data: CritterVariantsResponse) -> some View {
         VStack(spacing: 0) {
             // Header
-            VStack(spacing: 8) {
+            VStack(spacing: LottaPawsTheme.spacingSM) {
                 Text(data.critter.name)
                     .font(.title2)
                     .fontWeight(.bold)
+                    .foregroundColor(.textPrimary)
                 
                 if let familyName = data.critter.familyName {
                     Text(familyName)
                         .font(.subheadline)
-                        .foregroundColor(.calicoTextSecondary)
+                        .foregroundColor(.textSecondary)
                 }
                 
                 Text("Select variants to add to \(targetStatus == .collection ? "Collection" : "Wishlist")")
                     .font(.subheadline)
-                    .foregroundColor(.calicoTextSecondary)
+                    .foregroundColor(.textTertiary)
                     .multilineTextAlignment(.center)
             }
-            .padding()
+            .padding(LottaPawsTheme.spacingLG)
             
             // Variants list
             if data.variants.isEmpty {
-                ContentUnavailableView(
-                    "No Variants Available",
-                    systemImage: "photo.stack",
-                    description: Text("This critter has no variants yet")
+                LPEmptyState(
+                    icon: "photo.stack",
+                    title: "No Variants Available",
+                    message: "This critter has no variants yet"
                 )
             } else {
                 List {
@@ -122,7 +143,7 @@ struct VariantPickerSheet: View {
             }
             
             // Action buttons
-            VStack(spacing: 12) {
+            VStack(spacing: LottaPawsTheme.spacingMD) {
                 if !selectedVariantIds.isEmpty || hasOwnedVariants {
                     Button {
                         Task { await saveSelection(data) }
@@ -138,9 +159,9 @@ struct VariantPickerSheet: View {
                         .font(.headline)
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(selectedVariantIds.isEmpty ? Color.red : (targetStatus == .collection ? Color.blue : Color.pink))
-                        .cornerRadius(12)
+                        .padding(LottaPawsTheme.spacingLG)
+                        .background(selectedVariantIds.isEmpty ? Color.errorRed : (targetStatus == .collection ? Color.secondaryBlue : Color.primaryPink))
+                        .cornerRadius(LottaPawsTheme.radiusMD)
                     }
                     .disabled(isSaving)
                 }
@@ -148,9 +169,9 @@ struct VariantPickerSheet: View {
                 Button("Cancel") {
                     dismiss()
                 }
-                .foregroundColor(.calicoTextSecondary)
+                .foregroundColor(.textSecondary)
             }
-            .padding()
+            .padding(LottaPawsTheme.spacingLG)
         }
     }
     
@@ -272,10 +293,10 @@ struct VariantRowOnline: View {
     let isOwned: Bool
     
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: LottaPawsTheme.spacingMD) {
             // Checkbox
             Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                .foregroundColor(isSelected ? .blue : .gray)
+                .foregroundColor(isSelected ? .primaryPink : .textTertiary)
                 .font(.title3)
             
             // Variant image
@@ -288,7 +309,7 @@ struct VariantRowOnline: View {
                             .resizable()
                             .aspectRatio(contentMode: .fill)
                             .frame(width: 60, height: 60)
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                            .clipShape(RoundedRectangle(cornerRadius: LottaPawsTheme.radiusSM))
                     default:
                         placeholderView
                     }
@@ -299,28 +320,29 @@ struct VariantRowOnline: View {
             }
             
             // Variant info
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: LottaPawsTheme.spacingXS) {
                 HStack {
                     Text(variant.name)
                         .font(.headline)
+                        .foregroundColor(.textPrimary)
                     
                     if variant.isPrimary == true {
                         Text("Primary")
                             .font(.caption2)
-                            .padding(.horizontal, 6)
+                            .padding(.horizontal, LottaPawsTheme.spacingSM)
                             .padding(.vertical, 2)
-                            .background(Color.orange.opacity(0.2))
-                            .foregroundColor(.orange)
+                            .background(Color.warningYellow.opacity(0.2))
+                            .foregroundColor(.warningYellow)
                             .cornerRadius(4)
                     }
                     
                     if isOwned {
                         Text("✓ Owned")
                             .font(.caption2)
-                            .padding(.horizontal, 6)
+                            .padding(.horizontal, LottaPawsTheme.spacingSM)
                             .padding(.vertical, 2)
-                            .background(Color.green.opacity(0.2))
-                            .foregroundColor(.calicoSuccess)
+                            .background(Color.successGreen.opacity(0.15))
+                            .foregroundColor(.successGreen)
                             .cornerRadius(4)
                     }
                 }
@@ -328,37 +350,37 @@ struct VariantRowOnline: View {
                 if let epochId = variant.epochId, let setName = variant.setName {
                     Text("Set \(epochId) • \(setName)")
                         .font(.caption)
-                        .foregroundColor(.calicoTextSecondary)
+                        .foregroundColor(.textSecondary)
                         .lineLimit(1)
                 } else if let epochId = variant.epochId {
                     Text("Set \(epochId)")
                         .font(.caption)
-                        .foregroundColor(.calicoTextSecondary)
+                        .foregroundColor(.textSecondary)
                 } else if let sku = variant.sku {
                     Text("SKU: \(sku)")
                         .font(.caption)
-                        .foregroundColor(.calicoTextSecondary)
+                        .foregroundColor(.textSecondary)
                 }
                 
                 if let releaseYear = variant.releaseYear {
                     Text("Released: \(String(releaseYear))")
                         .font(.caption2)
-                        .foregroundColor(.calicoTextSecondary)
+                        .foregroundColor(.textTertiary)
                 }
             }
             
             Spacer()
         }
-        .padding(.vertical, 8)
+        .padding(.vertical, LottaPawsTheme.spacingSM)
     }
     
     private var placeholderView: some View {
-        RoundedRectangle(cornerRadius: 8)
-            .fill(Color.gray.opacity(0.2))
+        RoundedRectangle(cornerRadius: LottaPawsTheme.radiusSM)
+            .fill(Color.backgroundTertiary)
             .frame(width: 60, height: 60)
             .overlay {
                 Image(systemName: "photo")
-                    .foregroundColor(.gray)
+                    .foregroundColor(.textTertiary)
             }
     }
 }
