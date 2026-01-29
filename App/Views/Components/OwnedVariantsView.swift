@@ -133,6 +133,7 @@ struct OwnedVariantDetailView: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 0) {
+
                     // MARK: - Hero Image
                     GeometryReader { geometry in
                         ZStack(alignment: .bottomLeading) {
@@ -172,6 +173,28 @@ struct OwnedVariantDetailView: View {
                             )
                             .frame(height: 300)
                             
+                            // Expand button (bottom-right)
+                            if ownedVariant.imageURL != nil || ownedVariant.localImagePath != nil {
+                                VStack {
+                                    Spacer()
+                                    HStack {
+                                        Spacer()
+                                        Button {
+                                            showingFullscreenImage = true
+                                        } label: {
+                                            Image(systemName: "arrow.up.left.and.arrow.down.right")
+                                                .font(.system(size: 14, weight: .semibold))
+                                                .foregroundColor(.white)
+                                                .padding(8)
+                                                .background(Color.black.opacity(0.5))
+                                                .clipShape(Circle())
+                                        }
+                                        .padding(12)
+                                    }
+                                }
+                                .frame(height: 300)
+                            }
+                            
                             // Info overlay
                             VStack(alignment: .leading, spacing: 4) {
                                 Text(ownedVariant.critterName)
@@ -195,20 +218,7 @@ struct OwnedVariantDetailView: View {
                     
                     // MARK: - Content
                     VStack(spacing: 24) {
-                        // Tap to expand hint
-                        if ownedVariant.imageURL != nil || ownedVariant.localImagePath != nil {
-                            Button {
-                                showingFullscreenImage = true
-                            } label: {
-                                HStack {
-                                    Image(systemName: "arrow.up.left.and.arrow.down.right")
-                                    Text("Tap to view full size")
-                                        .font(.subheadline)
-                                }
-                                .foregroundColor(.calicoPrimary)
-                            }
-                        }
-                        
+                                            
                         // Photo Gallery (collection items only)
                         if ownedVariant.status == .collection {
                             PhotoGallerySection(variantUuid: ownedVariant.variantUuid)
