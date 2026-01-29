@@ -129,6 +129,7 @@ struct OwnedVariantDetailView: View {
     @State private var showingFullscreenImage = false
     @State private var showingPurchaseDetails = false
     @State private var showingReportIssue = false
+    @State private var showingCritterDetail = false
     
     private var hasPurchaseDetails: Bool {
         ownedVariant.pricePaid != nil ||
@@ -157,15 +158,15 @@ struct OwnedVariantDetailView: View {
                         }
                         
                         // Status Badge
-                        if let status = ownedVariant.status {
-                            VariantStatusBadge(
-                                status: status,
-                                addedDate: ownedVariant.addedDate
-                            )
-                        }
+//                        if let status = ownedVariant.status {
+//                            VariantStatusBadge(
+//                                status: status,
+//                                addedDate: ownedVariant.addedDate
+//                            )
+//                        }
                         
-                        // Info Section
-                        infoSection
+                        // Info Card (details + view critter)
+                        infoCard
                         
                         // Purchase Details (collection only)
                         if appSettings.showPurchaseDetails && ownedVariant.status == .collection {
@@ -208,24 +209,75 @@ struct OwnedVariantDetailView: View {
                     variantName: ownedVariant.variantName
                 )
             }
+            .navigationDestination(isPresented: $showingCritterDetail) {
+                CritterDetailView(critterUuid: ownedVariant.critterUuid)
+            }
         }
         .toast()
     }
     
     // MARK: - Subviews
     
-    private var infoSection: some View {
-        VStack(alignment: .leading, spacing: LottaPawsTheme.spacingMD) {
-            if let familyName = ownedVariant.familyName {
-                InfoRow(label: "Family", value: familyName)
+    private var infoCard: some View {
+        VStack(spacing: 0) {
+            // Info rows
+            VStack(alignment: .leading, spacing: LottaPawsTheme.spacingMD) {
+                if let familyName = ownedVariant.familyName {
+                    InfoRow(label: "Family", value: familyName)
+                }
+                
+                InfoRow(label: "Member Type", value: ownedVariant.memberType.capitalized)
+                
+                if let role = ownedVariant.role {
+                    InfoRow(label: "Role", value: role)
+                }
+                
+                if let setName = ownedVariant.setName {
+                    InfoRow(label: "Set", value: setName)
+                }
+                
+                if let epochId = ownedVariant.epochId {
+                    InfoRow(label: "Set ID", value: epochId)
+                }
+                // Status with date
+                if let status = ownedVariant.status {
+                    InfoRow(
+                        label: status == .collection ? "In Collection" : "In Wishlist",
+                        value: ownedVariant.addedDate.formatted(date: .abbreviated, time: .omitted)
+                    )
+                }
             }
+            .padding(LottaPawsTheme.spacingMD)
             
-            InfoRow(label: "Member Type", value: ownedVariant.memberType.capitalized)
+            // Divider
+            Rectangle()
+                .fill(Color(.separator))
+                .frame(height: 1)
             
-            if let role = ownedVariant.role {
-                InfoRow(label: "Role", value: role)
+            // View Critter button
+            Button {
+                showingCritterDetail = true
+            } label: {
+                HStack {
+                    Image(systemName: "pawprint.fill")
+                        .font(.subheadline)
+                    Text("View Critter")
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.caption)
+                        .foregroundColor(.textTertiary)
+                }
+                .font(.subheadline.weight(.medium))
+                .foregroundColor(.primaryPink)
+                .padding(LottaPawsTheme.spacingMD)
             }
         }
+        .background(Color.backgroundSecondary)
+        .cornerRadius(LottaPawsTheme.radiusMD)
+        .overlay(
+            RoundedRectangle(cornerRadius: LottaPawsTheme.radiusMD)
+                .stroke(Color(.separator).opacity(0.5), lineWidth: 1)
+        )
     }
     
     @ToolbarContentBuilder
