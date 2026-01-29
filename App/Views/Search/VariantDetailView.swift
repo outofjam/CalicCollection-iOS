@@ -23,7 +23,6 @@ struct VariantDetailView: View {
     @State private var showingPurchaseDetails = false
     @State private var showingReportIssue = false
     @State private var isAdding = false
-    @State private var showConfetti = false
     
     private var ownedVariant: OwnedVariant? {
         ownedVariants.first { $0.variantUuid == variant.uuid }
@@ -119,7 +118,6 @@ struct VariantDetailView: View {
             }
             .overlay { loadingOverlay }
         }
-        .confetti(isShowing: $showConfetti)
         .toast()
     }
     
@@ -209,7 +207,7 @@ struct VariantDetailView: View {
             UINotificationFeedbackGenerator().notificationOccurred(.success)
             
             if AppSettings.shared.showConfetti {
-                showConfetti = true
+                ConfettiManager.shared.trigger()
             }
             
             ToastManager.shared.show("✓ Added \(variant.name) to Collection", type: .success)

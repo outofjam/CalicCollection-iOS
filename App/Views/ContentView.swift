@@ -49,6 +49,7 @@ struct ContentView: View {
                 .tint(.primaryPink)
             }
         }
+        .confetti()
         .toast()
         .lottaPawsStyle()
     }

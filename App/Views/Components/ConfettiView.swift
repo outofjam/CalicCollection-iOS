@@ -94,18 +94,18 @@ struct ConfettiView: View {
 
 // View modifier for easy use
 struct ConfettiModifier: ViewModifier {
-    @Binding var isShowing: Bool
+    @ObservedObject var manager = ConfettiManager.shared
     
     func body(content: Content) -> some View {
         ZStack {
             content
-            ConfettiView(isShowing: $isShowing)
+            ConfettiView(isShowing: $manager.isShowing)
         }
     }
 }
 
 extension View {
-    func confetti(isShowing: Binding<Bool>) -> some View {
-        modifier(ConfettiModifier(isShowing: isShowing))
+    func confetti() -> some View {
+        modifier(ConfettiModifier())
     }
 }

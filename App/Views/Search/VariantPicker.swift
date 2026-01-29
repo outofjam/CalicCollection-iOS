@@ -20,7 +20,6 @@ struct VariantPickerSheet: View {
     @State private var errorMessage: String?
     @State private var selectedVariantIds: Set<String> = []
     @State private var isSaving = false
-    @State private var showConfetti = false
     
     private func isVariantOwned(_ variantUuid: String, status: CritterStatus) -> Bool {
         ownedVariants.contains { $0.variantUuid == variantUuid && $0.status == status }
@@ -64,7 +63,6 @@ struct VariantPickerSheet: View {
         }
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
-        .confetti(isShowing: $showConfetti)
         .task {
             await loadVariants()
         }
@@ -260,18 +258,16 @@ struct VariantPickerSheet: View {
             }
         }
         
-        // Show appropriate toast
+        // Show appropriate feedback
         let statusName = targetStatus == .collection ? "Collection" : "Wishlist"
         
         if addedCount > 0 {
             let generator = UINotificationFeedbackGenerator()
             generator.notificationOccurred(.success)
             
-            // Trigger confetti if adding to collection
+            // Trigger confetti if adding to collection (shows on root view)
             if targetStatus == .collection && AppSettings.shared.showConfetti {
-                showConfetti = true
-                // Small delay before dismissing so confetti shows
-                try? await Task.sleep(nanoseconds: 500_000_000)
+                ConfettiManager.shared.trigger()
             }
             
             ToastManager.shared.show("✓ Added \(addedCount) to \(statusName)", type: .success)
