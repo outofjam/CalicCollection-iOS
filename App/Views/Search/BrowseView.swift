@@ -241,9 +241,7 @@ struct BrowseView: View {
                 }
             }
             .listStyle(.insetGrouped)
-            .refreshable {
-                await loadBrowseCritters(reset: true)
-            }
+            
         }
     }
     
