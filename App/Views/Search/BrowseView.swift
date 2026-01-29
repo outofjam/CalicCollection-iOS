@@ -57,17 +57,7 @@ struct BrowseView: View {
     
     var body: some View {
         ZStack {
-            Color.backgroundPrimary.ignoresSafeArea()
-            
-            VStack(spacing: 0) {
-                if !isSearchMode {
-                    FilterChipsView(
-                        selectedFamilyUuid: $selectedFamilyUuid,
-                        selectedFamilyName: $selectedFamilyName,
-                        families: cachedFamilies
-                    )
-                }
-                
+            Group {
                 if isSearchMode {
                     searchContent
                 } else {
@@ -86,6 +76,11 @@ struct BrowseView: View {
         }
         .navigationTitle("Browse")
         .searchable(text: $searchText, prompt: "Search critters & variants...")
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                familyFilterMenu
+            }
+        }
         .onChange(of: searchText) { _, newValue in
             handleSearchTextChange(newValue)
         }
@@ -126,6 +121,50 @@ struct BrowseView: View {
             if isLoadingSet || isAddingSingleVariant { loadingOverlay }
         }
         .confetti(isShowing: $showConfetti)
+    }
+    
+    // MARK: - Family Filter Menu
+    
+    private var familyFilterMenu: some View {
+        Menu {
+            Button {
+                selectedFamilyUuid = nil
+                selectedFamilyName = nil
+            } label: {
+                HStack {
+                    Text("All Families")
+                    if selectedFamilyUuid == nil {
+                        Image(systemName: "checkmark")
+                    }
+                }
+            }
+            
+            Divider()
+            
+            ForEach(cachedFamilies.sorted(by: { $0.name < $1.name })) { family in
+                Button {
+                    selectedFamilyUuid = family.uuid
+                    selectedFamilyName = family.name
+                } label: {
+                    HStack {
+                        Text(family.name)
+                        if selectedFamilyUuid == family.uuid {
+                            Image(systemName: "checkmark")
+                        }
+                    }
+                }
+            }
+        } label: {
+            HStack(spacing: 4) {
+                Image(systemName: selectedFamilyUuid != nil ? "line.3.horizontal.decrease.circle.fill" : "line.3.horizontal.decrease.circle")
+                if let name = selectedFamilyName {
+                    Text(name)
+                        .font(.subheadline)
+                        .lineLimit(1)
+                }
+            }
+            .foregroundColor(.primaryPink)
+        }
     }
     
     // MARK: - Browse Content

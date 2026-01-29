@@ -60,10 +60,9 @@ extension View {
 // Call this in your App init or ContentView onAppear
 
 func configureLottaPawsAppearance() {
-    // Navigation Bar
+    // Navigation Bar - Standard (when scrolled)
     let navAppearance = UINavigationBarAppearance()
-    navAppearance.configureWithOpaqueBackground()
-    navAppearance.backgroundColor = UIColor(Color.backgroundPrimary)
+    navAppearance.configureWithDefaultBackground()
     navAppearance.titleTextAttributes = [
         .foregroundColor: UIColor(Color.textPrimary),
         .font: UIFont.systemFont(ofSize: 17, weight: .semibold)
@@ -73,15 +72,22 @@ func configureLottaPawsAppearance() {
         .font: UIFont.systemFont(ofSize: 34, weight: .bold)
     ]
     
+    // Scroll edge appearance (when at top - transparent/blur)
+    let scrollEdgeAppearance = UINavigationBarAppearance()
+    scrollEdgeAppearance.configureWithTransparentBackground()
+    scrollEdgeAppearance.largeTitleTextAttributes = [
+        .foregroundColor: UIColor(Color.textPrimary),
+        .font: UIFont.systemFont(ofSize: 34, weight: .bold)
+    ]
+    
     UINavigationBar.appearance().standardAppearance = navAppearance
-    UINavigationBar.appearance().scrollEdgeAppearance = navAppearance
+    UINavigationBar.appearance().scrollEdgeAppearance = scrollEdgeAppearance
     UINavigationBar.appearance().compactAppearance = navAppearance
     UINavigationBar.appearance().tintColor = UIColor(Color.primaryPink)
     
     // Tab Bar
     let tabAppearance = UITabBarAppearance()
-    tabAppearance.configureWithOpaqueBackground()
-    tabAppearance.backgroundColor = UIColor(Color.backgroundPrimary)
+    tabAppearance.configureWithDefaultBackground()
     
     // Unselected tab items
     tabAppearance.stackedLayoutAppearance.normal.iconColor = UIColor(Color.textTertiary)

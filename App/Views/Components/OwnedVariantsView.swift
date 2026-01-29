@@ -52,65 +52,64 @@ struct OwnedVariantsView: View {
     }
     
     var body: some View {
-        ZStack {
-            Color.backgroundPrimary.ignoresSafeArea()
-            
-            if filteredVariants.isEmpty {
-                LPEmptyState(
-                    icon: emptyIcon,
-                    title: "No \(title) Yet",
-                    message: emptyDescription
-                )
-            } else {
-                Group {
-                    switch viewMode {
-                    case .list:
-                        CollectionListView(
-                            groupedVariants: groupedVariants,
-                            sortedGroupNames: sortedFamilyNames,
-                            selectedVariant: $selectedVariant
-                        )
-                    case .gallery:
-                        CollectionGalleryView(
-                            groupedVariants: groupedVariants,
-                            sortedGroupNames: sortedFamilyNames,
-                            selectedVariant: $selectedVariant
-                        )
-                    case .stats:
-                        StatsView(variants: filteredVariants)
-                    }
-                }
-            }
-        }
-        .navigationTitle(title)
-        .navigationBarTitleDisplayMode(.large)
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    withAnimation(LottaPawsTheme.animationSpring) {
-                        if status == .collection {
-                            // Collection has 3 modes: list → gallery → stats → list
-                            switch viewMode {
-                            case .list:
-                                viewMode = .gallery
-                            case .gallery:
-                                viewMode = .stats
-                            case .stats:
-                                viewMode = .list
-                            }
-                        } else {
-                            // Wishlist has 2 modes: list → gallery → list
-                            viewMode = viewMode == .list ? .gallery : .list
+        NavigationStack {
+            ZStack {
+                if filteredVariants.isEmpty {
+                    LPEmptyState(
+                        icon: emptyIcon,
+                        title: "No \(title) Yet",
+                        message: emptyDescription
+                    )
+                } else {
+                    Group {
+                        switch viewMode {
+                        case .list:
+                            CollectionListView(
+                                groupedVariants: groupedVariants,
+                                sortedGroupNames: sortedFamilyNames,
+                                selectedVariant: $selectedVariant
+                            )
+                        case .gallery:
+                            CollectionGalleryView(
+                                groupedVariants: groupedVariants,
+                                sortedGroupNames: sortedFamilyNames,
+                                selectedVariant: $selectedVariant
+                            )
+                        case .stats:
+                            StatsView(variants: filteredVariants)
                         }
                     }
-                } label: {
-                    Image(systemName: iconForMode)
-                        .foregroundColor(.primaryPink)
                 }
             }
-        }
-        .sheet(item: $selectedVariant) { variant in
-            OwnedVariantDetailView(ownedVariant: variant)
+            .navigationTitle(title)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        withAnimation(LottaPawsTheme.animationSpring) {
+                            if status == .collection {
+                                // Collection has 3 modes: list → gallery → stats → list
+                                switch viewMode {
+                                case .list:
+                                    viewMode = .gallery
+                                case .gallery:
+                                    viewMode = .stats
+                                case .stats:
+                                    viewMode = .list
+                                }
+                            } else {
+                                // Wishlist has 2 modes: list → gallery → list
+                                viewMode = viewMode == .list ? .gallery : .list
+                            }
+                        }
+                    } label: {
+                        Image(systemName: iconForMode)
+                            .foregroundColor(.primaryPink)
+                    }
+                }
+            }
+            .sheet(item: $selectedVariant) { variant in
+                OwnedVariantDetailView(ownedVariant: variant)
+            }
         }
     }
 }
