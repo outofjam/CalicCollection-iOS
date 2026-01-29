@@ -458,8 +458,75 @@ struct BrowseView: View {
                 familyName: response.critter.familyName,
                 familySpecies: nil,
                 memberType: response.critter.memberType,
-                role: variant.role,
+                role: nil,
                 imageURL: variant.imageUrl,
                 thumbnailURL: variant.thumbnailUrl,
                 status: status
             )
+            
+            modelContext.insert(owned)
+            try modelContext.save()
+            
+            let generator = UINotificationFeedbackGenerator()
+            generator.notificationOccurred(.success)
+            
+            ToastManager.shared.show(
+                "✓ Added to \(status == .collection ? "Collection" : "Wishlist")",
+                type: .success
+            )
+        } catch {
+            AppLogger.error("Failed to add single variant: \(error)")
+            ToastManager.shared.show("Failed to add variant", type: .error)
+        }
+    }
+    
+    private func addSearchResult(_ result: SearchResultResponse, status: CritterStatus) async {
+        do {
+            try await OwnedVariant.create(from: result, status: status, in: modelContext)
+            
+            let generator = UINotificationFeedbackGenerator()
+            generator.notificationOccurred(.success)
+            
+            ToastManager.shared.show(
+                "✓ Added to \(status == .collection ? "Collection" : "Wishlist")",
+                type: .success
+            )
+        } catch {
+            ToastManager.shared.show("Failed to add", type: .error)
+        }
+    }
+    
+    private func fetchScannedSet(_ barcode: String) async {
+        isLoadingSet = true
+        showingBarcodeScanner = false
+        
+        do {
+            let setResponse = try await SetService.shared.fetchSetByBarcode(barcode)
+            scannedSet = setResponse
+            isLoadingSet = false
+            showingScannedSetPicker = true
+            scannedBarcode = nil
+        } catch {
+            isLoadingSet = false
+            
+            let errorMessage: String
+            if let apiError = error as? APIError {
+                errorMessage = apiError.localizedDescription
+            } else {
+                errorMessage = "Failed to load set"
+            }
+            
+            ToastManager.shared.show(errorMessage, type: .error)
+            scannedBarcode = nil
+        }
+    }
+}
+
+// MARK: - Typealias for backwards compatibility
+typealias SearchView = BrowseView
+
+#Preview {
+    NavigationStack {
+        BrowseView(searchText: .constant(""))
+    }
+}
