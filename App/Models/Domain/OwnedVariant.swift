@@ -14,6 +14,10 @@ final class OwnedVariant {
     var memberType: String
     var role: String?
     
+    // Set/epoch info for display
+    var epochId: String?
+    var setName: String?
+    
     // Remote URLs (for reference/re-download)
     var imageURL: String?
     var thumbnailURL: String?
@@ -55,6 +59,8 @@ final class OwnedVariant {
         familySpecies: String? = nil,
         memberType: String,
         role: String? = nil,
+        epochId: String? = nil,
+        setName: String? = nil,
         imageURL: String? = nil,
         thumbnailURL: String? = nil,
         localImagePath: String? = nil,
@@ -78,6 +84,8 @@ final class OwnedVariant {
         self.familySpecies = familySpecies
         self.memberType = memberType
         self.role = role
+        self.epochId = epochId
+        self.setName = setName
         self.imageURL = imageURL
         self.thumbnailURL = thumbnailURL
         self.localImagePath = localImagePath
@@ -126,6 +134,8 @@ extension OwnedVariant {
             existing.thumbnailURL = variant.thumbnailUrl
             existing.localImagePath = imagePath
             existing.localThumbnailPath = thumbPath
+            existing.epochId = variant.epochId
+            existing.setName = variant.setName
             if status == .collection && existing.photoPath == nil {
                 existing.addedDate = Date()
             }
@@ -139,6 +149,8 @@ extension OwnedVariant {
                 familyId: familyId,
                 familyName: critter.familyName,
                 memberType: critter.memberType,
+                epochId: variant.epochId,
+                setName: variant.setName,
                 imageURL: variant.imageUrl,
                 thumbnailURL: variant.thumbnailUrl,
                 localImagePath: imagePath,
@@ -178,6 +190,8 @@ extension OwnedVariant {
             existing.thumbnailURL = searchResult.thumbnailUrl
             existing.localImagePath = imagePath
             existing.localThumbnailPath = thumbPath
+            existing.epochId = searchResult.epochId
+            existing.setName = searchResult.setName
             if status == .collection && existing.photoPath == nil {
                 existing.addedDate = Date()
             }
@@ -191,6 +205,8 @@ extension OwnedVariant {
                 familyId: searchResult.familyUuid ?? "",
                 familyName: searchResult.familyName,
                 memberType: searchResult.memberType ?? "unknown",
+                epochId: searchResult.epochId,
+                setName: searchResult.setName,
                 imageURL: searchResult.imageUrl,
                 thumbnailURL: searchResult.thumbnailUrl,
                 localImagePath: imagePath,
@@ -230,6 +246,8 @@ extension OwnedVariant {
             existing.thumbnailURL = setVariant.thumbnailURL
             existing.localImagePath = imagePath
             existing.localThumbnailPath = thumbPath
+            existing.epochId = setVariant.epochId
+            existing.setName = setVariant.setName
             if status == .collection && existing.photoPath == nil {
                 existing.addedDate = Date()
             }
@@ -245,6 +263,8 @@ extension OwnedVariant {
                 familySpecies: setVariant.critter.family.species,
                 memberType: setVariant.critter.memberType,
                 role: setVariant.critter.role,
+                epochId: setVariant.epochId,
+                setName: setVariant.setName,
                 imageURL: setVariant.imageURL,
                 thumbnailURL: setVariant.thumbnailURL,
                 localImagePath: imagePath,
