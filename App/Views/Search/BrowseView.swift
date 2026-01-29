@@ -48,9 +48,6 @@ struct BrowseView: View {
     @State private var showingScannedSetPicker = false
     @State private var isLoadingSet = false
     
-    // Confetti
-    @State private var showConfetti = false
-    
     private var isSearchMode: Bool {
         !searchText.trimmingCharacters(in: .whitespaces).isEmpty && searchText.count >= 2
     }
@@ -120,7 +117,6 @@ struct BrowseView: View {
         .overlay {
             if isLoadingSet || isAddingSingleVariant { loadingOverlay }
         }
-        .confetti(isShowing: $showConfetti)
     }
     
     // MARK: - Family Filter Menu
@@ -241,7 +237,6 @@ struct BrowseView: View {
                 }
             }
             .listStyle(.insetGrouped)
-            
         }
     }
     
@@ -393,6 +388,10 @@ struct BrowseView: View {
             }
             
             totalPages = response.meta.lastPage
+        } catch is CancellationError {
+            // Don't treat cancellation as an error
+            AppLogger.debug("Browse fetch cancelled")
+            if reset { currentPage = 1 }
         } catch {
             browseError = error.localizedDescription
             if reset { currentPage = 1 }
@@ -528,6 +527,8 @@ struct BrowseView: View {
                 familySpecies: nil,
                 memberType: response.critter.memberType,
                 role: nil,
+                epochId: variant.epochId,
+                setName: variant.setName,
                 imageURL: variant.imageUrl,
                 thumbnailURL: variant.thumbnailUrl,
                 status: status
@@ -539,9 +540,9 @@ struct BrowseView: View {
             let generator = UINotificationFeedbackGenerator()
             generator.notificationOccurred(.success)
             
-            // Trigger confetti if adding to collection
+            // Trigger confetti if adding to collection (shows on root view)
             if status == .collection && AppSettings.shared.showConfetti {
-                showConfetti = true
+                ConfettiManager.shared.trigger()
             }
             
             ToastManager.shared.show(
@@ -561,9 +562,9 @@ struct BrowseView: View {
             let generator = UINotificationFeedbackGenerator()
             generator.notificationOccurred(.success)
             
-            // Trigger confetti if adding to collection
+            // Trigger confetti if adding to collection (shows on root view)
             if status == .collection && AppSettings.shared.showConfetti {
-                showConfetti = true
+                ConfettiManager.shared.trigger()
             }
             
             ToastManager.shared.show(

@@ -39,6 +39,7 @@
 		931E304C2F2BE7A900F1EA33 /* VariantStatusBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931E304B2F2BE7A900F1EA33 /* VariantStatusBadge.swift */; };
 		931E304E2F2BE7B600F1EA33 /* PurchaseDetailsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931E304D2F2BE7B600F1EA33 /* PurchaseDetailsSection.swift */; };
 		931E30522F2BE80A00F1EA33 /* ReportIssueSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931E30512F2BE80A00F1EA33 /* ReportIssueSheet.swift */; };
+		931E307C2F2BF6CD00F1EA33 /* ConfettiManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931E307B2F2BF6CD00F1EA33 /* ConfettiManager.swift */; };
 		937B9F3F2F2023AC00C08885 /* CalicCollectionV2App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937B9F3E2F2023AC00C08885 /* CalicCollectionV2App.swift */; };
 		937B9F412F2023AC00C08885 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937B9F402F2023AC00C08885 /* ContentView.swift */; };
 		937B9F742F20247B00C08885 /* FamilyResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937B9F732F20247800C08885 /* FamilyResponse.swift */; };
@@ -130,6 +131,7 @@
 		931E304B2F2BE7A900F1EA33 /* VariantStatusBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VariantStatusBadge.swift; sourceTree = "<group>"; };
 		931E304D2F2BE7B600F1EA33 /* PurchaseDetailsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseDetailsSection.swift; sourceTree = "<group>"; };
 		931E30512F2BE80A00F1EA33 /* ReportIssueSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportIssueSheet.swift; sourceTree = "<group>"; };
+		931E307B2F2BF6CD00F1EA33 /* ConfettiManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfettiManager.swift; sourceTree = "<group>"; };
 		937B9F3B2F2023AC00C08885 /* CalicCollectionV2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CalicCollectionV2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		937B9F3E2F2023AC00C08885 /* CalicCollectionV2App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalicCollectionV2App.swift; sourceTree = "<group>"; };
 		937B9F402F2023AC00C08885 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -247,6 +249,7 @@
 		931E2FCB2F2BC45500F1EA33 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				931E307B2F2BF6CD00F1EA33 /* ConfettiManager.swift */,
 				93C461C22F22D4B300A8F084 /* ToastManager.swift */,
 				93C462432F26E8BD00A8F084 /* VariantPhoto+Helpers.swift */,
 				937B9F8F2F202B6800C08885 /* Config.swift */,
@@ -597,6 +600,7 @@
 				93C461E22F2511DA00A8F084 /* FamilyDetailView.swift in Sources */,
 				93C461C32F22D4BB00A8F084 /* ToastManager.swift in Sources */,
 				93C461E82F251D8200A8F084 /* ScannedSetPickerSheet.swift in Sources */,
+				931E307C2F2BF6CD00F1EA33 /* ConfettiManager.swift in Sources */,
 				931E2F2F2F2AAFD900F1EA33 /* BrowseResponses.swift in Sources */,
 				931E2F3A2F2AB04F00F1EA33 /* OwnedVariant.swift in Sources */,
 				931E2F4B2F2AB94C00F1EA33 /* FilterChipsView.swift in Sources */,
