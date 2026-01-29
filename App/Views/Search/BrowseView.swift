@@ -39,6 +39,9 @@ struct BrowseView: View {
     @State private var selectedCritterUuid: String?
     @State private var pickerTargetStatus: CritterStatus = .collection
     
+    // Single variant add
+    @State private var isAddingSingleVariant = false
+    
     // Barcode scanner
     @State private var showingBarcodeScanner = false
     @State private var scannedBarcode: String?
@@ -116,7 +119,7 @@ struct BrowseView: View {
             }
         }
         .overlay {
-            if isLoadingSet { loadingOverlay }
+            if isLoadingSet || isAddingSingleVariant { loadingOverlay }
         }
     }
     
@@ -285,7 +288,7 @@ struct BrowseView: View {
             VStack(spacing: 12) {
                 ProgressView()
                     .scaleEffect(1.5)
-                Text("Loading set...")
+                Text(isAddingSingleVariant ? "Adding..." : "Loading set...")
                     .font(.subheadline)
             }
             .padding(20)
@@ -399,6 +402,13 @@ struct BrowseView: View {
             return
         }
         
+        // Single variant - add directly without picker
+        if critter.variantsCount == 1 {
+            Task { await addSingleVariant(critterUuid: critter.uuid, status: .collection) }
+            return
+        }
+        
+        // Multiple variants - show picker
         pickerTargetStatus = .collection
         selectedCritterUuid = critter.uuid
     }
@@ -409,57 +419,47 @@ struct BrowseView: View {
             return
         }
         
+        // Single variant - add directly without picker
+        if critter.variantsCount == 1 {
+            Task { await addSingleVariant(critterUuid: critter.uuid, status: .wishlist) }
+            return
+        }
+        
+        // Multiple variants - show picker
         pickerTargetStatus = .wishlist
         selectedCritterUuid = critter.uuid
     }
     
-    private func addSearchResult(_ result: SearchResultResponse, status: CritterStatus) async {
-        do {
-            try await OwnedVariant.create(from: result, status: status, in: modelContext)
-            
-            let generator = UINotificationFeedbackGenerator()
-            generator.notificationOccurred(.success)
-            
-            ToastManager.shared.show(
-                "✓ Added to \(status == .collection ? "Collection" : "Wishlist")",
-                type: .success
-            )
-        } catch {
-            ToastManager.shared.show("Failed to add", type: .error)
-        }
-    }
-    
-    private func fetchScannedSet(_ barcode: String) async {
-        isLoadingSet = true
-        showingBarcodeScanner = false
+    private func addSingleVariant(critterUuid: String, status: CritterStatus) async {
+        isAddingSingleVariant = true
+        defer { isAddingSingleVariant = false }
         
         do {
-            let setResponse = try await SetService.shared.fetchSetByBarcode(barcode)
-            scannedSet = setResponse
-            isLoadingSet = false
-            showingScannedSetPicker = true
-            scannedBarcode = nil
-        } catch {
-            isLoadingSet = false
+            let response = try await BrowseService.shared.fetchCritterVariants(critterUuid: critterUuid)
             
-            let errorMessage: String
-            if let apiError = error as? APIError {
-                errorMessage = apiError.localizedDescription
-            } else {
-                errorMessage = "Failed to load set"
+            guard let variant = response.variants.first else {
+                ToastManager.shared.show("No variant found", type: .error)
+                return
             }
             
-            ToastManager.shared.show(errorMessage, type: .error)
-            scannedBarcode = nil
-        }
-    }
-}
-
-// MARK: - Typealias for backwards compatibility
-typealias SearchView = BrowseView
-
-#Preview {
-    NavigationStack {
-        BrowseView(searchText: .constant(""))
-    }
-}
+            // Check if already owned
+            if ownedVariants.contains(where: { $0.variantUuid == variant.uuid }) {
+                ToastManager.shared.show("Already in your \(status == .collection ? "collection" : "wishlist")", type: .info)
+                return
+            }
+            
+            // Create OwnedVariant
+            let owned = OwnedVariant(
+                variantUuid: variant.uuid,
+                critterUuid: response.critter.uuid,
+                critterName: response.critter.name,
+                variantName: variant.name,
+                familyId: response.critter.familyUuid ?? "",
+                familyName: response.critter.familyName,
+                familySpecies: nil,
+                memberType: response.critter.memberType,
+                role: variant.role,
+                imageURL: variant.imageUrl,
+                thumbnailURL: variant.thumbnailUrl,
+                status: status
+            )

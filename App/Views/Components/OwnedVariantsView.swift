@@ -291,10 +291,24 @@ struct OwnedVariantDetailView: View {
                 )
             }
             .fullScreenCover(isPresented: $showingFullscreenImage) {
-                if let localPath = ownedVariant.localImagePath {
+                if let localPath = ownedVariant.localImagePath,
+                   FileManager.default.fileExists(atPath: localPath) {
                     FullscreenLocalImageViewer(imagePath: localPath)
                 } else if let imageURL = ownedVariant.imageURL {
                     FullscreenImageViewer(imageURL: imageURL)
+                } else {
+                    // Fallback - dismiss immediately if no image available
+                    Color.black.ignoresSafeArea()
+                        .overlay {
+                            VStack {
+                                Image(systemName: "photo.slash")
+                                    .font(.largeTitle)
+                                    .foregroundColor(.gray)
+                                Text("Image not available")
+                                    .foregroundColor(.gray)
+                            }
+                        }
+                        .onTapGesture { showingFullscreenImage = false }
                 }
             }
             .sheet(isPresented: $showingPurchaseDetails) {
