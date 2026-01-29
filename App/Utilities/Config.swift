@@ -1,5 +1,4 @@
 import Foundation
-
 /// App configuration and constants
 struct Config {
     
@@ -16,6 +15,10 @@ struct Config {
         return "https://api.callicollection.com/api/v1"
 #endif
     }
+    
+    // MARK: - URLs
+    
+    static let buyMeCoffeeURL = URL(string: "https://buymeacoffee.com/lottapaws")!
     
     // MARK: - App Information
     

@@ -19,7 +19,38 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             List {
-                // MARK: - Sync Section
+                // MARK: - Preferences
+                Section {
+                    Toggle(isOn: $appSettings.showPurchaseDetails) {
+                        VStack(alignment: .leading, spacing: LottaPawsTheme.spacingXS) {
+                            Text("Show Purchase Details")
+                                .font(.body)
+                                .foregroundColor(.textPrimary)
+                            Text("Track price, date, location, and condition")
+                                .font(.caption)
+                                .foregroundColor(.textSecondary)
+                        }
+                    }
+                    .tint(.primaryPink)
+                    
+                    Toggle(isOn: $appSettings.showConfetti) {
+                        VStack(alignment: .leading, spacing: LottaPawsTheme.spacingXS) {
+                            Text("Celebration Effects")
+                                .font(.body)
+                                .foregroundColor(.textPrimary)
+                            Text("Show confetti when adding to collection")
+                                .font(.caption)
+                                .foregroundColor(.textSecondary)
+                        }
+                    }
+                    .tint(.primaryPink)
+                } header: {
+                    Text("Preferences")
+                } footer: {
+                    Text("Purchase details are optional collector features. Turn off to simplify the interface for younger users.")
+                }
+                
+                // MARK: - Data
                 Section {
                     HStack {
                         VStack(alignment: .leading, spacing: LottaPawsTheme.spacingXS) {
@@ -79,57 +110,7 @@ struct SettingsView: View {
                             }
                         }
                     }
-                } header: {
-                    Text("Sync")
-                } footer: {
-                    if syncService.needsSync {
-                        Text("It's been a while since your last sync. Consider syncing to get the latest families.")
-                    }
-                }
-                
-                // MARK: - Preferences Section
-                Section {
-                    Toggle(isOn: $appSettings.showPurchaseDetails) {
-                        VStack(alignment: .leading, spacing: LottaPawsTheme.spacingXS) {
-                            Text("Show Purchase Details")
-                                .font(.body)
-                                .foregroundColor(.textPrimary)
-                            Text("Track price, date, location, and condition")
-                                .font(.caption)
-                                .foregroundColor(.textSecondary)
-                        }
-                    }
-                    .tint(.primaryPink)
                     
-                    Toggle(isOn: $appSettings.showConfetti) {
-                        VStack(alignment: .leading, spacing: LottaPawsTheme.spacingXS) {
-                            Text("Celebration Effects")
-                                .font(.body)
-                                .foregroundColor(.textPrimary)
-                            Text("Show confetti when adding to collection")
-                                .font(.caption)
-                                .foregroundColor(.textSecondary)
-                        }
-                    }
-                    .tint(.primaryPink)
-                } header: {
-                    Text("Preferences")
-                } footer: {
-                    Text("Purchase details are optional collector features. Turn off to simplify the interface for younger users.")
-                }
-                
-                // MARK: - About
-                Section {
-                    NavigationLink {
-                        AboutView()
-                    } label: {
-                        Label("About", systemImage: "info.circle")
-                            .foregroundColor(.textPrimary)
-                    }
-                }
-                
-                // MARK: - Data Section
-                Section {
                     NavigationLink {
                         DataManagementView()
                     } label: {
@@ -138,6 +119,57 @@ struct SettingsView: View {
                     }
                 } header: {
                     Text("Data")
+                } footer: {
+                    if syncService.needsSync {
+                        Text("It's been a while since your last sync. Consider syncing to get the latest families.")
+                    }
+                }
+                
+                // MARK: - About & Support
+                Section {
+                    NavigationLink {
+                        AboutView()
+                    } label: {
+                        Label("About", systemImage: "info.circle")
+                            .foregroundColor(.textPrimary)
+                    }
+                    
+                    Button {
+                        UIApplication.shared.open(Config.buyMeCoffeeURL)
+                    } label: {
+                        HStack(spacing: LottaPawsTheme.spacingSM) {
+                            ZStack {
+                                Image(systemName: "cup.and.saucer.fill")
+                                    .font(.title2)
+                                    .foregroundColor(.brown)
+                                
+                                Image(systemName: "pawprint.fill")
+                                    .font(.system(size: 8))
+                                    .foregroundColor(.primaryPink)
+                                    .offset(x: 10, y: -10)
+                            }
+                            .frame(width: 32)
+                            
+                            VStack(alignment: .leading, spacing: LottaPawsTheme.spacingXS) {
+                                Text("Support LottaPaws")
+                                    .font(.body)
+                                    .foregroundColor(.textPrimary)
+                                
+                                Text("Fuel the developer 🐾☕")
+                                    .font(.caption)
+                                    .foregroundColor(.textSecondary)
+                            }
+                            
+                            Spacer()
+                            
+                            Image(systemName: "arrow.up.right")
+                                .font(.caption)
+                                .foregroundColor(.textTertiary)
+                        }
+                    }
+                    .buttonStyle(.plain)
+                } header: {
+                    Text("About")
                 }
             }
             .navigationTitle("Settings")
