@@ -34,6 +34,7 @@
 		931E2FC72F2BB4DB00F1EA33 /* LottaPawsTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931E2FBF2F2BB4DB00F1EA33 /* LottaPawsTheme.swift */; };
 		931E2FC82F2BB4DB00F1EA33 /* LottaPawsInputs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931E2FBC2F2BB4DB00F1EA33 /* LottaPawsInputs.swift */; };
 		931E2FCA2F2BC08C00F1EA33 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 931E2FC92F2BC08C00F1EA33 /* README.md */; };
+		931E30452F2BE23500F1EA33 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 931E30442F2BE23500F1EA33 /* LaunchScreen.storyboard */; };
 		937B9F3F2F2023AC00C08885 /* CalicCollectionV2App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937B9F3E2F2023AC00C08885 /* CalicCollectionV2App.swift */; };
 		937B9F412F2023AC00C08885 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937B9F402F2023AC00C08885 /* ContentView.swift */; };
 		937B9F742F20247B00C08885 /* FamilyResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937B9F732F20247800C08885 /* FamilyResponse.swift */; };
@@ -121,6 +122,7 @@
 		931E2FBE2F2BB4DB00F1EA33 /* LottaPawsText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LottaPawsText.swift; sourceTree = "<group>"; };
 		931E2FBF2F2BB4DB00F1EA33 /* LottaPawsTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LottaPawsTheme.swift; sourceTree = "<group>"; };
 		931E2FC92F2BC08C00F1EA33 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		931E30442F2BE23500F1EA33 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		937B9F3B2F2023AC00C08885 /* CalicCollectionV2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CalicCollectionV2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		937B9F3E2F2023AC00C08885 /* CalicCollectionV2App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalicCollectionV2App.swift; sourceTree = "<group>"; };
 		937B9F402F2023AC00C08885 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -249,6 +251,7 @@
 		937B9F322F2023AC00C08885 = {
 			isa = PBXGroup;
 			children = (
+				931E30442F2BE23500F1EA33 /* LaunchScreen.storyboard */,
 				937B9F672F2023D800C08885 /* App */,
 				937B9F3D2F2023AC00C08885 /* CalicCollectionV2 */,
 				937B9F4D2F2023AD00C08885 /* CalicCollectionV2Tests */,
@@ -545,6 +548,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				931E2FCA2F2BC08C00F1EA33 /* README.md in Resources */,
+				931E30452F2BE23500F1EA33 /* LaunchScreen.storyboard in Resources */,
 				931E2F1F2F2A52B600F1EA33 /* ARCHITECTURE.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

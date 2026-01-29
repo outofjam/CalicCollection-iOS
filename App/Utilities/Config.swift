@@ -18,7 +18,7 @@ struct Config {
     
     // MARK: - URLs
     
-    static let buyMeCoffeeURL = URL(string: "https://buymeacoffee.com/lottapaws")!
+    static let buyMeCoffeeURL = URL(string: "https://ko-fi.com/outofjam")!
     
     // MARK: - App Information
     
