@@ -1,13 +1,5 @@
 //
 //  APIDecodingTests.swift
-//  CalicCollectionV2
-//
-//  Created by Ismail Dawoodjee on 2026-01-28.
-//
-
-
-//
-//  APIDecodingTests.swift
 //  CalicCollectionV2Tests
 //
 //  Created by Ismail Dawoodjee on 2026-01-28.
@@ -166,63 +158,149 @@ final class APIDecodingTests: XCTestCase {
         XCTAssertEqual(response.data.variants[0].imageUrl, "https://example.com/image.webp")
     }
     
-    // MARK: - SearchResultResponse Tests
+    // MARK: - CritterSearchResult Tests (New Grouped Search)
     
-    func testDecodeSearchResultResponse() throws {
+    func testDecodeCritterSearchResult() throws {
         let json = """
         {
-            "variant_uuid": "variant-123",
-            "variant_name": "Holiday Edition",
-            "critter_uuid": "critter-456",
-            "critter_name": "Stella Chocolate",
-            "family_uuid": "family-789",
-            "family_name": "Chocolate Rabbit",
-            "member_type": "Kids",
-            "image_url": "https://example.com/image.jpg",
+            "critter_uuid": "abc-123",
+            "critter_name": "Flora Rabbit",
+            "member_type": "Babies",
+            "birthday": "12-03",
+            "hobby": "Painting",
+            "family_uuid": "def-456",
+            "family_name": "Flora Rabbit",
+            "species": "Rabbit",
             "thumbnail_url": "https://example.com/thumb.jpg",
-            "set_name": "Holiday Set",
-            "release_year": 2023
+            "matching_variants_count": 2,
+            "matching_variants": [
+                {
+                    "variant_uuid": "v1",
+                    "variant_name": "Original Release",
+                    "set_name": "Classic Set",
+                    "epoch_id": "CC-2024",
+                    "release_year": 2024,
+                    "thumbnail_url": "https://example.com/v1.jpg"
+                },
+                {
+                    "variant_uuid": "v2",
+                    "variant_name": "Christmas Edition",
+                    "set_name": "Holiday Set",
+                    "epoch_id": "HC-2024",
+                    "release_year": 2024,
+                    "thumbnail_url": "https://example.com/v2.jpg"
+                }
+            ]
         }
         """.data(using: .utf8)!
         
-        let result = try decoder.decode(SearchResultResponse.self, from: json)
+        let result = try decoder.decode(CritterSearchResult.self, from: json)
         
-        XCTAssertEqual(result.variantUuid, "variant-123")
-        XCTAssertEqual(result.variantName, "Holiday Edition")
-        XCTAssertEqual(result.critterUuid, "critter-456")
-        XCTAssertEqual(result.critterName, "Stella Chocolate")
-        XCTAssertEqual(result.familyUuid, "family-789")
-        XCTAssertEqual(result.familyName, "Chocolate Rabbit")
-        XCTAssertEqual(result.memberType, "Kids")
-        XCTAssertEqual(result.setName, "Holiday Set")
-        XCTAssertEqual(result.releaseYear, 2023)
+        XCTAssertEqual(result.critterUuid, "abc-123")
+        XCTAssertEqual(result.critterName, "Flora Rabbit")
+        XCTAssertEqual(result.memberType, "Babies")
+        XCTAssertEqual(result.birthday, "12-03")
+        XCTAssertEqual(result.hobby, "Painting")
+        XCTAssertEqual(result.familyUuid, "def-456")
+        XCTAssertEqual(result.familyName, "Flora Rabbit")
+        XCTAssertEqual(result.species, "Rabbit")
+        XCTAssertEqual(result.matchingVariantsCount, 2)
+        XCTAssertEqual(result.matchingVariants.count, 2)
+        XCTAssertEqual(result.matchingVariants[0].variantName, "Original Release")
+        XCTAssertEqual(result.matchingVariants[1].epochId, "HC-2024")
     }
     
-    func testDecodeSearchResultResponseWithNulls() throws {
+    func testDecodeCritterSearchResultWithNulls() throws {
         let json = """
         {
-            "variant_uuid": "variant-123",
-            "variant_name": "Basic Variant",
-            "critter_uuid": null,
-            "critter_name": null,
+            "critter_uuid": "abc-123",
+            "critter_name": "Test Critter",
+            "member_type": "Kids",
+            "birthday": null,
+            "hobby": null,
             "family_uuid": null,
             "family_name": null,
-            "member_type": null,
-            "image_url": null,
+            "species": null,
             "thumbnail_url": null,
-            "set_name": null,
-            "release_year": null
+            "matching_variants_count": 0,
+            "matching_variants": []
         }
         """.data(using: .utf8)!
         
-        let result = try decoder.decode(SearchResultResponse.self, from: json)
+        let result = try decoder.decode(CritterSearchResult.self, from: json)
         
-        XCTAssertEqual(result.variantUuid, "variant-123")
-        XCTAssertEqual(result.variantName, "Basic Variant")
-        XCTAssertNil(result.critterUuid)
-        XCTAssertNil(result.critterName)
+        XCTAssertEqual(result.critterUuid, "abc-123")
+        XCTAssertNil(result.birthday)
+        XCTAssertNil(result.hobby)
         XCTAssertNil(result.familyUuid)
-        XCTAssertNil(result.releaseYear)
+        XCTAssertEqual(result.matchingVariants.count, 0)
+    }
+    
+    func testDecodeMatchingVariant() throws {
+        let json = """
+        {
+            "variant_uuid": "v1",
+            "variant_name": "Holiday Edition",
+            "set_name": "Holiday Set 2024",
+            "epoch_id": "5735",
+            "release_year": 2024,
+            "thumbnail_url": "https://example.com/thumb.jpg"
+        }
+        """.data(using: .utf8)!
+        
+        let variant = try decoder.decode(MatchingVariant.self, from: json)
+        
+        XCTAssertEqual(variant.variantUuid, "v1")
+        XCTAssertEqual(variant.variantName, "Holiday Edition")
+        XCTAssertEqual(variant.setName, "Holiday Set 2024")
+        XCTAssertEqual(variant.epochId, "5735")
+        XCTAssertEqual(variant.releaseYear, 2024)
+    }
+    
+    func testDecodeCritterSearchAPIResponse() throws {
+        let json = """
+        {
+            "data": [
+                {
+                    "critter_uuid": "abc-123",
+                    "critter_name": "Flora Rabbit",
+                    "member_type": "Babies",
+                    "birthday": null,
+                    "hobby": null,
+                    "family_uuid": "def-456",
+                    "family_name": "Flora Rabbit",
+                    "species": "Rabbit",
+                    "thumbnail_url": null,
+                    "matching_variants_count": 1,
+                    "matching_variants": [
+                        {
+                            "variant_uuid": "v1",
+                            "variant_name": "Original",
+                            "set_name": null,
+                            "epoch_id": null,
+                            "release_year": null,
+                            "thumbnail_url": null
+                        }
+                    ]
+                }
+            ],
+            "meta": {
+                "current_page": 1,
+                "last_page": 1,
+                "per_page": 20,
+                "total": 1,
+                "total_variants_matched": 1,
+                "response_time_ms": 45
+            }
+        }
+        """.data(using: .utf8)!
+        
+        let response = try decoder.decode(CritterSearchAPIResponse.self, from: json)
+        
+        XCTAssertEqual(response.data.count, 1)
+        XCTAssertEqual(response.data[0].critterName, "Flora Rabbit")
+        XCTAssertEqual(response.meta.currentPage, 1)
+        XCTAssertEqual(response.meta.totalVariantsMatched, 1)
     }
     
     // MARK: - FamilyDetailResponse Tests
@@ -402,10 +480,6 @@ final class APIDecodingTests: XCTestCase {
             "message": "Report submitted successfully. Thank you for helping improve our database!",
             "data": {
                 "uuid": "034d9c75-545f-4ea4-a8b3-b7802721b898"
-            },
-            "meta": {
-                "response_time_ms": 56,
-                "count": 1
             }
         }
         """.data(using: .utf8)!
@@ -435,6 +509,28 @@ final class APIDecodingTests: XCTestCase {
         XCTAssertEqual(meta.lastPage, 5)
         XCTAssertEqual(meta.perPage, 30)
         XCTAssertEqual(meta.total, 149)
+    }
+    
+    // MARK: - SearchPaginationMeta Tests
+    
+    func testDecodeSearchPaginationMeta() throws {
+        let json = """
+        {
+            "current_page": 1,
+            "last_page": 3,
+            "per_page": 20,
+            "total": 45,
+            "total_variants_matched": 78,
+            "response_time_ms": 52
+        }
+        """.data(using: .utf8)!
+        
+        let meta = try decoder.decode(SearchPaginationMeta.self, from: json)
+        
+        XCTAssertEqual(meta.currentPage, 1)
+        XCTAssertEqual(meta.lastPage, 3)
+        XCTAssertEqual(meta.total, 45)
+        XCTAssertEqual(meta.totalVariantsMatched, 78)
     }
     
     // MARK: - Error Cases
@@ -499,5 +595,27 @@ final class APIDecodingTests: XCTestCase {
         
         XCTAssertEqual(response.data.count, 0)
         XCTAssertEqual(response.meta.total, 0)
+    }
+    
+    func testDecodeEmptySearchResults() throws {
+        let json = """
+        {
+            "data": [],
+            "meta": {
+                "current_page": 1,
+                "last_page": 1,
+                "per_page": 20,
+                "total": 0,
+                "total_variants_matched": 0,
+                "response_time_ms": 15
+            }
+        }
+        """.data(using: .utf8)!
+        
+        let response = try decoder.decode(CritterSearchAPIResponse.self, from: json)
+        
+        XCTAssertEqual(response.data.count, 0)
+        XCTAssertEqual(response.meta.total, 0)
+        XCTAssertEqual(response.meta.totalVariantsMatched, 0)
     }
 }

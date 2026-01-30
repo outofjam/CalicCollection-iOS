@@ -58,24 +58,6 @@ struct VariantAdditionHelpers {
             ConfettiManager.shared.trigger()
         }
     }
-    
-    /// Add a search result to collection/wishlist
-    static func addSearchResult(
-        _ result: SearchResultResponse,
-        status: CritterStatus,
-        modelContext: ModelContext
-    ) async throws {
-        try await OwnedVariant.create(from: result, status: status, in: modelContext)
-        
-        // Success feedback
-        let generator = UINotificationFeedbackGenerator()
-        generator.notificationOccurred(.success)
-        
-        // Trigger confetti if adding to collection
-        if status == .collection && AppSettings.shared.showConfetti {
-            ConfettiManager.shared.trigger()
-        }
-    }
 }
 
 // MARK: - Error Types

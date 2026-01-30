@@ -1,3 +1,10 @@
+//
+//  OwnedVariantTests.swift
+//  CalicCollectionV2Tests
+//
+//  Created by Ismail Dawoodjee on 2026-01-28.
+//
+
 import XCTest
 import SwiftData
 @testable import CalicCollectionV2
@@ -51,29 +58,45 @@ final class OwnedVariantTests: XCTestCase {
         XCTAssertEqual(ownedVariants.first?.familyId, critter.familyUuid)
     }
     
-    // MARK: - Test Creation from SearchResult
+    // MARK: - Test Direct Initialization
     
-    func testCreateOwnedVariantFromSearchResult() async throws {
+    func testCreateOwnedVariantDirectly() throws {
         // Given
-        let searchResult = createTestSearchResult()
+        let variantUuid = UUID().uuidString
+        let critterUuid = UUID().uuidString
+        let familyId = UUID().uuidString
         
         // When
-        try await OwnedVariant.create(
-            from: searchResult,
-            status: .wishlist,
-            in: modelContext
+        let owned = OwnedVariant(
+            variantUuid: variantUuid,
+            critterUuid: critterUuid,
+            critterName: "Flora Rabbit",
+            variantName: "Holiday Edition",
+            familyId: familyId,
+            familyName: "Flora Rabbit Family",
+            familySpecies: "Rabbit",
+            memberType: "Babies",
+            role: nil,
+            epochId: "5735",
+            setName: "Holiday Set 2024",
+            imageURL: "https://example.com/image.jpg",
+            thumbnailURL: "https://example.com/thumb.jpg",
+            status: .wishlist
         )
+        
+        modelContext.insert(owned)
+        try modelContext.save()
         
         // Then
         let descriptor = FetchDescriptor<OwnedVariant>()
         let ownedVariants = try modelContext.fetch(descriptor)
         
         XCTAssertEqual(ownedVariants.count, 1)
-        XCTAssertEqual(ownedVariants.first?.variantUuid, searchResult.variantUuid)
+        XCTAssertEqual(ownedVariants.first?.variantUuid, variantUuid)
         XCTAssertEqual(ownedVariants.first?.status, .wishlist)
-        XCTAssertEqual(ownedVariants.first?.critterName, searchResult.critterName)
-        XCTAssertEqual(ownedVariants.first?.familyName, searchResult.familyName)
-        XCTAssertEqual(ownedVariants.first?.familyId, searchResult.familyUuid)
+        XCTAssertEqual(ownedVariants.first?.critterName, "Flora Rabbit")
+        XCTAssertEqual(ownedVariants.first?.epochId, "5735")
+        XCTAssertEqual(ownedVariants.first?.setName, "Holiday Set 2024")
     }
     
     // MARK: - Test Duplicate Handling
@@ -221,8 +244,11 @@ final class OwnedVariantTests: XCTestCase {
             uuid: UUID().uuidString,
             name: "Test Critter",
             memberType: "Kids",
+            birthday: nil,
             familyName: "Test Family",
-            familyUuid: familyUuid
+            familyUuid: familyUuid,
+            species: "fox"
+            
         )
         let variant = createTestVariantResponse(critterId: critter.uuid)
         
@@ -243,6 +269,128 @@ final class OwnedVariantTests: XCTestCase {
         XCTAssertFalse(ownedVariant?.familyId.isEmpty ?? true, "Family ID should not be empty")
     }
     
+    // MARK: - Test Status Computed Property
+    
+    func testStatusComputedProperty() throws {
+        // Given
+        let owned = OwnedVariant(
+            variantUuid: UUID().uuidString,
+            critterUuid: UUID().uuidString,
+            critterName: "Test",
+            variantName: "Test Variant",
+            familyId: UUID().uuidString,
+            memberType: "Kids",
+            status: .collection
+        )
+        
+        // Then
+        XCTAssertEqual(owned.status, .collection)
+        XCTAssertEqual(owned.statusRaw, "collection")
+        
+        // When - Change status
+        owned.status = .wishlist
+        
+        // Then
+        XCTAssertEqual(owned.status, .wishlist)
+        XCTAssertEqual(owned.statusRaw, "wishlist")
+    }
+    
+    // MARK: - Test hasLocalImages Computed Property
+    
+    func testHasLocalImagesWithNoImages() throws {
+        // Given
+        let owned = OwnedVariant(
+            variantUuid: UUID().uuidString,
+            critterUuid: UUID().uuidString,
+            critterName: "Test",
+            variantName: "Test Variant",
+            familyId: UUID().uuidString,
+            memberType: "Kids",
+            localImagePath: nil,
+            localThumbnailPath: nil,
+            status: .collection
+        )
+        
+        // Then
+        XCTAssertFalse(owned.hasLocalImages)
+    }
+    
+    func testHasLocalImagesWithThumbnail() throws {
+        // Given
+        let owned = OwnedVariant(
+            variantUuid: UUID().uuidString,
+            critterUuid: UUID().uuidString,
+            critterName: "Test",
+            variantName: "Test Variant",
+            familyId: UUID().uuidString,
+            memberType: "Kids",
+            localImagePath: nil,
+            localThumbnailPath: "/path/to/thumb.jpg",
+            status: .collection
+        )
+        
+        // Then
+        XCTAssertTrue(owned.hasLocalImages)
+    }
+    
+    func testHasLocalImagesWithFullImage() throws {
+        // Given
+        let owned = OwnedVariant(
+            variantUuid: UUID().uuidString,
+            critterUuid: UUID().uuidString,
+            critterName: "Test",
+            variantName: "Test Variant",
+            familyId: UUID().uuidString,
+            memberType: "Kids",
+            localImagePath: "/path/to/image.jpg",
+            localThumbnailPath: nil,
+            status: .collection
+        )
+        
+        // Then
+        XCTAssertTrue(owned.hasLocalImages)
+    }
+    
+    // MARK: - Test Epoch/Set Info Storage
+    
+    func testEpochAndSetInfoIsStored() async throws {
+        // Given
+        let critter = createTestCritterInfo()
+        let variant = VariantResponse(
+            uuid: UUID().uuidString,
+            critterId: critter.uuid,
+            name: "Holiday Edition",
+            sku: "CC-5735-01",
+            barcode: nil,
+            imageUrl: nil,
+            thumbnailUrl: nil,
+            releaseYear: 2024,
+            notes: nil,
+            setId: "set-123",
+            setName: "Holiday Set 2024",
+            epochId: "5735",
+            createdAt: "2024-01-01T00:00:00Z",
+            updatedAt: "2024-01-01T00:00:00Z",
+            isPrimary: true
+        )
+        
+        // When
+        try await OwnedVariant.create(
+            variant: variant,
+            critter: critter,
+            familyId: critter.familyUuid ?? "",
+            status: .collection,
+            in: modelContext
+        )
+        
+        // Then
+        let descriptor = FetchDescriptor<OwnedVariant>()
+        let ownedVariant = try modelContext.fetch(descriptor).first
+        
+        XCTAssertEqual(ownedVariant?.epochId, "5735")
+        XCTAssertEqual(ownedVariant?.setName, "Holiday Set 2024")
+    }
+    
     // MARK: - Helper Methods
     
     private func createTestCritterInfo() -> CritterInfo {
@@ -250,8 +398,10 @@ final class OwnedVariantTests: XCTestCase {
             uuid: UUID().uuidString,
             name: "Test Husky",
             memberType: "Kids",
+            birthday: "03-15",
             familyName: "Husky Family",
-            familyUuid: UUID().uuidString
+            familyUuid: UUID().uuidString,
+            species: "fox"
         )
     }
     
@@ -272,22 +422,6 @@ final class OwnedVariantTests: XCTestCase {
             createdAt: "2024-01-01T00:00:00Z",
             updatedAt: "2024-01-01T00:00:00Z",
             isPrimary: true
-        )
-    }
-    
-    private func createTestSearchResult() -> SearchResultResponse {
-        return SearchResultResponse(
-            variantUuid: UUID().uuidString,
-            variantName: "Search Result Variant",
-            critterUuid: UUID().uuidString,
-            critterName: "Search Critter",
-            familyUuid: UUID().uuidString,
-            familyName: "Search Family",
-            memberType: "Parents",
-            imageUrl: "https://example.com/search-image.jpg",
-            thumbnailUrl: "https://example.com/search-thumb.jpg",
-            setName: nil,
-            releaseYear: 2023
         )
     }
 }

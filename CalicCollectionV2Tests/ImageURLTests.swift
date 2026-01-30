@@ -138,49 +138,49 @@ final class ImageURLTests: XCTestCase {
     
     // MARK: - Test SearchResultResponse URLs
     
-    func testSearchResultThumbnailFallback() {
-        // Given
-        let searchResult = SearchResultResponse(
-            variantUuid: UUID().uuidString,
-            variantName: "Test Variant",
-            critterUuid: UUID().uuidString,
-            critterName: "Test Critter",
-            familyUuid: UUID().uuidString,
-            familyName: "Test Family",
-            memberType: "Kids",
-            imageUrl: "https://example.com/image.jpg",
-            thumbnailUrl: nil,
-            setName: nil,
-            releaseYear: nil
-        )
-        
-        // When
-        let displayURL = searchResult.thumbnailUrl ?? searchResult.imageUrl
-        
-        // Then
-        XCTAssertEqual(displayURL, "https://example.com/image.jpg")
-    }
+//    func testSearchResultThumbnailFallback() {
+//        // Given
+//        let searchResult = SearchResultResponse(
+//            variantUuid: UUID().uuidString,
+//            variantName: "Test Variant",
+//            critterUuid: UUID().uuidString,
+//            critterName: "Test Critter",
+//            familyUuid: UUID().uuidString,
+//            familyName: "Test Family",
+//            memberType: "Kids",
+//            imageUrl: "https://example.com/image.jpg",
+//            thumbnailUrl: nil,
+//            setName: nil,
+//            releaseYear: nil
+//        )
+//        
+//        // When
+//        let displayURL = searchResult.thumbnailUrl ?? searchResult.imageUrl
+//        
+//        // Then
+//        XCTAssertEqual(displayURL, "https://example.com/image.jpg")
+//    }
     
-    func testSearchResultPrefersThumbnail() {
-        // Given
-        let searchResult = SearchResultResponse(
-            variantUuid: UUID().uuidString,
-            variantName: "Test Variant",
-            critterUuid: UUID().uuidString,
-            critterName: "Test Critter",
-            familyUuid: UUID().uuidString,
-            familyName: "Test Family",
-            memberType: "Kids",
-            imageUrl: "https://example.com/image.jpg",
-            thumbnailUrl: "https://example.com/thumb.jpg",
-            setName: nil,
-            releaseYear: nil
-        )
-        
-        // When
-        let displayURL = searchResult.thumbnailUrl ?? searchResult.imageUrl
-        
-        // Then
-        XCTAssertEqual(displayURL, "https://example.com/thumb.jpg")
-    }
+//    func testSearchResultPrefersThumbnail() {
+//        // Given
+//        let searchResult = SearchResultResponse(
+//            variantUuid: UUID().uuidString,
+//            variantName: "Test Variant",
+//            critterUuid: UUID().uuidString,
+//            critterName: "Test Critter",
+//            familyUuid: UUID().uuidString,
+//            familyName: "Test Family",
+//            memberType: "Kids",
+//            imageUrl: "https://example.com/image.jpg",
+//            thumbnailUrl: "https://example.com/thumb.jpg",
+//            setName: nil,
+//            releaseYear: nil
+//        )
+//        
+//        // When
+//        let displayURL = searchResult.thumbnailUrl ?? searchResult.imageUrl
+//        
+//        // Then
+//        XCTAssertEqual(displayURL, "https://example.com/thumb.jpg")
+//    }
 }

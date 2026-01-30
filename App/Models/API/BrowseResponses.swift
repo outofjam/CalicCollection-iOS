@@ -28,7 +28,7 @@ struct BrowseCritterResponse: Codable, Identifiable {
     let memberType: String
     let familyUuid: String?
     let familyName: String?
-    let species: String?  // Add
+    let species: String?
     let variantsCount: Int
     let thumbnailUrl: String?
     
@@ -63,7 +63,7 @@ struct CritterInfo: Codable {
     let birthday: String?
     let familyName: String?
     let familyUuid: String?
-    let species: String?  // Add
+    let species: String?
     
     enum CodingKeys: String, CodingKey {
         case uuid, name, birthday, species
@@ -88,48 +88,81 @@ struct ResponseMeta: Codable {
     }
 }
 
-// MARK: - Search Results (Flat Variants)
+// MARK: - Search Results (Grouped by Critter)
 
-struct SearchResultResponse: Codable, Identifiable {
-    let variantUuid: String
-    let variantName: String
-    let critterUuid: String?
-    let critterName: String?
+struct CritterSearchResult: Codable, Identifiable {
+    let critterUuid: String
+    let critterName: String
+    let memberType: String
+    let birthday: String?
+    let hobby: String?
     let familyUuid: String?
     let familyName: String?
-    let species: String?  // Add
-    let memberType: String?
-    let birthday: String?
-    let imageUrl: String?
+    let species: String?
     let thumbnailUrl: String?
+    let matchingVariantsCount: Int
+    let matchingVariants: [MatchingVariant]
+    
+    var id: String { critterUuid }
+    
+    enum CodingKeys: String, CodingKey {
+        case critterUuid = "critter_uuid"
+        case critterName = "critter_name"
+        case memberType = "member_type"
+        case birthday, hobby
+        case familyUuid = "family_uuid"
+        case familyName = "family_name"
+        case species
+        case thumbnailUrl = "thumbnail_url"
+        case matchingVariantsCount = "matching_variants_count"
+        case matchingVariants = "matching_variants"
+    }
+}
+
+struct MatchingVariant: Codable, Identifiable {
+    let variantUuid: String
+    let variantName: String
     let setName: String?
+    let epochId: String?
     let releaseYear: Int?
+    let thumbnailUrl: String?
     
     var id: String { variantUuid }
     
     enum CodingKeys: String, CodingKey {
         case variantUuid = "variant_uuid"
         case variantName = "variant_name"
-        case critterUuid = "critter_uuid"
-        case critterName = "critter_name"
-        case familyUuid = "family_uuid"
-        case familyName = "family_name"
-        case species
-        case memberType = "member_type"
-        case imageUrl = "image_url"
-        case thumbnailUrl = "thumbnail_url"
         case setName = "set_name"
+        case epochId = "epoch_id"
         case releaseYear = "release_year"
-        case birthday
+        case thumbnailUrl = "thumbnail_url"
     }
 }
 
-struct SearchAPIResponse: Codable {
-    let data: [SearchResultResponse]
-    let meta: PaginationMeta
+struct SearchPaginationMeta: Codable {
+    let currentPage: Int
+    let lastPage: Int
+    let perPage: Int
+    let total: Int
+    let totalVariantsMatched: Int
+    let responseTimeMs: Int?
+    
+    enum CodingKeys: String, CodingKey {
+        case currentPage = "current_page"
+        case lastPage = "last_page"
+        case perPage = "per_page"
+        case total
+        case totalVariantsMatched = "total_variants_matched"
+        case responseTimeMs = "response_time_ms"
+    }
 }
 
-// MARK: - Families (Updated)
+struct CritterSearchAPIResponse: Codable {
+    let data: [CritterSearchResult]
+    let meta: SearchPaginationMeta
+}
+
+// MARK: - Families
 
 struct FamilyBrowseResponse: Codable, Identifiable {
     let uuid: String
@@ -159,7 +192,7 @@ struct FamilyDetailCritter: Codable, Identifiable {
     let uuid: String
     let name: String
     let memberType: String
-    let species: String?  // Add
+    let species: String?
     let variantsCount: Int
     let thumbnailUrl: String?
     

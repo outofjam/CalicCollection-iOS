@@ -1,6 +1,6 @@
 import Foundation
 
-/// Service for searching variants (online only)
+/// Service for searching critters (online only)
 class SearchService {
     static let shared = SearchService()
     
@@ -10,16 +10,17 @@ class SearchService {
     
     private init() {}
     
-    /// Search variants across variant names, critter names, and family names
+    /// Search critters across variant names, critter names, and family names
+    /// Returns results grouped by critter with matching variants
     /// - Parameters:
     ///   - query: Search query (min 2 characters)
     ///   - page: Page number (default 1)
-    ///   - perPage: Items per page (default 30)
+    ///   - perPage: Critters per page (default 20)
     func search(
         query: String,
         page: Int = 1,
-        perPage: Int = 30
-    ) async throws -> SearchAPIResponse {
+        perPage: Int = 20
+    ) async throws -> CritterSearchAPIResponse {
         // URL encode the query
         guard let encodedQuery = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
             throw APIError.invalidURL
@@ -53,6 +54,6 @@ class SearchService {
         }
         
         let decoder = JSONDecoder()
-        return try decoder.decode(SearchAPIResponse.self, from: data)
+        return try decoder.decode(CritterSearchAPIResponse.self, from: data)
     }
 }

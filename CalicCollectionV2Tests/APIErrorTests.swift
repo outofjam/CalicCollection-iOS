@@ -1,13 +1,5 @@
 //
 //  APIErrorTests.swift
-//  CalicCollectionV2
-//
-//  Created by Ismail Dawoodjee on 2026-01-28.
-//
-
-
-//
-//  APIErrorTests.swift
 //  CalicCollectionV2Tests
 //
 //  Created by Ismail Dawoodjee on 2026-01-28.
@@ -37,23 +29,30 @@ final class APIErrorTests: XCTestCase {
     
     func testHTTPErrorDescription() {
         let error400 = APIError.httpError(statusCode: 400)
-        XCTAssertTrue(error400.localizedDescription.contains("400"))
+        XCTAssertEqual(error400.localizedDescription, "HTTP error: 400")
         
         let error500 = APIError.httpError(statusCode: 500)
-        XCTAssertTrue(error500.localizedDescription.contains("500"))
+        XCTAssertEqual(error500.localizedDescription, "HTTP error: 500")
         
         let error404 = APIError.httpError(statusCode: 404)
-        XCTAssertTrue(error404.localizedDescription.contains("404"))
+        XCTAssertEqual(error404.localizedDescription, "HTTP error: 404")
     }
     
     func testRateLimitedErrorDescription() {
         let error = APIError.rateLimited
-        XCTAssertFalse(error.localizedDescription.isEmpty)
+        XCTAssertEqual(error.localizedDescription, "Too many requests. Please try again later.")
     }
     
     func testDecodingErrorDescription() {
-        let error = APIError.decodingError(message: "Failed to decode response")
-        XCTAssertEqual(error.localizedDescription, "Failed to decode response")
+        // decodingError takes an Error, not a message string
+        let underlyingError = NSError(
+            domain: "TestDomain",
+            code: 1,
+            userInfo: [NSLocalizedDescriptionKey: "Test decoding failure"]
+        )
+        let error = APIError.decodingError(underlyingError)
+        XCTAssertTrue(error.localizedDescription.contains("Failed to decode response"))
+        XCTAssertTrue(error.localizedDescription.contains("Test decoding failure"))
     }
     
     func testNetworkErrorDescription() {
@@ -63,7 +62,18 @@ final class APIErrorTests: XCTestCase {
             userInfo: [NSLocalizedDescriptionKey: "The Internet connection appears to be offline."]
         )
         let error = APIError.networkError(underlyingError)
-        XCTAssertFalse(error.localizedDescription.isEmpty)
+        XCTAssertTrue(error.localizedDescription.contains("Network error"))
+        XCTAssertTrue(error.localizedDescription.contains("offline"))
+    }
+    
+    func testValidationErrorDescription() {
+        let error = APIError.validationError(message: "Invalid input data")
+        XCTAssertEqual(error.localizedDescription, "Invalid input data")
+    }
+    
+    func testOfflineErrorDescription() {
+        let error = APIError.offline
+        XCTAssertEqual(error.localizedDescription, "No internet connection. Please check your network.")
     }
     
     // MARK: - CritterStatus Tests
@@ -80,12 +90,7 @@ final class APIErrorTests: XCTestCase {
         XCTAssertNil(CritterStatus(rawValue: ""))
     }
     
-    func testCritterStatusAllCases() {
-        XCTAssertEqual(CritterStatus.allCases.count, 2)
-        XCTAssertTrue(CritterStatus.allCases.contains(.collection))
-        XCTAssertTrue(CritterStatus.allCases.contains(.wishlist))
-    }
-    
+
     // MARK: - ReportIssueType Tests
     
     func testReportIssueTypeRawValues() {

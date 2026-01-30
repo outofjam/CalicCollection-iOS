@@ -2,22 +2,22 @@
 //  SearchResultsList.swift
 //  LottaPaws
 //
-//  Search results list with pagination
+//  Search results list showing critters with matching variants
 //
 
 import SwiftUI
 
 struct SearchResultsList: View {
-    let results: [SearchResultResponse]
+    let results: [CritterSearchResult]
     let searchText: String
     let isSearching: Bool
     let error: String?
     let currentPage: Int
     let totalPages: Int
     let onLoadMore: () -> Void
-    let onCollectionAction: (SearchResultResponse) -> Void
-    let onWishlistAction: (SearchResultResponse) -> Void
-    let isOwnedCheck: (String) -> Bool
+    let onCritterTap: (CritterSearchResult) -> Void
+    let collectionCountFor: (String) -> Int
+    let wishlistCountFor: (String) -> Int
     
     var body: some View {
         if isSearching && results.isEmpty {
@@ -39,30 +39,19 @@ struct SearchResultsList: View {
             LPEmptyState(
                 icon: "magnifyingglass",
                 title: "No Results",
-                message: "No variants found for \"\(searchText)\""
+                message: "No critters found for \"\(searchText)\""
             )
         } else {
             List {
                 ForEach(results) { result in
-                    SearchResultRow(
+                    SearchCritterRow(
                         result: result,
-                        isOwned: isOwnedCheck(result.variantUuid)
+                        collectionCount: collectionCountFor(result.critterUuid),
+                        wishlistCount: wishlistCountFor(result.critterUuid)
                     )
-                    .swipeActions(edge: .leading) {
-                        Button {
-                            onCollectionAction(result)
-                        } label: {
-                            Label("Collection", systemImage: "star.fill")
-                        }
-                        .tint(.secondaryBlue)
-                    }
-                    .swipeActions(edge: .trailing) {
-                        Button {
-                            onWishlistAction(result)
-                        } label: {
-                            Label("Wishlist", systemImage: "heart.fill")
-                        }
-                        .tint(.primaryPink)
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        onCritterTap(result)
                     }
                     .onAppear {
                         if result.id == results.last?.id && currentPage < totalPages {

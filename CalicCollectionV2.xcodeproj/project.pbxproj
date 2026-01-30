@@ -22,7 +22,6 @@
 		931E2F492F2AB94500F1EA33 /* BrowseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931E2F482F2AB94500F1EA33 /* BrowseView.swift */; };
 		931E2F4B2F2AB94C00F1EA33 /* FilterChipsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931E2F4A2F2AB94C00F1EA33 /* FilterChipsView.swift */; };
 		931E2F4D2F2AB95300F1EA33 /* BrowseCritterRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931E2F4C2F2AB95300F1EA33 /* BrowseCritterRow.swift */; };
-		931E2F4F2F2AB95A00F1EA33 /* SearchResultRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931E2F4E2F2AB95A00F1EA33 /* SearchResultRow.swift */; };
 		931E2F792F2B9D3700F1EA33 /* ConfettiView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931E2F782F2B9D3700F1EA33 /* ConfettiView.swift */; };
 		931E2FC02F2BB4DB00F1EA33 /* LottaPawsCards.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931E2FB92F2BB4DB00F1EA33 /* LottaPawsCards.swift */; };
 		931E2FC12F2BB4DB00F1EA33 /* LottaPawsBadges.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931E2FB72F2BB4DB00F1EA33 /* LottaPawsBadges.swift */; };
@@ -43,6 +42,7 @@
 		931E30A62F2BF9DF00F1EA33 /* BrowseCrittersList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931E30A52F2BF9DF00F1EA33 /* BrowseCrittersList.swift */; };
 		931E30A82F2BF9E900F1EA33 /* SearchResultsList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931E30A72F2BF9E900F1EA33 /* SearchResultsList.swift */; };
 		931E30AA2F2BF9F700F1EA33 /* VariantAdditionHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931E30A92F2BF9F700F1EA33 /* VariantAdditionHelpers.swift */; };
+		931E30E92F2CEA7000F1EA33 /* SearchCritterRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931E30E82F2CEA7000F1EA33 /* SearchCritterRow.swift */; };
 		937B9F3F2F2023AC00C08885 /* CalicCollectionV2App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937B9F3E2F2023AC00C08885 /* CalicCollectionV2App.swift */; };
 		937B9F412F2023AC00C08885 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937B9F402F2023AC00C08885 /* ContentView.swift */; };
 		937B9F742F20247B00C08885 /* FamilyResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937B9F732F20247800C08885 /* FamilyResponse.swift */; };
@@ -117,7 +117,6 @@
 		931E2F482F2AB94500F1EA33 /* BrowseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowseView.swift; sourceTree = "<group>"; };
 		931E2F4A2F2AB94C00F1EA33 /* FilterChipsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterChipsView.swift; sourceTree = "<group>"; };
 		931E2F4C2F2AB95300F1EA33 /* BrowseCritterRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowseCritterRow.swift; sourceTree = "<group>"; };
-		931E2F4E2F2AB95A00F1EA33 /* SearchResultRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchResultRow.swift; sourceTree = "<group>"; };
 		931E2F782F2B9D3700F1EA33 /* ConfettiView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfettiView.swift; sourceTree = "<group>"; };
 		931E2FB72F2BB4DB00F1EA33 /* LottaPawsBadges.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LottaPawsBadges.swift; sourceTree = "<group>"; };
 		931E2FB82F2BB4DB00F1EA33 /* LottaPawsButtons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LottaPawsButtons.swift; sourceTree = "<group>"; };
@@ -138,6 +137,7 @@
 		931E30A52F2BF9DF00F1EA33 /* BrowseCrittersList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowseCrittersList.swift; sourceTree = "<group>"; };
 		931E30A72F2BF9E900F1EA33 /* SearchResultsList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchResultsList.swift; sourceTree = "<group>"; };
 		931E30A92F2BF9F700F1EA33 /* VariantAdditionHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VariantAdditionHelpers.swift; sourceTree = "<group>"; };
+		931E30E82F2CEA7000F1EA33 /* SearchCritterRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchCritterRow.swift; sourceTree = "<group>"; };
 		937B9F3B2F2023AC00C08885 /* CalicCollectionV2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CalicCollectionV2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		937B9F3E2F2023AC00C08885 /* CalicCollectionV2App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalicCollectionV2App.swift; sourceTree = "<group>"; };
 		937B9F402F2023AC00C08885 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -397,12 +397,12 @@
 		937B9F6E2F20241200C08885 /* Search */ = {
 			isa = PBXGroup;
 			children = (
+				931E30E82F2CEA7000F1EA33 /* SearchCritterRow.swift */,
 				93C461E52F251D6600A8F084 /* BarcodeScannerView.swift */,
 				931E30D32F2BFAEA00F1EA33 /* Browse */,
 				937B9F8B2F2028E300C08885 /* CritterDetailView.swift */,
 				931E2F4A2F2AB94C00F1EA33 /* FilterChipsView.swift */,
 				93C461E72F251D8200A8F084 /* ScannedSetPickerSheet.swift */,
-				931E2F4E2F2AB95A00F1EA33 /* SearchResultRow.swift */,
 				93C461CC2F22EB3100A8F084 /* VariantDetailView.swift */,
 			);
 			path = Search;
@@ -663,6 +663,7 @@
 				931E2FC72F2BB4DB00F1EA33 /* LottaPawsTheme.swift in Sources */,
 				931E2FC82F2BB4DB00F1EA33 /* LottaPawsInputs.swift in Sources */,
 				931E2F442F2AB08D00F1EA33 /* BrowseService.swift in Sources */,
+				931E30E92F2CEA7000F1EA33 /* SearchCritterRow.swift in Sources */,
 				931E2F452F2AB08D00F1EA33 /* APIError.swift in Sources */,
 				931E2F462F2AB08D00F1EA33 /* SearchService.swift in Sources */,
 				931E2F472F2AB08D00F1EA33 /* ImagePersistenceService.swift in Sources */,
@@ -679,7 +680,6 @@
 				937B9F3F2F2023AC00C08885 /* CalicCollectionV2App.swift in Sources */,
 				93ADCD462F292DFC00351CE9 /* NetworkConfig.swift in Sources */,
 				93C4625E2F27B6D400A8F084 /* CachedAsyncImage.swift in Sources */,
-				931E2F4F2F2AB95A00F1EA33 /* SearchResultRow.swift in Sources */,
 				931E2F3D2F2AB07200F1EA33 /* Family.swift in Sources */,
 				93ADCD1A2F29272300351CE9 /* FullscreenImageViewer.swift in Sources */,
 				93C461CB2F22D65B00A8F084 /* SettingsView.swift in Sources */,

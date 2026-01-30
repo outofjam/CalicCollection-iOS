@@ -189,63 +189,7 @@ extension OwnedVariant {
         try context.save()
     }
     
-    /// Create from search result selection
-    static func create(
-        from searchResult: SearchResultResponse,
-        status: CritterStatus,
-        in context: ModelContext
-    ) async throws {
-        let variantUuid = searchResult.variantUuid
-        
-        // Check if already owned
-        let descriptor = FetchDescriptor<OwnedVariant>(
-            predicate: #Predicate { $0.variantUuid == variantUuid }
-        )
-        
-        // Cache images for offline access
-        let (imagePath, thumbPath) = try await ImagePersistenceService.shared.cacheImages(
-            imageUrl: searchResult.imageUrl,
-            thumbnailUrl: searchResult.thumbnailUrl,
-            for: variantUuid
-        )
-        
-        print("🎂 Birthday from search: \(searchResult.birthday ?? "nil")")
-        
-        if let existing = try? context.fetch(descriptor).first {
-            // Update existing
-            existing.status = status
-            existing.imageURL = searchResult.imageUrl
-            existing.thumbnailURL = searchResult.thumbnailUrl
-            existing.localImagePath = imagePath
-            existing.localThumbnailPath = thumbPath
-            existing.birthday = searchResult.birthday
-            if status == .collection && existing.photoPath == nil {
-                existing.addedDate = Date()
-            }
-        } else {
-            // Create new
-            let owned = OwnedVariant(
-                variantUuid: searchResult.variantUuid,
-                critterUuid: searchResult.critterUuid ?? "",
-                critterName: searchResult.critterName ?? "Unknown",
-                variantName: searchResult.variantName,
-                familyId: searchResult.familyUuid ?? "",
-                familyName: searchResult.familyName,
-                memberType: searchResult.memberType ?? "unknown",
-                birthday: searchResult.birthday,
-                epochId: nil,
-                setName: nil,
-                imageURL: searchResult.imageUrl,
-                thumbnailURL: searchResult.thumbnailUrl,
-                localImagePath: imagePath,
-                localThumbnailPath: thumbPath,
-                status: status
-            )
-            context.insert(owned)
-        }
-        
-        try context.save()
-    }
+
     
     /// Create from barcode scan (SetVariant)
     static func create(

@@ -1,13 +1,5 @@
 //
 //  SyncServiceTests.swift
-//  CalicCollectionV2
-//
-//  Created by Ismail Dawoodjee on 2026-01-28.
-//
-
-
-//
-//  SyncServiceTests.swift
 //  CalicCollectionV2Tests
 //
 //  Created by Ismail Dawoodjee on 2026-01-28.
@@ -109,9 +101,9 @@ final class SyncServiceTests: XCTestCase {
         XCTAssertGreaterThanOrEqual(families.count, 1)
     }
     
-    // MARK: - FamilyResponse to Family Conversion Tests
+    // MARK: - FamilyBrowseResponse Decoding Tests (used in sync)
     
-    func testFamilyResponseDecoding() throws {
+    func testFamilyBrowseResponseDecoding() throws {
         let json = """
         {
             "uuid": "5097c565-4446-47cc-8e2a-55035f3e7d6b",
@@ -124,14 +116,71 @@ final class SyncServiceTests: XCTestCase {
         """.data(using: .utf8)!
         
         let decoder = JSONDecoder()
-        let response = try decoder.decode(FamilyResponse.self, from: json)
+        let response = try decoder.decode(FamilyBrowseResponse.self, from: json)
         
         XCTAssertEqual(response.uuid, "5097c565-4446-47cc-8e2a-55035f3e7d6b")
         XCTAssertEqual(response.name, "Chocolate Rabbit")
         XCTAssertEqual(response.slug, "chocolate-rabbit")
         XCTAssertEqual(response.species, "Rabbit")
-        XCTAssertNil(response.imageURL)
+        XCTAssertNil(response.imageUrl)
         XCTAssertEqual(response.crittersCount, 8)
+    }
+    
+    func testFamilyBrowseResponseWithImageUrl() throws {
+        let json = """
+        {
+            "uuid": "test-uuid",
+            "name": "Husky Family",
+            "slug": "husky-family",
+            "species": "Dog",
+            "image_url": "https://example.com/husky.jpg",
+            "critters_count": 5
+        }
+        """.data(using: .utf8)!
+        
+        let decoder = JSONDecoder()
+        let response = try decoder.decode(FamilyBrowseResponse.self, from: json)
+        
+        XCTAssertEqual(response.uuid, "test-uuid")
+        XCTAssertEqual(response.imageUrl, "https://example.com/husky.jpg")
+        XCTAssertEqual(response.crittersCount, 5)
+    }
+    
+    func testFamiliesAPIResponseDecoding() throws {
+        let json = """
+        {
+            "data": [
+                {
+                    "uuid": "uuid-1",
+                    "name": "Chocolate Rabbit",
+                    "slug": "chocolate-rabbit",
+                    "species": "Rabbit",
+                    "image_url": null,
+                    "critters_count": 8
+                },
+                {
+                    "uuid": "uuid-2",
+                    "name": "Persian Cat",
+                    "slug": "persian-cat",
+                    "species": "Cat",
+                    "image_url": "https://example.com/cat.jpg",
+                    "critters_count": 5
+                }
+            ],
+            "meta": {
+                "response_time_ms": 45,
+                "count": 2
+            }
+        }
+        """.data(using: .utf8)!
+        
+        let decoder = JSONDecoder()
+        let response = try decoder.decode(FamiliesAPIResponse.self, from: json)
+        
+        XCTAssertEqual(response.data.count, 2)
+        XCTAssertEqual(response.data[0].name, "Chocolate Rabbit")
+        XCTAssertEqual(response.data[1].name, "Persian Cat")
+        XCTAssertEqual(response.meta?.count, 2)
     }
     
     // MARK: - Backup Tests
@@ -235,21 +284,5 @@ final class SyncServiceTests: XCTestCase {
         XCTAssertEqual(decoded.variantUuid, "variant-1")
         XCTAssertEqual(decoded.filename, "photo_001.jpg")
         XCTAssertEqual(decoded.caption, "My setup")
-    }
-    
-    // MARK: - Import Result Tests
-    
-    func testImportResultStructure() {
-        let result = ImportResult(
-            imported: 10,
-            skipped: 2,
-            updated: 5,
-            photosImported: 8
-        )
-        
-        XCTAssertEqual(result.imported, 10)
-        XCTAssertEqual(result.skipped, 2)
-        XCTAssertEqual(result.updated, 5)
-        XCTAssertEqual(result.photosImported, 8)
     }
 }

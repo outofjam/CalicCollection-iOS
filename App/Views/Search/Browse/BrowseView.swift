@@ -23,7 +23,7 @@ struct BrowseView: View {
     @State private var browseError: String?
     
     // Search state
-    @State private var searchResults: [SearchResultResponse] = []
+    @State private var searchResults: [CritterSearchResult] = []
     @State private var searchPage = 1
     @State private var searchTotalPages = 1
     @State private var isSearching = false
@@ -192,13 +192,11 @@ struct BrowseView: View {
             currentPage: searchPage,
             totalPages: searchTotalPages,
             onLoadMore: { Task { await performSearch(reset: false) } },
-            onCollectionAction: { result in
-                Task { await handleSearchResultAction(result, status: .collection) }
+            onCritterTap: { result in
+                handleSearchCritterTap(result)
             },
-            onWishlistAction: { result in
-                Task { await handleSearchResultAction(result, status: .wishlist) }
-            },
-            isOwnedCheck: isOwned
+            collectionCountFor: collectionCountFor,
+            wishlistCountFor: wishlistCountFor
         )
     }
     
@@ -328,7 +326,7 @@ struct BrowseView: View {
             let response = try await SearchService.shared.search(
                 query: searchText,
                 page: searchPage,
-                perPage: 30
+                perPage: 20
             )
             
             if reset {
@@ -355,10 +353,6 @@ struct BrowseView: View {
     
     private func wishlistCountFor(_ critterUuid: String) -> Int {
         ownedVariants.filter { $0.critterUuid == critterUuid && $0.status == .wishlist }.count
-    }
-    
-    private func isOwned(_ variantUuid: String) -> Bool {
-        ownedVariants.contains { $0.variantUuid == variantUuid }
     }
     
     private func handleCollectionAction(for critter: BrowseCritterResponse) {
@@ -419,21 +413,11 @@ struct BrowseView: View {
         }
     }
     
-    private func handleSearchResultAction(_ result: SearchResultResponse, status: CritterStatus) async {
-        do {
-            try await VariantAdditionHelpers.addSearchResult(
-                result,
-                status: status,
-                modelContext: modelContext
-            )
-            
-            ToastManager.shared.show(
-                "✓ Added to \(status == .collection ? "Collection" : "Wishlist")",
-                type: .success
-            )
-        } catch {
-            ToastManager.shared.show("Failed to add", type: .error)
-        }
+    private func handleSearchCritterTap(_ result: CritterSearchResult) {
+        // If only one matching variant, could add directly
+        // For now, always show picker for consistency
+        pickerTargetStatus = .collection
+        selectedCritterUuid = result.critterUuid
     }
     
     private func fetchScannedSet(_ barcode: String) async {
