@@ -121,6 +121,31 @@ struct StatsView: View {
                     )
                 }
                 
+                // MARK: - Set Completion Link
+                NavigationLink {
+                    SetCompletionView(ownedVariants: variants)
+                } label: {
+                    HStack {
+                        Image(systemName: "square.stack.3d.up")
+                            .font(.subheadline)
+                            .foregroundColor(.primaryPink)
+                        Text("Set Completion")
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                            .foregroundColor(.textPrimary)
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .font(.caption)
+                            .foregroundColor(.textTertiary)
+                    }
+                    .padding(LottaPawsTheme.spacingMD)
+                    .background(
+                        RoundedRectangle(cornerRadius: LottaPawsTheme.radiusMD)
+                            .fill(Color.backgroundSecondary)
+                    )
+                }
+                .buttonStyle(.plain)
+                
                 LPDivider()
                 
                 // MARK: - Family Breakdown
