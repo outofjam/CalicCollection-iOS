@@ -54,12 +54,14 @@ struct SetCritter: Codable {
     let uuid: String
     let name: String
     let memberType: String
+    let birthday: String?
     let role: String?
     let family: SetFamily
     
     enum CodingKeys: String, CodingKey {
-        case uuid, name, role, family
+        case uuid, name, role, family, birthday
         case memberType = "member_type"
+        
     }
 }
 

@@ -13,6 +13,7 @@ final class OwnedVariant {
     var familySpecies: String?
     var memberType: String
     var role: String?
+    var birthday: String?  // Format: "mm-dd" from API
     
     // Set/epoch info for display
     var epochId: String?
@@ -48,6 +49,25 @@ final class OwnedVariant {
     var hasLocalImages: Bool {
         localThumbnailPath != nil || localImagePath != nil
     }
+    
+    /// Returns a formatted birthday string like "December 3" or nil if no birthday
+    var formattedBirthday: String? {
+        guard let birthday = birthday else { return nil }
+        let parts = birthday.split(separator: "-")
+        guard parts.count == 2,
+              let month = Int(parts[0]),
+              let day = Int(parts[1]) else { return nil }
+        
+        var components = DateComponents()
+        components.month = month
+        components.day = day
+        
+        guard let date = Calendar.current.date(from: components) else { return nil }
+        
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMMM d"
+        return formatter.string(from: date)
+    }
 
     init(
         variantUuid: String,
@@ -59,6 +79,7 @@ final class OwnedVariant {
         familySpecies: String? = nil,
         memberType: String,
         role: String? = nil,
+        birthday: String? = nil,
         epochId: String? = nil,
         setName: String? = nil,
         imageURL: String? = nil,
@@ -84,6 +105,7 @@ final class OwnedVariant {
         self.familySpecies = familySpecies
         self.memberType = memberType
         self.role = role
+        self.birthday = birthday
         self.epochId = epochId
         self.setName = setName
         self.imageURL = imageURL
@@ -127,6 +149,8 @@ extension OwnedVariant {
             for: variantUuid
         )
         
+        print("🎂 Birthday from API: \(critter.birthday ?? "nil")")  // ADD THIS LINE
+        
         if let existing = try? context.fetch(descriptor).first {
             // Update existing
             existing.status = status
@@ -136,6 +160,7 @@ extension OwnedVariant {
             existing.localThumbnailPath = thumbPath
             existing.epochId = variant.epochId
             existing.setName = variant.setName
+            existing.birthday = critter.birthday
             if status == .collection && existing.photoPath == nil {
                 existing.addedDate = Date()
             }
@@ -149,6 +174,7 @@ extension OwnedVariant {
                 familyId: familyId,
                 familyName: critter.familyName,
                 memberType: critter.memberType,
+                birthday: critter.birthday,
                 epochId: variant.epochId,
                 setName: variant.setName,
                 imageURL: variant.imageUrl,
@@ -183,6 +209,8 @@ extension OwnedVariant {
             for: variantUuid
         )
         
+        print("🎂 Birthday from search: \(searchResult.birthday ?? "nil")")
+        
         if let existing = try? context.fetch(descriptor).first {
             // Update existing
             existing.status = status
@@ -190,7 +218,7 @@ extension OwnedVariant {
             existing.thumbnailURL = searchResult.thumbnailUrl
             existing.localImagePath = imagePath
             existing.localThumbnailPath = thumbPath
-            // Note: epochId/setName not available in search results
+            existing.birthday = searchResult.birthday
             if status == .collection && existing.photoPath == nil {
                 existing.addedDate = Date()
             }
@@ -204,8 +232,9 @@ extension OwnedVariant {
                 familyId: searchResult.familyUuid ?? "",
                 familyName: searchResult.familyName,
                 memberType: searchResult.memberType ?? "unknown",
-                epochId: nil,  // Not available in search results
-                setName: nil,  // Not available in search results
+                birthday: searchResult.birthday,
+                epochId: nil,
+                setName: nil,
                 imageURL: searchResult.imageUrl,
                 thumbnailURL: searchResult.thumbnailUrl,
                 localImagePath: imagePath,
@@ -245,7 +274,7 @@ extension OwnedVariant {
             existing.thumbnailURL = setVariant.thumbnailURL
             existing.localImagePath = imagePath
             existing.localThumbnailPath = thumbPath
-            // Note: epochId/setName would need to be passed from SetInfo
+            existing.birthday = setVariant.critter.birthday
             if status == .collection && existing.photoPath == nil {
                 existing.addedDate = Date()
             }
@@ -261,8 +290,9 @@ extension OwnedVariant {
                 familySpecies: setVariant.critter.family.species,
                 memberType: setVariant.critter.memberType,
                 role: setVariant.critter.role,
-                epochId: nil,  // Would need SetInfo passed in
-                setName: nil,  // Would need SetInfo passed in
+                birthday: setVariant.critter.birthday,
+                epochId: nil,
+                setName: nil,
                 imageURL: setVariant.imageURL,
                 thumbnailURL: setVariant.thumbnailURL,
                 localImagePath: imagePath,

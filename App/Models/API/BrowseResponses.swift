@@ -59,11 +59,12 @@ struct CritterInfo: Codable {
     let uuid: String
     let name: String
     let memberType: String
+    let birthday: String?
     let familyName: String?
     let familyUuid: String?
     
     enum CodingKeys: String, CodingKey {
-        case uuid, name
+        case uuid, name, birthday
         case memberType = "member_type"
         case familyName = "family_name"
         case familyUuid = "family_uuid"
@@ -95,6 +96,7 @@ struct SearchResultResponse: Codable, Identifiable {
     let familyUuid: String?
     let familyName: String?
     let memberType: String?
+    let birthday: String?
     let imageUrl: String?
     let thumbnailUrl: String?
     let setName: String?
@@ -114,6 +116,7 @@ struct SearchResultResponse: Codable, Identifiable {
         case thumbnailUrl = "thumbnail_url"
         case setName = "set_name"
         case releaseYear = "release_year"
+        case birthday = "birthday"
     }
 }
 

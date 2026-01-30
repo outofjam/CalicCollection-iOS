@@ -232,13 +232,18 @@ struct OwnedVariantDetailView: View {
                     InfoRow(label: "Role", value: role)
                 }
                 
-                if let setName = ownedVariant.setName {
-                    InfoRow(label: "Set", value: setName)
+                if let birthday = ownedVariant.formattedBirthday {
+                    InfoRow(label: "Birthday", value: birthday)
                 }
                 
-                if let epochId = ownedVariant.epochId {
+                if let setName = ownedVariant.setName, let epochId = ownedVariant.epochId {
+                    InfoRow(label: "Set", value: "\(setName) (\(epochId))")
+                } else if let setName = ownedVariant.setName {
+                    InfoRow(label: "Set", value: setName)
+                } else if let epochId = ownedVariant.epochId {
                     InfoRow(label: "Set ID", value: epochId)
                 }
+        
                 // Status with date
                 if let status = ownedVariant.status {
                     InfoRow(
