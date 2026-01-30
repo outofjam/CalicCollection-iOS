@@ -28,13 +28,14 @@ struct BrowseCritterResponse: Codable, Identifiable {
     let memberType: String
     let familyUuid: String?
     let familyName: String?
+    let species: String?  // Add
     let variantsCount: Int
     let thumbnailUrl: String?
     
     var id: String { uuid }
     
     enum CodingKeys: String, CodingKey {
-        case uuid, name
+        case uuid, name, species
         case memberType = "member_type"
         case familyUuid = "family_uuid"
         case familyName = "family_name"
@@ -62,9 +63,10 @@ struct CritterInfo: Codable {
     let birthday: String?
     let familyName: String?
     let familyUuid: String?
+    let species: String?  // Add
     
     enum CodingKeys: String, CodingKey {
-        case uuid, name, birthday
+        case uuid, name, birthday, species
         case memberType = "member_type"
         case familyName = "family_name"
         case familyUuid = "family_uuid"
@@ -95,6 +97,7 @@ struct SearchResultResponse: Codable, Identifiable {
     let critterName: String?
     let familyUuid: String?
     let familyName: String?
+    let species: String?  // Add
     let memberType: String?
     let birthday: String?
     let imageUrl: String?
@@ -111,12 +114,13 @@ struct SearchResultResponse: Codable, Identifiable {
         case critterName = "critter_name"
         case familyUuid = "family_uuid"
         case familyName = "family_name"
+        case species
         case memberType = "member_type"
         case imageUrl = "image_url"
         case thumbnailUrl = "thumbnail_url"
         case setName = "set_name"
         case releaseYear = "release_year"
-        case birthday = "birthday"
+        case birthday
     }
 }
 
@@ -155,13 +159,14 @@ struct FamilyDetailCritter: Codable, Identifiable {
     let uuid: String
     let name: String
     let memberType: String
+    let species: String?  // Add
     let variantsCount: Int
     let thumbnailUrl: String?
     
     var id: String { uuid }
     
     enum CodingKeys: String, CodingKey {
-        case uuid, name
+        case uuid, name, species
         case memberType = "member_type"
         case variantsCount = "variants_count"
         case thumbnailUrl = "thumbnail_url"

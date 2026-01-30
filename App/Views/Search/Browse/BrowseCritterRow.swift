@@ -96,6 +96,7 @@ struct BrowseCritterRow: View {
                 memberType: "girl",
                 familyUuid: "1",
                 familyName: "Chocolate Rabbit",
+                species: "Rabbit",
                 variantsCount: 3,
                 thumbnailUrl: nil
             ),
@@ -110,6 +111,7 @@ struct BrowseCritterRow: View {
                 memberType: "mother",
                 familyUuid: "1",
                 familyName: "Chocolate Rabbit",
+                species: "Rabbit",
                 variantsCount: 2,
                 thumbnailUrl: nil
             ),
@@ -124,6 +126,7 @@ struct BrowseCritterRow: View {
                 memberType: "father",
                 familyUuid: "1",
                 familyName: "Chocolate Rabbit",
+                species: "Rabbit",
                 variantsCount: 2,
                 thumbnailUrl: nil
             ),

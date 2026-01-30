@@ -222,20 +222,20 @@ struct OwnedVariantDetailView: View {
         VStack(spacing: 0) {
             // Info rows
             VStack(alignment: .leading, spacing: LottaPawsTheme.spacingMD) {
-                if let familyName = ownedVariant.familyName {
-                    InfoRow(label: "Family", value: familyName)
-                }
-                
-                InfoRow(label: "Member Type", value: ownedVariant.memberType.capitalized)
-                
+//                if let familyName = ownedVariant.familyName {
+//                    InfoRow(label: "Family", value: familyName)
+//                }
+//                
+//                InfoRow(label: "Member Type", value: ownedVariant.memberType.capitalized)
+//                
                 if let role = ownedVariant.role {
                     InfoRow(label: "Role", value: role)
                 }
                 
-                if let birthday = ownedVariant.formattedBirthday {
-                    InfoRow(label: "Birthday", value: birthday)
-                }
-                
+//                if let birthday = ownedVariant.formattedBirthday {
+//                    InfoRow(label: "Birthday", value: birthday)
+//                }
+//                
                 if let setName = ownedVariant.setName, let epochId = ownedVariant.epochId {
                     InfoRow(label: "Set", value: "\(setName) (\(epochId))")
                 } else if let setName = ownedVariant.setName {

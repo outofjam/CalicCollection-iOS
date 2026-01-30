@@ -289,7 +289,8 @@ struct VariantDetailView: View {
             memberType: "kids",
             birthday: "0101",
             familyName: "Husky Family",
-            familyUuid: "de7237f6-7f2e-4dc1-959b-a5dc02bb677c"
+            familyUuid: "de7237f6-7f2e-4dc1-959b-a5dc02bb677c",
+            species: "Dog"
         ),
         familyUuid: "family-1"
     )

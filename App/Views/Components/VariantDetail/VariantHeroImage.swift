@@ -12,33 +12,34 @@ struct VariantHeroImage: View {
     let localImagePath: String?
     let remoteImageURL: String?
     let title: String
-    let subtitle: String
-    let caption: String?
+    let memberType: String
+    let birthday: String?
+    let species: String?
     let onExpandTap: () -> Void
     
     private let heroHeight: CGFloat = 300
     
     var body: some View {
         GeometryReader { geometry in
-            ZStack(alignment: .bottomLeading) {
+            ZStack(alignment: .bottom) {
                 // Image layer (local → remote → placeholder)
                 imageLayer(width: geometry.size.width)
                 
                 // Gradient overlay
                 LinearGradient(
-                    colors: [.clear, .black.opacity(0.7)],
+                    colors: [.clear, .clear, .black.opacity(0.8)],
                     startPoint: .top,
                     endPoint: .bottom
                 )
                 .frame(height: heroHeight)
                 
-                // Expand button (bottom-right)
+                // Expand button (top-right, moved up so it doesn't compete with card)
                 if hasImage {
                     expandButton
                 }
                 
-                // Text overlay (bottom-left)
-                textOverlay
+                // Trading card overlay
+                tradingCardOverlay
             }
         }
         .frame(height: heroHeight)
@@ -83,6 +84,7 @@ struct VariantHeroImage: View {
             Spacer()
             HStack {
                 Spacer()
+
                 Button {
                     onExpandTap()
                 } label: {
@@ -95,27 +97,37 @@ struct VariantHeroImage: View {
                 }
                 .padding(LottaPawsTheme.spacingMD)
             }
+//            Spacer()
         }
         .frame(height: heroHeight)
     }
     
-    private var textOverlay: some View {
-        VStack(alignment: .leading, spacing: LottaPawsTheme.spacingXS) {
+    private var tradingCardOverlay: some View {
+        VStack(alignment: .leading, spacing: LottaPawsTheme.spacingSM) {
+            // Name - the star of the show
             Text(title)
-                .font(.system(size: 28, weight: .bold))
+                .font(.system(size: 26, weight: .bold))
                 .foregroundColor(.white)
             
-            Text(subtitle)
-                .font(.subheadline)
-                .foregroundColor(.white.opacity(0.9))
-            
-            if let caption = caption {
-                Text(caption)
-                    .font(.caption)
-                    .foregroundColor(.white.opacity(0.8))
+            // Metadata pills
+            HStack(spacing: LottaPawsTheme.spacingSM) {
+                // Species + Member Type pill
+                MetadataPill(
+                    emoji: speciesEmoji,
+                    text: memberType.capitalized
+                )
+                
+                // Birthday pill (if available)
+                if let birthday = birthday {
+                    MetadataPill(
+                        emoji: "🎂",
+                        text: birthday
+                    )
+                }
             }
         }
-        .padding(LottaPawsTheme.spacingXL)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(LottaPawsTheme.spacingLG)
     }
     
     private var gradientPlaceholder: some View {
@@ -134,11 +146,73 @@ struct VariantHeroImage: View {
     private var hasImage: Bool {
         localImagePath != nil || remoteImageURL != nil
     }
+    
+    private var speciesEmoji: String {
+        guard let species = species?.lowercased() else { return "🐾" }
+        
+        switch species {
+        case "rabbit": return "🐰"
+        case "cat": return "🐱"
+        case "dog": return "🐶"
+        case "bear": return "🐻"
+        case "squirrel": return "🐿️"
+        case "mouse": return "🐭"
+        case "elephant": return "🐘"
+        case "deer": return "🦌"
+        case "fox": return "🦊"
+        case "hedgehog": return "🦔"
+        case "koala": return "🐨"
+        case "monkey": return "🐵"
+        case "otter": return "🦦"
+        case "owl": return "🦉"
+        case "panda": return "🐼"
+        case "penguin": return "🐧"
+        case "pig": return "🐷"
+        case "sheep", "lamb": return "🐑"
+        case "kangaroo": return "🦘"
+        case "lion": return "🦁"
+        case "tiger": return "🐯"
+        case "wolf": return "🐺"
+        case "beaver": return "🦫"
+        case "hamster": return "🐹"
+        case "raccoon": return "🦝"
+        case "skunk": return "🦨"
+        case "chipmunk": return "🐿️"
+        case "duck": return "🦆"
+        case "goat": return "🐐"
+        case "cow": return "🐮"
+        case "horse": return "🐴"
+        case "frog": return "🐸"
+        default: return "🐾"
+        }
+    }
+}
+
+// MARK: - Metadata Pill
+
+private struct MetadataPill: View {
+    let emoji: String
+    let text: String
+    
+    var body: some View {
+        HStack(spacing: 4) {
+            Text(emoji)
+                .font(.system(size: 14))
+            Text(text)
+                .font(.system(size: 13, weight: .medium))
+        }
+        .foregroundColor(.white)
+        .padding(.horizontal, LottaPawsTheme.spacingSM)
+        .padding(.vertical, LottaPawsTheme.spacingXS)
+        .background(Color.white.opacity(0.2))
+        .clipShape(Capsule())
+    }
 }
 
 // MARK: - Convenience Initializers
 
 extension VariantHeroImage {
+    /// Initialize from API response (VariantResponse + CritterInfo)
     /// Initialize from API response (VariantResponse + CritterInfo)
     init(
         variant: VariantResponse,
@@ -148,17 +222,9 @@ extension VariantHeroImage {
         self.localImagePath = nil
         self.remoteImageURL = variant.imageUrl
         self.title = critter.name
-        self.subtitle = variant.name
-        
-        // Build caption from epoch/set info
-        if let epochId = variant.epochId, let setName = variant.setName {
-            self.caption = "Set \(epochId) • \(setName)"
-        } else if let epochId = variant.epochId {
-            self.caption = "Set \(epochId)"
-        } else {
-            self.caption = nil
-        }
-        
+        self.memberType = critter.memberType
+        self.birthday = critter.birthday
+        self.species = critter.species
         self.onExpandTap = onExpandTap
     }
     
@@ -170,28 +236,21 @@ extension VariantHeroImage {
         self.localImagePath = ownedVariant.localImagePath
         self.remoteImageURL = ownedVariant.imageURL
         self.title = ownedVariant.critterName
-        self.subtitle = ownedVariant.variantName
-        
-        // Build caption from epoch/set info (same logic as API variant)
-        if let epochId = ownedVariant.epochId, let setName = ownedVariant.setName {
-            self.caption = "Set \(epochId) • \(setName)"
-        } else if let epochId = ownedVariant.epochId {
-            self.caption = "Set \(epochId)"
-        } else {
-            self.caption = ownedVariant.familyName
-        }
-        
+        self.memberType = ownedVariant.memberType
+        self.birthday = ownedVariant.formattedBirthday
+        self.species = ownedVariant.familySpecies
         self.onExpandTap = onExpandTap
     }
 }
 
-#Preview("With Remote Image") {
+#Preview("With Metadata") {
     VariantHeroImage(
         localImagePath: nil,
         remoteImageURL: "https://example.com/image.jpg",
-        title: "Stella Hopscotch",
-        subtitle: "Original Release",
-        caption: "Chocolate Rabbit Family",
+        title: "Flora Rabbit",
+        memberType: "Babies",
+        birthday: "December 3",
+        species: "rabbit",
         onExpandTap: {}
     )
 }
@@ -200,9 +259,10 @@ extension VariantHeroImage {
     VariantHeroImage(
         localImagePath: nil,
         remoteImageURL: nil,
-        title: "Stella Hopscotch",
-        subtitle: "Original Release",
-        caption: nil,
+        title: "Flora Rabbit",
+        memberType: "Babies",
+        birthday: nil,
+        species: nil,
         onExpandTap: {}
     )
 }

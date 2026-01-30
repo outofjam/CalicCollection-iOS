@@ -18,7 +18,7 @@ struct InfoRow: View {
                 .foregroundColor(.textSecondary)
             Spacer()
             Text(value)
-                .font(.body)
+                .font(.subheadline)
                 .foregroundColor(.textPrimary)
         }
     }
