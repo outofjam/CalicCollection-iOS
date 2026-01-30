@@ -170,4 +170,36 @@ class BrowseService {
             throw error
         }
     }
+    
+    // MARK: - Sets
+    
+    /// Fetch all sets with their variants (for set completion tracking)
+    func fetchSets() async throws -> [SetBrowseResponse] {
+        let urlString = "\(baseURL)/sets"
+        
+        guard let url = URL(string: urlString) else {
+            throw APIError.invalidURL
+        }
+        
+        AppLogger.networkRequest(urlString)
+        
+        var request = URLRequest(url: url)
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        
+        let (data, response) = try await NetworkConfig.performRequest(request)
+        
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw APIError.invalidResponse
+        }
+        
+        AppLogger.networkResponse(status: httpResponse.statusCode, url: urlString)
+        
+        guard httpResponse.statusCode == 200 else {
+            throw APIError.httpError(statusCode: httpResponse.statusCode)
+        }
+        
+        let decoder = JSONDecoder()
+        let apiResponse = try decoder.decode(SetsAPIResponse.self, from: data)
+        return apiResponse.data
+    }
 }

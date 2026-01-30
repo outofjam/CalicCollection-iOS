@@ -225,3 +225,41 @@ struct FamilyDetailAPIResponse: Codable {
     let data: FamilyDetailResponse
     let meta: ResponseMeta?
 }
+
+// MARK: - Sets
+
+struct SetsAPIResponse: Codable {
+    let data: [SetBrowseResponse]
+}
+
+struct SetBrowseResponse: Codable, Identifiable {
+    let uuid: String
+    let epochId: String?
+    let name: String
+    let releaseYear: Int?
+    let barcode: String?
+    let variantCount: Int
+    let variants: [SetVariantInfo]
+    
+    var id: String { uuid }
+    
+    enum CodingKeys: String, CodingKey {
+        case uuid, name, barcode, variants
+        case epochId = "epoch_id"
+        case releaseYear = "release_year"
+        case variantCount = "variant_count"
+    }
+}
+
+struct SetVariantInfo: Codable, Identifiable {
+    let uuid: String
+    let name: String
+    let thumbnailUrl: String?
+    
+    var id: String { uuid }
+    
+    enum CodingKeys: String, CodingKey {
+        case uuid, name
+        case thumbnailUrl = "thumbnail_url"
+    }
+}
