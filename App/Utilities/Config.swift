@@ -6,14 +6,13 @@ struct Config {
     
     /// Base API URL
     static var apiBaseURL: String {
-#if DEBUG
+    #if DEBUG
         // Development URL
-        return "https://calicoprod.thetechnodro.me/api/v1"
-        //return "http://callicollection.test/api/v1"
-#else
+        return "https://api.lottapaws.app/api/v1"
+    #else
         // Production URL
-        return "https://api.callicollection.com/api/v1"
-#endif
+        return "https://api.lottapaws.app/api/v1"
+    #endif
     }
     
     // MARK: - URLs
@@ -21,9 +20,9 @@ struct Config {
     static let buyMeCoffeeURL = URL(string: "https://ko-fi.com/outofjam")!
     
     // MARK: - App Information
-    
-    static let appName = "CaliCollection"
-    static let appVersion = "2.6a"
+
+    static let appName = "LottaPaws"
+    static let appVersion = "2.7a"
     
     // MARK: - Sync Settings
     
