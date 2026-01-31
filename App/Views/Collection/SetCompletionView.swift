@@ -50,11 +50,21 @@ struct SetCompletionView: View {
                         .padding(.top, 100)
                 } else if let error = errorMessage {
                     errorView(error)
-                } else if setCompletions.isEmpty {
-                    emptyView
                 } else {
-                    statsContent
-                }
+                                    // Check if we have ANY started sets (ignoring the filter)
+                                    let hasAnyStartedSets = sets.contains { set in
+                                        let ownedUuids = Set(ownedVariants.map { $0.variantUuid })
+                                        return set.variants.contains { ownedUuids.contains($0.uuid) }
+                                    }
+                                    
+                                    if !hasAnyStartedSets {
+                                        emptyView
+                                    } else if setCompletions.isEmpty && showIncompleteOnly {
+                                        filteredEmptyView
+                                    } else {
+                                        statsContent
+                                    }
+                                }
             }
             .padding(LottaPawsTheme.spacingLG)
         }
@@ -79,6 +89,31 @@ struct SetCompletionView: View {
         }
         .padding(.top, 100)
     }
+    
+    private var filteredEmptyView: some View {
+            VStack(spacing: LottaPawsTheme.spacingLG) {
+                Toggle("Show incomplete only", isOn: $showIncompleteOnly)
+                    .padding(.horizontal, LottaPawsTheme.spacingXS)
+                    .tint(.primaryPink)
+                
+                LPDivider()
+                
+                VStack(spacing: LottaPawsTheme.spacingMD) {
+                    Image(systemName: "checkmark.seal.fill")
+                        .font(.system(size: 50))
+                        .foregroundStyle(LinearGradient.lottaGradient)
+                    Text("All sets complete!")
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .foregroundColor(.textPrimary)
+                    Text("Turn off the filter to see your completed sets")
+                        .font(.subheadline)
+                        .foregroundColor(.textSecondary)
+                        .multilineTextAlignment(.center)
+                }
+                .padding(.top, 60)
+            }
+        }
     
     private var emptyView: some View {
         VStack(spacing: LottaPawsTheme.spacingMD) {
