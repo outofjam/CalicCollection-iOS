@@ -55,6 +55,7 @@
 		937B9F8E2F202A1000C08885 /* FirstSyncView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937B9F8D2F202A0E00C08885 /* FirstSyncView.swift */; };
 		937B9F902F202B7400C08885 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937B9F8F2F202B6800C08885 /* Config.swift */; };
 		93A81A082F2D2B8E00B457FC /* SetCompletionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A81A072F2D2B8E00B457FC /* SetCompletionView.swift */; };
+		93A81A362F2D7CF000B457FC /* CollectionBadgeStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A81A352F2D7CF000B457FC /* CollectionBadgeStyle.swift */; };
 		93ADCD182F29271600351CE9 /* BottomActionBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93ADCD172F29271600351CE9 /* BottomActionBar.swift */; };
 		93ADCD1A2F29272300351CE9 /* FullscreenImageViewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93ADCD192F29272300351CE9 /* FullscreenImageViewer.swift */; };
 		93ADCD1C2F29275D00351CE9 /* InfoRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93ADCD1B2F29275D00351CE9 /* InfoRow.swift */; };
@@ -155,6 +156,7 @@
 		937B9F8F2F202B6800C08885 /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
 		937B9F912F202C8400C08885 /* info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = info.plist; sourceTree = "<group>"; };
 		93A81A072F2D2B8E00B457FC /* SetCompletionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetCompletionView.swift; sourceTree = "<group>"; };
+		93A81A352F2D7CF000B457FC /* CollectionBadgeStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionBadgeStyle.swift; sourceTree = "<group>"; };
 		93ADCD172F29271600351CE9 /* BottomActionBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomActionBar.swift; sourceTree = "<group>"; };
 		93ADCD192F29272300351CE9 /* FullscreenImageViewer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullscreenImageViewer.swift; sourceTree = "<group>"; };
 		93ADCD1B2F29275D00351CE9 /* InfoRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoRow.swift; sourceTree = "<group>"; };
@@ -388,6 +390,7 @@
 		937B9F6D2F20240500C08885 /* Domain */ = {
 			isa = PBXGroup;
 			children = (
+				93A81A352F2D7CF000B457FC /* CollectionBadgeStyle.swift */,
 				937B9F812F20254800C08885 /* CritterStatus.swift */,
 				931E2F3C2F2AB07200F1EA33 /* Family.swift */,
 				931E2F392F2AB04F00F1EA33 /* OwnedVariant.swift */,
@@ -659,6 +662,7 @@
 				931E2FC12F2BB4DB00F1EA33 /* LottaPawsBadges.swift in Sources */,
 				931E2FC22F2BB4DB00F1EA33 /* LottaPawsColors.swift in Sources */,
 				931E2FC32F2BB4DB00F1EA33 /* LottaPawsLoading.swift in Sources */,
+				93A81A362F2D7CF000B457FC /* CollectionBadgeStyle.swift in Sources */,
 				931E2FC42F2BB4DB00F1EA33 /* LottaPawsButtons.swift in Sources */,
 				931E2FC52F2BB4DB00F1EA33 /* LottaPawsText.swift in Sources */,
 				931E30522F2BE80A00F1EA33 /* ReportIssueSheet.swift in Sources */,

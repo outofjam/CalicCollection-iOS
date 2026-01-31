@@ -44,6 +44,22 @@ struct SettingsView: View {
                         }
                     }
                     .tint(.primaryPink)
+                    
+                    Picker(selection: $appSettings.collectionBadgeStyle) {
+                        ForEach(CollectionBadgeStyle.allCases, id: \.self) { style in
+                            Text(style.displayName).tag(style)
+                        }
+                    } label: {
+                        VStack(alignment: .leading, spacing: LottaPawsTheme.spacingXS) {
+                            Text("Collection Badge")
+                                .font(.body)
+                                .foregroundColor(.textPrimary)
+                            Text("Show count on Collection tab")
+                                .font(.caption)
+                                .foregroundColor(.textSecondary)
+                        }
+                    }
+                    .tint(.primaryPink)
                 } header: {
                     Text("Preferences")
                 } footer: {

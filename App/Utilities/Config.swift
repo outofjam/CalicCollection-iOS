@@ -20,7 +20,6 @@ struct Config {
     static let buyMeCoffeeURL = URL(string: "https://ko-fi.com/outofjam")!
     
     // MARK: - App Information
-
     static let appName = "LottaPaws"
     static let appVersion = "2.7a"
     
@@ -38,6 +37,7 @@ struct Config {
         static let lastBackupDate = "lastBackupDate"
         static let deviceId = "deviceId"
         static let showConfetti = "showConfetti"
+        static let collectionBadgeStyle = "collectionBadgeStyle"
     }
     
     // MARK: - Device Identifier

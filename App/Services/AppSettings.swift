@@ -16,6 +16,12 @@ class AppSettings: ObservableObject {
         }
     }
     
+    @Published var collectionBadgeStyle: CollectionBadgeStyle {
+        didSet {
+            UserDefaults.standard.set(collectionBadgeStyle.rawValue, forKey: Config.UserDefaultsKeys.collectionBadgeStyle)
+        }
+    }
+    
     var lastBackupDate: Date? {
         get {
             UserDefaults.standard.object(forKey: Config.UserDefaultsKeys.lastBackupDate) as? Date
@@ -38,5 +44,8 @@ class AppSettings: ObservableObject {
         self.showPurchaseDetails = UserDefaults.standard.bool(forKey: Config.UserDefaultsKeys.showPurchaseDetails)
         // Default to true for confetti (fun by default!)
         self.showConfetti = UserDefaults.standard.object(forKey: Config.UserDefaultsKeys.showConfetti) as? Bool ?? true
+        // Default to off for badge
+        let badgeRaw = UserDefaults.standard.string(forKey: Config.UserDefaultsKeys.collectionBadgeStyle) ?? "off"
+        self.collectionBadgeStyle = CollectionBadgeStyle(rawValue: badgeRaw) ?? .off
     }
 }

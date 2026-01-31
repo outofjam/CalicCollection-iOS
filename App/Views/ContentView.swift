@@ -11,6 +11,21 @@ import SwiftData
 struct ContentView: View {
     @State private var searchText = ""
     @AppStorage(Config.UserDefaultsKeys.hasCompletedFirstSync) private var hasCompletedFirstSync = false
+    @ObservedObject private var appSettings = AppSettings.shared
+    
+    @Query(filter: #Predicate<OwnedVariant> { $0.statusRaw == "collection" })
+    private var collectionVariants: [OwnedVariant]
+    
+    private var collectionBadgeCount: Int {
+        switch appSettings.collectionBadgeStyle {
+        case .off:
+            return 0
+        case .critters:
+            return Set(collectionVariants.map { $0.critterUuid }).count
+        case .variants:
+            return collectionVariants.count
+        }
+    }
     
     init() {
         // Configure app-wide appearance on first init
@@ -29,6 +44,7 @@ struct ContentView: View {
                             CollectionView()
                         }
                     }
+                    .badge(collectionBadgeCount)
                     
                     Tab("Wishlist", systemImage: "heart") {
                         NavigationStack {
