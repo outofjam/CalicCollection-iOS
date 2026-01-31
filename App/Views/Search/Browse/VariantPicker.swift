@@ -271,6 +271,14 @@ struct VariantPickerSheet: View {
             }
             
             ToastManager.shared.show("✓ Added \(addedCount) to \(statusName)", type: .success)
+            
+            // Check for birthday match (only for collection, not wishlist)
+            if targetStatus == .collection {
+                BirthdayMatchManager.shared.checkAndCelebrate(
+                    critterName: critter.name,
+                    critterBirthday: critter.birthday
+                )
+            }
         } else if removedCount > 0 {
             let generator = UINotificationFeedbackGenerator()
             generator.notificationOccurred(.warning)

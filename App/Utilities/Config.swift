@@ -38,6 +38,7 @@ struct Config {
         static let deviceId = "deviceId"
         static let showConfetti = "showConfetti"
         static let collectionBadgeStyle = "collectionBadgeStyle"
+        static let userBirthday = "userBirthday"
     }
     
     // MARK: - Device Identifier

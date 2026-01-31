@@ -12,6 +12,7 @@ struct SettingsView: View {
     @ObservedObject private var appSettings = AppSettings.shared
     
     @State private var showingSyncConfirmation = false
+    @State private var showingBirthdayPicker = false
     @State private var refreshID = UUID()
     @State private var apiStats: APIStats?
     @State private var isLoadingStats = false
@@ -60,6 +61,39 @@ struct SettingsView: View {
                         }
                     }
                     .tint(.primaryPink)
+                    
+                    // Birthday row
+                    Button {
+                        showingBirthdayPicker = true
+                    } label: {
+                        HStack {
+                            VStack(alignment: .leading, spacing: LottaPawsTheme.spacingXS) {
+                                Text("Your Birthday")
+                                    .font(.body)
+                                    .foregroundColor(.textPrimary)
+                                Text("Find critters who share your birthday")
+                                    .font(.caption)
+                                    .foregroundColor(.textSecondary)
+                            }
+                            
+                            Spacer()
+                            
+                            if let display = appSettings.userBirthdayDisplay {
+                                Text(display)
+                                    .font(.subheadline)
+                                    .foregroundColor(.primaryPink)
+                            } else {
+                                Text("Not set")
+                                    .font(.subheadline)
+                                    .foregroundColor(.textTertiary)
+                            }
+                            
+                            Image(systemName: "chevron.right")
+                                .font(.caption)
+                                .foregroundColor(.textTertiary)
+                        }
+                    }
+                    .buttonStyle(.plain)
                 } header: {
                     Text("Preferences")
                 } footer: {
@@ -205,6 +239,9 @@ struct SettingsView: View {
             } message: {
                 Text("This will refresh family data from the server.")
             }
+            .sheet(isPresented: $showingBirthdayPicker) {
+                BirthdayPickerSheet()
+            }
         }
         .tint(.primaryPink)
     }
@@ -221,6 +258,136 @@ struct SettingsView: View {
         }
         
         isLoadingStats = false
+    }
+}
+
+// MARK: - Birthday Picker Sheet
+
+struct BirthdayPickerSheet: View {
+    @Environment(\.dismiss) private var dismiss
+    @ObservedObject private var appSettings = AppSettings.shared
+    
+    @State private var selectedMonth: Int
+    @State private var selectedDay: Int
+    
+    private let months = [
+        (1, "January"), (2, "February"), (3, "March"), (4, "April"),
+        (5, "May"), (6, "June"), (7, "July"), (8, "August"),
+        (9, "September"), (10, "October"), (11, "November"), (12, "December")
+    ]
+    
+    private var daysInMonth: Int {
+        switch selectedMonth {
+        case 2: return 29
+        case 4, 6, 9, 11: return 30
+        default: return 31
+        }
+    }
+    
+    init() {
+        // Initialize with current birthday or defaults
+        if let birthday = AppSettings.shared.userBirthday {
+            let parts = birthday.split(separator: "-")
+            if parts.count == 2,
+               let month = Int(parts[0]),
+               let day = Int(parts[1]) {
+                _selectedMonth = State(initialValue: month)
+                _selectedDay = State(initialValue: day)
+            } else {
+                _selectedMonth = State(initialValue: 1)
+                _selectedDay = State(initialValue: 1)
+            }
+        } else {
+            _selectedMonth = State(initialValue: 1)
+            _selectedDay = State(initialValue: 1)
+        }
+    }
+    
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: LottaPawsTheme.spacingXL) {
+                VStack(spacing: LottaPawsTheme.spacingSM) {
+                    Image(systemName: "birthday.cake.fill")
+                        .font(.system(size: 48))
+                        .foregroundColor(.primaryPink)
+                    
+                    Text("Your Birthday")
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .foregroundColor(.textPrimary)
+                    
+                    Text("Find critters who share your special day! 🎂")
+                        .font(.subheadline)
+                        .foregroundColor(.textSecondary)
+                        .multilineTextAlignment(.center)
+                }
+                .padding(.top, LottaPawsTheme.spacingXL)
+                
+                // Month and Day pickers
+                HStack(spacing: LottaPawsTheme.spacingMD) {
+                    Picker("Month", selection: $selectedMonth) {
+                        ForEach(months, id: \.0) { month in
+                            Text(month.1).tag(month.0)
+                        }
+                    }
+                    .pickerStyle(.wheel)
+                    .frame(width: 150, height: 150)
+                    .clipped()
+                    
+                    Picker("Day", selection: $selectedDay) {
+                        ForEach(1...daysInMonth, id: \.self) { day in
+                            Text("\(day)").tag(day)
+                        }
+                    }
+                    .pickerStyle(.wheel)
+                    .frame(width: 80, height: 150)
+                    .clipped()
+                }
+                .onChange(of: selectedMonth) { _, _ in
+                    if selectedDay > daysInMonth {
+                        selectedDay = daysInMonth
+                    }
+                }
+                
+                Spacer()
+                
+                // Action buttons
+                VStack(spacing: LottaPawsTheme.spacingMD) {
+                    Button("Save Birthday") {
+                        saveBirthday()
+                    }
+                    .buttonStyle(.primary)
+                    
+                    if appSettings.userBirthday != nil {
+                        Button("Remove Birthday") {
+                            appSettings.userBirthday = nil
+                            dismiss()
+                        }
+                        .font(.subheadline)
+                        .foregroundColor(.errorRed)
+                    }
+                }
+                .padding(.bottom, LottaPawsTheme.spacingLG)
+            }
+            .padding(LottaPawsTheme.spacingLG)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                    .foregroundColor(.textSecondary)
+                }
+            }
+        }
+        .presentationDetents([.medium])
+        .presentationDragIndicator(.visible)
+    }
+    
+    private func saveBirthday() {
+        let birthday = AppSettings.formatBirthdayForStorage(month: selectedMonth, day: selectedDay)
+        appSettings.userBirthday = birthday
+        dismiss()
     }
 }
 

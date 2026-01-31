@@ -66,6 +66,7 @@ struct ContentView: View {
             }
         }
         .confetti()
+        .birthdayMatch()
         .toast()
         .lottaPawsStyle()
     }

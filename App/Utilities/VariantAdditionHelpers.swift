@@ -11,12 +11,14 @@ import SwiftData
 struct VariantAdditionHelpers {
     
     /// Add a single variant directly (when critter has only 1 variant)
+    /// Returns the critter info for birthday checking
+    @discardableResult
     static func addSingleVariant(
         critterUuid: String,
         status: CritterStatus,
         modelContext: ModelContext,
         ownedVariants: [OwnedVariant]
-    ) async throws {
+    ) async throws -> CritterInfo {
         let response = try await BrowseService.shared.fetchCritterVariants(critterUuid: critterUuid)
         
         guard let variant = response.variants.first else {
@@ -57,6 +59,18 @@ struct VariantAdditionHelpers {
         if status == .collection && AppSettings.shared.showConfetti {
             ConfettiManager.shared.trigger()
         }
+        
+        // Check for birthday match (only for collection, not wishlist)
+        if status == .collection {
+            await MainActor.run {
+                BirthdayMatchManager.shared.checkAndCelebrate(
+                    critterName: response.critter.name,
+                    critterBirthday: response.critter.birthday
+                )
+            }
+        }
+        
+        return response.critter
     }
 }
 
